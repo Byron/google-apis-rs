@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Instances Create - AI Platform Notebooks v2.0.0+20210305</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AI Platform Notebooks v2.0.0+20210305</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-environments-create">Locations Environments Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-environments-delete">Locations Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-environments-get">Locations Environments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-environments-list">Locations Environments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-executions-create">Locations Executions Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-executions-delete">Locations Executions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-executions-get">Locations Executions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-executions-list">Locations Executions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Instances Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-delete">Locations Instances Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-get">Locations Instances Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-get-iam-policy">Locations Instances Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-get-instance-health">Locations Instances Get Instance Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-is-upgradeable">Locations Instances Is Upgradeable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-list">Locations Instances List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-register">Locations Instances Register</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-report">Locations Instances Report</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-reset">Locations Instances Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-set-accelerator">Locations Instances Set Accelerator</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-set-iam-policy">Locations Instances Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-set-labels">Locations Instances Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-set-machine-type">Locations Instances Set Machine Type</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-start">Locations Instances Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-stop">Locations Instances Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-test-iam-permissions">Locations Instances Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-upgrade">Locations Instances Upgrade</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-instances-upgrade-internal">Locations Instances Upgrade Internal</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-schedules-create">Locations Schedules Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-schedules-delete">Locations Schedules Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-schedules-get">Locations Schedules Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-schedules-list">Locations Schedules List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-schedules-trigger">Locations Schedules Trigger</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Instances Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/notebooks1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a new Instance in a given project and location.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>notebooks1 --scope &lt;scope&gt; projects locations-instances-create ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. Format: <code>parent=projects/{project_id}/locations/{location}</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Instance:
+  accelerator-config:
+    core-count: int64
+    type: string
+  boot-disk-size-gb: string
+  boot-disk-type: string
+  container-image:
+    repository: string
+    tag: string
+  create-time: string
+  custom-gpu-driver-path: string
+  data-disk-size-gb: string
+  data-disk-type: string
+  disk-encryption: string
+  install-gpu-driver: boolean
+  instance-owners: [string]
+  kms-key: string
+  labels: { string: string }
+  machine-type: string
+  metadata: { string: string }
+  name: string
+  network: string
+  no-proxy-access: boolean
+  no-public-ip: boolean
+  no-remove-data-disk: boolean
+  post-startup-script: string
+  proxy-uri: string
+  service-account: string
+  service-account-scopes: [string]
+  shielded-instance-config:
+    enable-integrity-monitoring: boolean
+    enable-secure-boot: boolean
+    enable-vtpm: boolean
+  state: string
+  subnet: string
+  tags: [string]
+  update-time: string
+  vm-image:
+    image-family: string
+    image-name: string
+    project: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .accelerator-config    core-count=-16</code><ul>
+<li>Count of cores of this accelerator.</li>
+</ul>
+</li>
+<li>
+<p><code>type=est</code></p>
+<ul>
+<li>Type of this accelerator.</li>
+</ul>
+</li>
+<li>
+<p><code>..    boot-disk-size-gb=ipsum</code></p>
+<ul>
+<li>Input only. The size of the boot disk in GB attached to this instance, up to a maximum of 64000 GB (64 TB). The minimum recommended value is 100 GB. If not specified, this defaults to 100.</li>
+</ul>
+</li>
+<li><code>boot-disk-type=ipsum</code><ul>
+<li>Input only. The type of the boot disk attached to this instance, defaults to standard persistent disk (<code>PD_STANDARD</code>).</li>
+</ul>
+</li>
+<li><code>container-image    repository=est</code><ul>
+<li>Required. The path to the container image repository. For example: <code>gcr.io/{project_id}/{image_name}</code></li>
+</ul>
+</li>
+<li>
+<p><code>tag=gubergren</code></p>
+<ul>
+<li>The tag of the container image. If not specified, this defaults to the latest tag.</li>
+</ul>
+</li>
+<li>
+<p><code>..    create-time=ea</code></p>
+<ul>
+<li>Output only. Instance creation time.</li>
+</ul>
+</li>
+<li><code>custom-gpu-driver-path=dolor</code><ul>
+<li>Specify a custom Cloud Storage path where the GPU driver is stored. If not specified, we&#39;ll automatically choose from official GPU drivers.</li>
+</ul>
+</li>
+<li><code>data-disk-size-gb=lorem</code><ul>
+<li>Input only. The size of the data disk in GB attached to this instance, up to a maximum of 64000 GB (64 TB). You can choose the size of the data disk based on how big your notebooks and data are. If not specified, this defaults to 100.</li>
+</ul>
+</li>
+<li><code>data-disk-type=eos</code><ul>
+<li>Input only. The type of the data disk attached to this instance, defaults to standard persistent disk (<code>PD_STANDARD</code>).</li>
+</ul>
+</li>
+<li><code>disk-encryption=labore</code><ul>
+<li>Input only. Disk encryption method used on the boot and data disks, defaults to GMEK.</li>
+</ul>
+</li>
+<li><code>install-gpu-driver=true</code><ul>
+<li>Whether the end user authorizes Google Cloud to install GPU driver on this instance. If this field is empty or set to false, the GPU driver won&#39;t be installed. Only applicable to instances with GPUs.</li>
+</ul>
+</li>
+<li><code>instance-owners=duo</code><ul>
+<li>Input only. The owner of this instance after creation. Format: <code>alias@example.com</code> Currently supports one owner only. If not specified, all of the service account users of your VM instance&#39;s service account can use the instance.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>kms-key=sed</code><ul>
+<li>Input only. The KMS key used to encrypt the disks, only applicable if disk_encryption is CMEK. Format: <code>projects/{project_id}/locations/{location}/keyRings/{key_ring_id}/cryptoKeys/{key_id}</code> Learn more about <a href="..//kms/docs/quickstart">using your own encryption keys</a>.</li>
+</ul>
+</li>
+<li><code>labels=key=no</code><ul>
+<li>Labels to apply to this instance. These can be later modified by the setLabels method.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>machine-type=stet</code><ul>
+<li>Required. The <a href="..//compute/docs/machine-types">Compute Engine machine type</a> of this instance.</li>
+</ul>
+</li>
+<li><code>metadata=key=kasd</code><ul>
+<li>Custom metadata to apply to this instance.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>name=et</code><ul>
+<li>Output only. The name of this notebook instance. Format: <code>projects/{project_id}/locations/{location}/instances/{instance_id}</code></li>
+</ul>
+</li>
+<li><code>network=sed</code><ul>
+<li>The name of the VPC that this instance is in. Format: <code>projects/{project_id}/global/networks/{network_id}</code></li>
+</ul>
+</li>
+<li><code>no-proxy-access=true</code><ul>
+<li>If true, the notebook instance will not register with the proxy.</li>
+</ul>
+</li>
+<li><code>no-public-ip=false</code><ul>
+<li>If true, no public IP will be assigned to this instance.</li>
+</ul>
+</li>
+<li><code>no-remove-data-disk=false</code><ul>
+<li>Input only. If true, the data disk will not be auto deleted when deleting the instance.</li>
+</ul>
+</li>
+<li><code>post-startup-script=duo</code><ul>
+<li>Path to a Bash script that automatically runs after a notebook instance fully boots up. The path must be a URL or Cloud Storage path (gs://path-to-file/file-name).</li>
+</ul>
+</li>
+<li><code>proxy-uri=dolore</code><ul>
+<li>Output only. The proxy endpoint that is used to access the Jupyter notebook.</li>
+</ul>
+</li>
+<li><code>service-account=et</code><ul>
+<li>The service account on this instance, giving access to other Google Cloud services. You can use any service account within the same project, but you must have the service account user permission to use the instance. If not specified, the <a href="https://cloud.google.com/compute/docs/access/service-accounts#default_service_account">Compute Engine default service account</a> is used.</li>
+</ul>
+</li>
+<li><code>service-account-scopes=voluptua.</code><ul>
+<li>Optional. The URIs of service account scopes to be included in Compute Engine instances. If not specified, the following <a href="https://cloud.google.com/compute/docs/access/service-accounts#accesscopesiam">scopes</a> are defined: - https://www.googleapis.com/auth/cloud-platform - https://www.googleapis.com/auth/userinfo.email If not using default scopes, you need at least: https://www.googleapis.com/auth/compute</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>shielded-instance-config    enable-integrity-monitoring=false</code><ul>
+<li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created. Enabled by default.</li>
+</ul>
+</li>
+<li><code>enable-secure-boot=false</code><ul>
+<li>Defines whether the instance has Secure Boot enabled. Secure Boot helps ensure that the system only runs authentic software by verifying the digital signature of all boot components, and halting the boot process if signature verification fails. Disabled by default.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-vtpm=true</code></p>
+<ul>
+<li>Defines whether the instance has the vTPM enabled. Enabled by default.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=et</code></p>
+<ul>
+<li>Output only. The state of this instance.</li>
+</ul>
+</li>
+<li><code>subnet=et</code><ul>
+<li>The name of the subnet that this instance is in. Format: <code>projects/{project_id}/regions/{region}/subnetworks/{subnetwork_id}</code></li>
+</ul>
+</li>
+<li><code>tags=sadipscing</code><ul>
+<li>Optional. The Compute Engine tags to add to runtime (see <a href="https://cloud.google.com/compute/docs/label-or-tag-resources#tags">Tagging instances</a>).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>update-time=stet</code><ul>
+<li>Output only. Instance update time.</li>
+</ul>
+</li>
+<li><code>vm-image    image-family=dolor</code><ul>
+<li>Use this VM image family to find the image; the newest image in this family will be used.</li>
+</ul>
+</li>
+<li><code>image-name=duo</code><ul>
+<li>Use VM image name to find the image.</li>
+</ul>
+</li>
+<li><code>project=vero</code><ul>
+<li>Required. The name of the Google Cloud project that this VM image belongs to. Format: <code>projects/{project_id}</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p instance-id=string</strong><ul>
+<li>Required. User-defined unique ID of this instance.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-instances-delete" class="btn btn-neutral float-right" title="Locations Instances Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-get" class="btn btn-neutral" title="Locations Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-instances-delete" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

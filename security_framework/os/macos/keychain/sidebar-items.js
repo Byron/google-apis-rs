@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["SecPreferencesDomain",""]],"struct":[["CreateOptions","A builder type to create new keychains."],["KeychainSettings","Settings associated with a `SecKeychain`."],["KeychainUserInteractionLock","Automatically re-enables user interaction."],["SecKeychain","A type representing a keychain."]]});

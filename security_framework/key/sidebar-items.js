@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SecKey","A type representing an encryption key."]]});

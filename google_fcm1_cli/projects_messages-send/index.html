@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Messages Send - Firebase Cloud Messaging v2.0.0+20210329</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Firebase Cloud Messaging v2.0.0+20210329</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Messages Send</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Messages Send</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/fcm1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Send a message to specified target (a registration token, topic or condition).</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>fcm1 --scope &lt;scope&gt; projects messages-send ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. It contains the Firebase project id (i.e. the unique identifier for your Firebase project), in the format of <code>projects/{project_id}</code>. For legacy support, the numeric project number with no padding is also supported in the format of <code>projects/{project_number}</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>SendMessageRequest:
+  message:
+    android:
+      collapse-key: string
+      data: { string: string }
+      direct-boot-ok: boolean
+      fcm-options:
+        analytics-label: string
+      notification:
+        body: string
+        body-loc-args: [string]
+        body-loc-key: string
+        channel-id: string
+        click-action: string
+        color: string
+        default-light-settings: boolean
+        default-sound: boolean
+        default-vibrate-timings: boolean
+        event-time: string
+        icon: string
+        image: string
+        light-settings:
+          color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          light-off-duration: string
+          light-on-duration: string
+        local-only: boolean
+        notification-count: integer
+        notification-priority: string
+        sound: string
+        sticky: boolean
+        tag: string
+        ticker: string
+        title: string
+        title-loc-args: [string]
+        title-loc-key: string
+        vibrate-timings: [string]
+        visibility: string
+      priority: string
+      restricted-package-name: string
+      ttl: string
+    apns:
+      fcm-options:
+        analytics-label: string
+        image: string
+      headers: { string: string }
+    condition: string
+    data: { string: string }
+    fcm-options:
+      analytics-label: string
+    name: string
+    notification:
+      body: string
+      image: string
+      title: string
+    token: string
+    topic: string
+    webpush:
+      data: { string: string }
+      fcm-options:
+        analytics-label: string
+        link: string
+      headers: { string: string }
+  validate-only: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .message.android    collapse-key=et</code><ul>
+<li>An identifier of a group of messages that can be collapsed, so that only the last message gets sent when delivery can be resumed. A maximum of 4 different collapse keys is allowed at any given time.</li>
+</ul>
+</li>
+<li><code>data=key=magna</code><ul>
+<li>Arbitrary key/value payload. If present, it will override google.firebase.fcm.v1.Message.data.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>direct-boot-ok=true</code><ul>
+<li>If set to true, messages will be allowed to be delivered to the app while the device is in direct boot mode. See <a href="https://developer.android.com/training/articles/direct-boot">Support Direct Boot mode</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>fcm-options    analytics-label=voluptua.</code></p>
+<ul>
+<li>Label associated with the message&#39;s analytics data.</li>
+</ul>
+</li>
+<li>
+<p><code>..notification    body=at</code></p>
+<ul>
+<li>The notification&#39;s body text. If present, it will override google.firebase.fcm.v1.Notification.body.</li>
+</ul>
+</li>
+<li><code>body-loc-args=sanctus</code><ul>
+<li>Variable string values to be used in place of the format specifiers in body_loc_key to use to localize the body text to the user&#39;s current localization. See <a href="https://goo.gl/MalYE3">Formatting and Styling</a> for more information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>body-loc-key=sed</code><ul>
+<li>The key to the body string in the app&#39;s string resources to use to localize the body text to the user&#39;s current localization. See <a href="https://goo.gl/NdFZGI">String Resources</a> for more information.</li>
+</ul>
+</li>
+<li><code>channel-id=amet.</code><ul>
+<li>The <a href="https://developer.android.com/guide/topics/ui/notifiers/notifications#ManageChannels">notification&#39;s channel id</a> (new in Android O). The app must create a channel with this channel ID before any notification with this channel ID is received. If you don&#39;t send this channel ID in the request, or if the channel ID provided has not yet been created by the app, FCM uses the channel ID specified in the app manifest.</li>
+</ul>
+</li>
+<li><code>click-action=takimata</code><ul>
+<li>The action associated with a user click on the notification. If specified, an activity with a matching intent filter is launched when a user clicks on the notification.</li>
+</ul>
+</li>
+<li><code>color=amet.</code><ul>
+<li>The notification&#39;s icon color, expressed in #rrggbb format.</li>
+</ul>
+</li>
+<li><code>default-light-settings=true</code><ul>
+<li>If set to true, use the Android framework&#39;s default LED light settings for the notification. Default values are specified in <a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/config.xml">config.xml</a>. If <code>default_light_settings</code> is set to true and <code>light_settings</code> is also set, the user-specified <code>light_settings</code> is used instead of the default value.</li>
+</ul>
+</li>
+<li><code>default-sound=true</code><ul>
+<li>If set to true, use the Android framework&#39;s default sound for the notification. Default values are specified in <a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/config.xml">config.xml</a>.</li>
+</ul>
+</li>
+<li><code>default-vibrate-timings=true</code><ul>
+<li>If set to true, use the Android framework&#39;s default vibrate pattern for the notification. Default values are specified in <a href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/config.xml">config.xml</a>. If <code>default_vibrate_timings</code> is set to true and <code>vibrate_timings</code> is also set, the default value is used instead of the user-specified <code>vibrate_timings</code>.</li>
+</ul>
+</li>
+<li><code>event-time=gubergren</code><ul>
+<li>Set the time that the event in the notification occurred. Notifications in the panel are sorted by this time. A point in time is represented using <a href="https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/Timestamp">protobuf.Timestamp</a>.</li>
+</ul>
+</li>
+<li><code>icon=eos</code><ul>
+<li>The notification&#39;s icon. Sets the notification icon to myicon for drawable resource myicon. If you don&#39;t send this key in the request, FCM displays the launcher icon specified in your app manifest.</li>
+</ul>
+</li>
+<li><code>image=dolor</code><ul>
+<li>Contains the URL of an image that is going to be displayed in a notification. If present, it will override google.firebase.fcm.v1.Notification.image.</li>
+</ul>
+</li>
+<li><code>light-settings.color    alpha=0.6562776331888889</code><ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.912305342889376</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.1092883976212714</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.8204376297831348</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    light-off-duration=ipsum</code></p>
+<ul>
+<li>Required. Along with <code>light_on_duration</code>, define the blink rate of LED flashes. Resolution defined by <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Duration">proto.Duration</a></li>
+</ul>
+</li>
+<li>
+<p><code>light-on-duration=sed</code></p>
+<ul>
+<li>Required. Along with <code>light_off_duration</code>, define the blink rate of LED flashes. Resolution defined by <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Duration">proto.Duration</a></li>
+</ul>
+</li>
+<li>
+<p><code>..    local-only=true</code></p>
+<ul>
+<li>Set whether or not this notification is relevant only to the current device. Some notifications can be bridged to other devices for remote display, such as a Wear OS watch. This hint can be set to recommend this notification not be bridged. See <a href="https://developer.android.com/training/wearables/notifications/bridger#existing-method-of-preventing-bridging">Wear OS guides</a></li>
+</ul>
+</li>
+<li><code>notification-count=51</code><ul>
+<li>Sets the number of items this notification represents. May be displayed as a badge count for launchers that support badging.See <a href="https://developer.android.com/training/notify-user/badges">Notification Badge</a>. For example, this might be useful if you&#39;re using just one notification to represent multiple new messages but you want the count here to represent the number of total new messages. If zero or unspecified, systems that support badging use the default, which is to increment a number displayed on the long-press menu each time a new notification arrives.</li>
+</ul>
+</li>
+<li><code>notification-priority=ipsum</code><ul>
+<li>Set the relative priority for this notification. Priority is an indication of how much of the user&#39;s attention should be consumed by this notification. Low-priority notifications may be hidden from the user in certain situations, while the user might be interrupted for a higher-priority notification. The effect of setting the same priorities may differ slightly on different platforms. Note this priority differs from <code>AndroidMessagePriority</code>. This priority is processed by the client after the message has been delivered, whereas <a href="https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority">AndroidMessagePriority</a> is an FCM concept that controls when the message is delivered.</li>
+</ul>
+</li>
+<li><code>sound=est</code><ul>
+<li>The sound to play when the device receives the notification. Supports &#34;default&#34; or the filename of a sound resource bundled in the app. Sound files must reside in /res/raw/.</li>
+</ul>
+</li>
+<li><code>sticky=true</code><ul>
+<li>When set to false or unset, the notification is automatically dismissed when the user clicks it in the panel. When set to true, the notification persists even when the user clicks it.</li>
+</ul>
+</li>
+<li><code>tag=ea</code><ul>
+<li>Identifier used to replace existing notifications in the notification drawer. If not specified, each request creates a new notification. If specified and a notification with the same tag is already being shown, the new notification replaces the existing one in the notification drawer.</li>
+</ul>
+</li>
+<li><code>ticker=dolor</code><ul>
+<li>Sets the &#34;ticker&#34; text, which is sent to accessibility services. Prior to API level 21 (<code>Lollipop</code>), sets the text that is displayed in the status bar when the notification first arrives.</li>
+</ul>
+</li>
+<li><code>title=lorem</code><ul>
+<li>The notification&#39;s title. If present, it will override google.firebase.fcm.v1.Notification.title.</li>
+</ul>
+</li>
+<li><code>title-loc-args=eos</code><ul>
+<li>Variable string values to be used in place of the format specifiers in title_loc_key to use to localize the title text to the user&#39;s current localization. See <a href="https://goo.gl/MalYE3">Formatting and Styling</a> for more information.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>title-loc-key=labore</code><ul>
+<li>The key to the title string in the app&#39;s string resources to use to localize the title text to the user&#39;s current localization. See <a href="https://goo.gl/NdFZGI">String Resources</a> for more information.</li>
+</ul>
+</li>
+<li><code>vibrate-timings=sed</code><ul>
+<li>Set the vibration pattern to use. Pass in an array of <a href="https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Duration">protobuf.Duration</a> to turn on or off the vibrator. The first value indicates the <code>Duration</code> to wait before turning the vibrator on. The next value indicates the <code>Duration</code> to keep the vibrator on. Subsequent values alternate between <code>Duration</code> to turn the vibrator off and to turn the vibrator on. If <code>vibrate_timings</code> is set and <code>default_vibrate_timings</code> is set to <code>true</code>, the default value is used instead of the user-specified <code>vibrate_timings</code>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>visibility=duo</code></p>
+<ul>
+<li>Set the <a href="https://developer.android.com/reference/android/app/Notification.html#visibility">Notification.visibility</a> of the notification.</li>
+</ul>
+</li>
+<li>
+<p><code>..    priority=sed</code></p>
+<ul>
+<li>Message priority. Can take &#34;normal&#34; and &#34;high&#34; values. For more information, see <a href="https://goo.gl/GjONJv">Setting the priority of a message</a>.</li>
+</ul>
+</li>
+<li><code>restricted-package-name=no</code><ul>
+<li>Package name of the application where the registration token must match in order to receive the message.</li>
+</ul>
+</li>
+<li>
+<p><code>ttl=stet</code></p>
+<ul>
+<li>How long (in seconds) the message should be kept in FCM storage if the device is offline. The maximum time to live supported is 4 weeks, and the default value is 4 weeks if not set. Set it to 0 if want to send the message immediately. In JSON format, the Duration type is encoded as a string rather than an object, where the string ends in the suffix &#34;s&#34; (indicating seconds) and is preceded by the number of seconds, with nanoseconds expressed as fractional seconds. For example, 3 seconds with 0 nanoseconds should be encoded in JSON format as &#34;3s&#34;, while 3 seconds and 1 nanosecond should be expressed in JSON format as &#34;3.000000001s&#34;. The ttl will be rounded down to the nearest second.</li>
+</ul>
+</li>
+<li>
+<p><code>..apns.fcm-options    analytics-label=kasd</code></p>
+<ul>
+<li>Label associated with the message&#39;s analytics data.</li>
+</ul>
+</li>
+<li>
+<p><code>image=et</code></p>
+<ul>
+<li>Contains the URL of an image that is going to be displayed in a notification. If present, it will override google.firebase.fcm.v1.Notification.image.</li>
+</ul>
+</li>
+<li>
+<p><code>..    headers=key=sed</code></p>
+<ul>
+<li>HTTP request headers defined in Apple Push Notification Service. Refer to <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns">APNs request headers</a> for supported headers, e.g. &#34;apns-priority&#34;: &#34;10&#34;.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    condition=et</code></p>
+<ul>
+<li>Condition to send a message to, e.g. &#34;&#39;foo&#39; in topics &amp;&amp; &#39;bar&#39; in topics&#34;.</li>
+</ul>
+</li>
+<li><code>data=key=et</code><ul>
+<li>Input only. Arbitrary key/value payload. The key should not be a reserved word (&#34;from&#34;, &#34;message_type&#34;, or any word starting with &#34;google&#34; or &#34;gcm&#34;).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>fcm-options    analytics-label=vero</code></p>
+<ul>
+<li>Label associated with the message&#39;s analytics data.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=erat</code></p>
+<ul>
+<li>Output Only. The identifier of the message sent, in the format of <code>projects/*/messages/{message_id}</code>.</li>
+</ul>
+</li>
+<li><code>notification    body=sed</code><ul>
+<li>The notification&#39;s body text.</li>
+</ul>
+</li>
+<li><code>image=duo</code><ul>
+<li>Contains the URL of an image that is going to be downloaded on the device and displayed in a notification. JPEG, PNG, BMP have full support across platforms. Animated GIF and video only work on iOS. WebP and HEIF have varying levels of support across platforms and platform versions. Android has 1MB image size limit. Quota usage and implications/costs for hosting image on Firebase Storage: https://firebase.google.com/pricing</li>
+</ul>
+</li>
+<li>
+<p><code>title=dolore</code></p>
+<ul>
+<li>The notification&#39;s title.</li>
+</ul>
+</li>
+<li>
+<p><code>..    token=et</code></p>
+<ul>
+<li>Registration token to send a message to.</li>
+</ul>
+</li>
+<li><code>topic=voluptua.</code><ul>
+<li>Topic name to send a message to, e.g. &#34;weather&#34;. Note: &#34;/topics/&#34; prefix should not be provided.</li>
+</ul>
+</li>
+<li><code>webpush    data=key=amet.</code><ul>
+<li>Arbitrary key/value payload. If present, it will override google.firebase.fcm.v1.Message.data.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>fcm-options    analytics-label=consetetur</code><ul>
+<li>Label associated with the message&#39;s analytics data.</li>
+</ul>
+</li>
+<li>
+<p><code>link=diam</code></p>
+<ul>
+<li>The link to open when the user clicks on the notification. For all URL values, HTTPS is required.</li>
+</ul>
+</li>
+<li>
+<p><code>..    headers=key=dolor</code></p>
+<ul>
+<li>HTTP headers defined in webpush protocol. Refer to <a href="https://tools.ietf.org/html/rfc8030#section-5">Webpush protocol</a> for supported headers, e.g. &#34;TTL&#34;: &#34;15&#34;.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>...    validate-only=false</code></p>
+<ul>
+<li>Flag for testing the request without actually delivering the message.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

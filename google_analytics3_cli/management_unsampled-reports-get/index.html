@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Unsampled Reports Get - analytics v2.0.0+20190807</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> analytics v2.0.0+20190807</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Data</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../data_ga-get">Ga Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../data_mcf-get">Mcf Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../data_realtime-get">Realtime Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Management</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_account-summaries-list">Account Summaries List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_account-user-links-delete">Account User Links Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_account-user-links-insert">Account User Links Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_account-user-links-list">Account User Links List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_account-user-links-update">Account User Links Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_accounts-list">Accounts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_client-id-hash-client-id">Client Id Hash Client Id</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-data-sources-list">Custom Data Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-dimensions-get">Custom Dimensions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-dimensions-insert">Custom Dimensions Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-dimensions-list">Custom Dimensions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-dimensions-patch">Custom Dimensions Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-dimensions-update">Custom Dimensions Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-metrics-get">Custom Metrics Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-metrics-insert">Custom Metrics Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-metrics-list">Custom Metrics List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-metrics-patch">Custom Metrics Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_custom-metrics-update">Custom Metrics Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-delete">Experiments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-get">Experiments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-insert">Experiments Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-list">Experiments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-patch">Experiments Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_experiments-update">Experiments Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-delete">Filters Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-get">Filters Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-insert">Filters Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-list">Filters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-patch">Filters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_filters-update">Filters Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_goals-get">Goals Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_goals-insert">Goals Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_goals-list">Goals List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_goals-patch">Goals Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_goals-update">Goals Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-delete">Profile Filter Links Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-get">Profile Filter Links Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-insert">Profile Filter Links Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-list">Profile Filter Links List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-patch">Profile Filter Links Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-filter-links-update">Profile Filter Links Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-user-links-delete">Profile User Links Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-user-links-insert">Profile User Links Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-user-links-list">Profile User Links List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profile-user-links-update">Profile User Links Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-delete">Profiles Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-get">Profiles Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-insert">Profiles Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-list">Profiles List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-patch">Profiles Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_profiles-update">Profiles Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-delete">Remarketing Audience Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-get">Remarketing Audience Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-insert">Remarketing Audience Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-list">Remarketing Audience List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-patch">Remarketing Audience Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_remarketing-audience-update">Remarketing Audience Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_segments-list">Segments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_unsampled-reports-delete">Unsampled Reports Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Unsampled Reports Get</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_unsampled-reports-insert">Unsampled Reports Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_unsampled-reports-list">Unsampled Reports List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_uploads-delete-upload-data">Uploads Delete Upload Data</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_uploads-get">Uploads Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_uploads-list">Uploads List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_uploads-upload-data">Uploads Upload Data</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-delete">Web Property Ad Words Links Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-get">Web Property Ad Words Links Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-insert">Web Property Ad Words Links Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-list">Web Property Ad Words Links List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-patch">Web Property Ad Words Links Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_web-property-ad-words-links-update">Web Property Ad Words Links Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperties-get">Webproperties Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperties-insert">Webproperties Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperties-list">Webproperties List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperties-patch">Webproperties Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperties-update">Webproperties Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperty-user-links-delete">Webproperty User Links Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperty-user-links-insert">Webproperty User Links Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperty-user-links-list">Webproperty User Links List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../management_webproperty-user-links-update">Webproperty User Links Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Metadata</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../metadata_columns-list">Columns List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Provisioning</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../provisioning_create-account-ticket">Create Account Ticket</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../provisioning_create-account-tree">Create Account Tree</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>User Deletion</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../user-deletion_user-deletion-request-upsert">User Deletion Request Upsert</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Unsampled Reports Get</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Returns a single unsampled report.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/analytics</em></li>
+<li><em>https://www.googleapis.com/auth/analytics.edit</em></li>
+<li><em>https://www.googleapis.com/auth/analytics.readonly</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/analytics.readonly</em>.
+You can set the scope for this method like this: <code>analytics3 --scope &lt;scope&gt; management unsampled-reports-get ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;account-id&gt;</strong> <em>(string)</em><ul>
+<li>Account ID to retrieve unsampled report for.</li>
+</ul>
+</li>
+<li><strong>&lt;web-property-id&gt;</strong> <em>(string)</em><ul>
+<li>Web property ID to retrieve unsampled reports for.</li>
+</ul>
+</li>
+<li><strong>&lt;profile-id&gt;</strong> <em>(string)</em><ul>
+<li>View (Profile) ID to retrieve unsampled report for.</li>
+</ul>
+</li>
+<li><strong>&lt;unsampled-report-id&gt;</strong> <em>(string)</em><ul>
+<li>ID of the unsampled report to retrieve.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../management_unsampled-reports-insert" class="btn btn-neutral float-right" title="Unsampled Reports Insert"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../management_unsampled-reports-delete" class="btn btn-neutral" title="Unsampled Reports Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../management_unsampled-reports-delete" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../management_unsampled-reports-insert" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

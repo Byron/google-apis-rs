@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Workflow Templates Instantiate Inline - Dataproc v2.0.0+20210322</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dataproc v2.0.0+20210322</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-create">Locations Autoscaling Policies Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-delete">Locations Autoscaling Policies Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-get">Locations Autoscaling Policies Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-get-iam-policy">Locations Autoscaling Policies Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-list">Locations Autoscaling Policies List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-set-iam-policy">Locations Autoscaling Policies Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-test-iam-permissions">Locations Autoscaling Policies Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-autoscaling-policies-update">Locations Autoscaling Policies Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-create">Locations Workflow Templates Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-delete">Locations Workflow Templates Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-get">Locations Workflow Templates Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-get-iam-policy">Locations Workflow Templates Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-instantiate">Locations Workflow Templates Instantiate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Workflow Templates Instantiate Inline</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-list">Locations Workflow Templates List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-set-iam-policy">Locations Workflow Templates Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-test-iam-permissions">Locations Workflow Templates Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-workflow-templates-update">Locations Workflow Templates Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-create">Regions Autoscaling Policies Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-delete">Regions Autoscaling Policies Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-get">Regions Autoscaling Policies Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-get-iam-policy">Regions Autoscaling Policies Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-list">Regions Autoscaling Policies List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-set-iam-policy">Regions Autoscaling Policies Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-test-iam-permissions">Regions Autoscaling Policies Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-autoscaling-policies-update">Regions Autoscaling Policies Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-create">Regions Clusters Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-delete">Regions Clusters Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-diagnose">Regions Clusters Diagnose</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-get">Regions Clusters Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-get-iam-policy">Regions Clusters Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-inject-credentials">Regions Clusters Inject Credentials</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-list">Regions Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-patch">Regions Clusters Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-set-iam-policy">Regions Clusters Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-start">Regions Clusters Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-stop">Regions Clusters Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-clusters-test-iam-permissions">Regions Clusters Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-cancel">Regions Jobs Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-delete">Regions Jobs Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-get">Regions Jobs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-get-iam-policy">Regions Jobs Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-list">Regions Jobs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-patch">Regions Jobs Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-set-iam-policy">Regions Jobs Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-submit">Regions Jobs Submit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-submit-as-operation">Regions Jobs Submit As Operation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-jobs-test-iam-permissions">Regions Jobs Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-cancel">Regions Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-delete">Regions Operations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-get">Regions Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-get-iam-policy">Regions Operations Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-list">Regions Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-set-iam-policy">Regions Operations Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-operations-test-iam-permissions">Regions Operations Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-create">Regions Workflow Templates Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-delete">Regions Workflow Templates Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-get">Regions Workflow Templates Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-get-iam-policy">Regions Workflow Templates Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-instantiate">Regions Workflow Templates Instantiate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-instantiate-inline">Regions Workflow Templates Instantiate Inline</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-list">Regions Workflow Templates List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-set-iam-policy">Regions Workflow Templates Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-test-iam-permissions">Regions Workflow Templates Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_regions-workflow-templates-update">Regions Workflow Templates Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Workflow Templates Instantiate Inline</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/dataproc1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>dataproc1 --scope &lt;scope&gt; projects locations-workflow-templates-instantiate-inline ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates,instantiateinline, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.instantiateinline, the resource name of the location has the following format: projects/{project_id}/locations/{location}</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>WorkflowTemplate:
+  create-time: string
+  dag-timeout: string
+  id: string
+  labels: { string: string }
+  name: string
+  placement:
+    cluster-selector:
+      cluster-labels: { string: string }
+      zone: string
+    managed-cluster:
+      cluster-name: string
+      config:
+        autoscaling-config:
+          policy-uri: string
+        config-bucket: string
+        encryption-config:
+          gce-pd-kms-key-name: string
+        endpoint-config:
+          enable-http-port-access: boolean
+          http-ports: { string: string }
+        gce-cluster-config:
+          internal-ip-only: boolean
+          metadata: { string: string }
+          network-uri: string
+          node-group-affinity:
+            node-group-uri: string
+          private-ipv6-google-access: string
+          reservation-affinity:
+            consume-reservation-type: string
+            key: string
+            values: [string]
+          service-account: string
+          service-account-scopes: [string]
+          shielded-instance-config:
+            enable-integrity-monitoring: boolean
+            enable-secure-boot: boolean
+            enable-vtpm: boolean
+          subnetwork-uri: string
+          tags: [string]
+          zone-uri: string
+        gke-cluster-config:
+          namespaced-gke-deployment-target:
+            cluster-namespace: string
+            target-gke-cluster: string
+        lifecycle-config:
+          auto-delete-time: string
+          auto-delete-ttl: string
+          idle-delete-ttl: string
+          idle-start-time: string
+        master-config:
+          disk-config:
+            boot-disk-size-gb: integer
+            boot-disk-type: string
+            num-local-ssds: integer
+          image-uri: string
+          instance-names: [string]
+          is-preemptible: boolean
+          machine-type-uri: string
+          managed-group-config:
+            instance-group-manager-name: string
+            instance-template-name: string
+          min-cpu-platform: string
+          num-instances: integer
+          preemptibility: string
+        metastore-config:
+          dataproc-metastore-service: string
+        secondary-worker-config:
+          disk-config:
+            boot-disk-size-gb: integer
+            boot-disk-type: string
+            num-local-ssds: integer
+          image-uri: string
+          instance-names: [string]
+          is-preemptible: boolean
+          machine-type-uri: string
+          managed-group-config:
+            instance-group-manager-name: string
+            instance-template-name: string
+          min-cpu-platform: string
+          num-instances: integer
+          preemptibility: string
+        security-config:
+          identity-config:
+            user-service-account-mapping: { string: string }
+          kerberos-config:
+            cross-realm-trust-admin-server: string
+            cross-realm-trust-kdc: string
+            cross-realm-trust-realm: string
+            cross-realm-trust-shared-password-uri: string
+            enable-kerberos: boolean
+            kdc-db-key-uri: string
+            key-password-uri: string
+            keystore-password-uri: string
+            keystore-uri: string
+            kms-key-uri: string
+            realm: string
+            root-principal-password-uri: string
+            tgt-lifetime-hours: integer
+            truststore-password-uri: string
+            truststore-uri: string
+        software-config:
+          image-version: string
+          optional-components: [string]
+          properties: { string: string }
+        temp-bucket: string
+        worker-config:
+          disk-config:
+            boot-disk-size-gb: integer
+            boot-disk-type: string
+            num-local-ssds: integer
+          image-uri: string
+          instance-names: [string]
+          is-preemptible: boolean
+          machine-type-uri: string
+          managed-group-config:
+            instance-group-manager-name: string
+            instance-template-name: string
+          min-cpu-platform: string
+          num-instances: integer
+          preemptibility: string
+      labels: { string: string }
+  update-time: string
+  version: integer
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    create-time=sit</code><ul>
+<li>Output only. The time template was created.</li>
+</ul>
+</li>
+<li><code>dag-timeout=sed</code><ul>
+<li>Optional. Timeout duration for the DAG of jobs, expressed in seconds (see JSON representation of duration (https://developers.google.com/protocol-buffers/docs/proto3#json)). The timeout duration must be from 10 minutes (&#34;600s&#34;) to 24 hours (&#34;86400s&#34;). The timer begins when the first job is submitted. If the workflow is running at the end of the timeout period, any remaining jobs are cancelled, the workflow is ended, and if the workflow was running on a managed cluster, the cluster is deleted.</li>
+</ul>
+</li>
+<li><code>id=eos</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>labels=key=lorem</code><ul>
+<li>Optional. The labels to associate with this template. These labels will be propagated to all jobs and clusters created by the workflow instance.Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than 32 labels can be associated with a template.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>name=ea</code><ul>
+<li>Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}</li>
+</ul>
+</li>
+<li><code>placement.cluster-selector    cluster-labels=key=stet</code><ul>
+<li>Required. The cluster labels. Cluster must have all labels to match.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>zone=dolores</code></p>
+<ul>
+<li>Optional. The zone where workflow process executes. This parameter does not affect the selection of the cluster.If unspecified, the zone of the first cluster matching the selector is used.</li>
+</ul>
+</li>
+<li>
+<p><code>..managed-cluster    cluster-name=eos</code></p>
+<ul>
+<li>Required. The cluster name prefix. A unique cluster name will be formed by appending a random suffix.The name must contain only lower-case letters (a-z), numbers (0-9), and hyphens (-). Must begin with a letter. Cannot begin or end with hyphen. Must consist of between 2 and 35 characters.</li>
+</ul>
+</li>
+<li>
+<p><code>config.autoscaling-config    policy-uri=et</code></p>
+<ul>
+<li>Optional. The autoscaling policy used by the cluster.Only resource names including projectid and location (region) are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id] projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]Note that the policy must be in the same project and Dataproc region.</li>
+</ul>
+</li>
+<li>
+<p><code>..    config-bucket=sea</code></p>
+<ul>
+<li>Optional. A Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster&#39;s staging bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Dataproc staging bucket (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)). This field requires a Cloud Storage bucket name, not a URI to a Cloud Storage bucket.</li>
+</ul>
+</li>
+<li>
+<p><code>encryption-config    gce-pd-kms-key-name=et</code></p>
+<ul>
+<li>Optional. The Cloud KMS key name to use for PD disk encryption for all instances in the cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>..endpoint-config    enable-http-port-access=false</code></p>
+<ul>
+<li>Optional. If true, enable http access to specific ports on the cluster from external sources. Defaults to false.</li>
+</ul>
+</li>
+<li>
+<p><code>http-ports=key=dolore</code></p>
+<ul>
+<li>Output only. The map of port descriptions to URLs. Will only be populated if enable_http_port_access is true.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..gce-cluster-config    internal-ip-only=true</code></p>
+<ul>
+<li>Optional. If true, all instances in the cluster will only have internal IP addresses. By default, clusters are not restricted to internal IP addresses, and will have ephemeral external IP addresses assigned to each instance. This internal_ip_only restriction can only be enabled for subnetwork enabled networks, and all off-cluster dependencies must be configured to be accessible without external IP addresses.</li>
+</ul>
+</li>
+<li><code>metadata=key=lorem</code><ul>
+<li>The Compute Engine metadata entries to add to all instances (see Project and instance metadata (https://cloud.google.com/compute/docs/storing-retrieving-metadata#project_and_instance_metadata)).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>network-uri=accusam</code><ul>
+<li>Optional. The Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither network_uri nor subnetwork_uri is specified, the &#34;default&#34; network of the project is used, if it exists. Cannot be a &#34;Custom Subnet Network&#34; (see Using Subnetworks (https://cloud.google.com/compute/docs/subnetworks) for more information).A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/regions/global/default projects/[project_id]/regions/global/default default</li>
+</ul>
+</li>
+<li>
+<p><code>node-group-affinity    node-group-uri=amet</code></p>
+<ul>
+<li>Required. The URI of a sole-tenant node group resource (https://cloud.google.com/compute/docs/reference/rest/v1/nodeGroups) that the cluster will be created on.A full URL, partial URI, or node group name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-central1-a/nodeGroups/node-group-1 projects/[project_id]/zones/us-central1-a/nodeGroups/node-group-1 node-group-1</li>
+</ul>
+</li>
+<li>
+<p><code>..    private-ipv6-google-access=erat</code></p>
+<ul>
+<li>Optional. The type of IPv6 access for a cluster.</li>
+</ul>
+</li>
+<li><code>reservation-affinity    consume-reservation-type=dolores</code><ul>
+<li>Optional. Type of reservation to consume</li>
+</ul>
+</li>
+<li><code>key=erat</code><ul>
+<li>Optional. Corresponds to the label key of reservation resource.</li>
+</ul>
+</li>
+<li>
+<p><code>values=accusam</code></p>
+<ul>
+<li>Optional. Corresponds to the label values of reservation resource.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account=sea</code></p>
+<ul>
+<li>Optional. The Dataproc service account (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/service-accounts#service_accounts_in_dataproc) (also see VM Data Plane identity (https://cloud.google.com/dataproc/docs/concepts/iam/dataproc-principals#vm_service_account_data_plane_identity)) used by Dataproc cluster VM instances to access Google Cloud Platform services.If not specified, the Compute Engine default service account (https://cloud.google.com/compute/docs/access/service-accounts#default_service_account) is used.</li>
+</ul>
+</li>
+<li><code>service-account-scopes=takimata</code><ul>
+<li>Optional. The URIs of service account scopes to be included in Compute Engine instances. The following base set of scopes is always included: https://www.googleapis.com/auth/cloud.useraccounts.readonly https://www.googleapis.com/auth/devstorage.read_write https://www.googleapis.com/auth/logging.writeIf no scopes are specified, the following defaults are also provided: https://www.googleapis.com/auth/bigquery https://www.googleapis.com/auth/bigtable.admin.table https://www.googleapis.com/auth/bigtable.data https://www.googleapis.com/auth/devstorage.full_control</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>shielded-instance-config    enable-integrity-monitoring=true</code><ul>
+<li>Optional. Defines whether instances have integrity monitoring enabled.</li>
+</ul>
+</li>
+<li><code>enable-secure-boot=false</code><ul>
+<li>Optional. Defines whether instances have Secure Boot enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-vtpm=true</code></p>
+<ul>
+<li>Optional. Defines whether instances have the vTPM enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..    subnetwork-uri=erat</code></p>
+<ul>
+<li>Optional. The Compute Engine subnetwork to be used for machine communications. Cannot be specified with network_uri.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-east1/subnetworks/sub0 projects/[project_id]/regions/us-east1/subnetworks/sub0 sub0</li>
+</ul>
+</li>
+<li><code>tags=sea</code><ul>
+<li>The Compute Engine tags to add to all instances (see Tagging instances (https://cloud.google.com/compute/docs/label-or-tag-resources#tags)).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>zone-uri=nonumy</code></p>
+<ul>
+<li>Optional. The zone where the Compute Engine cluster will be located. On a create request, it is required in the &#34;global&#34; region. If omitted in a non-global Dataproc region, the service will pick a zone in the corresponding Compute Engine region. On a get request, zone will always be present.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone] projects/[project_id]/zones/[zone] us-central1-f</li>
+</ul>
+</li>
+<li>
+<p><code>..gke-cluster-config.namespaced-gke-deployment-target    cluster-namespace=et</code></p>
+<ul>
+<li>Optional. A namespace within the GKE cluster to deploy into.</li>
+</ul>
+</li>
+<li>
+<p><code>target-gke-cluster=gubergren</code></p>
+<ul>
+<li>Optional. The target GKE cluster to deploy to. Format: &#39;projects/{project}/locations/{location}/clusters/{cluster_id}&#39;</li>
+</ul>
+</li>
+<li>
+<p><code>...lifecycle-config    auto-delete-time=justo</code></p>
+<ul>
+<li>Optional. The time when cluster will be auto-deleted (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).</li>
+</ul>
+</li>
+<li><code>auto-delete-ttl=sea</code><ul>
+<li>Optional. The lifetime duration of cluster. The cluster will be auto-deleted at the end of this period. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).</li>
+</ul>
+</li>
+<li><code>idle-delete-ttl=consetetur</code><ul>
+<li>Optional. The duration to keep the cluster alive while idling (when no jobs are running). Passing this threshold will cause the cluster to be deleted. Minimum value is 5 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).</li>
+</ul>
+</li>
+<li>
+<p><code>idle-start-time=sit</code></p>
+<ul>
+<li>Output only. The time when cluster became idle (most recent job finished) and became eligible for deletion due to idleness (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).</li>
+</ul>
+</li>
+<li>
+<p><code>..master-config.disk-config    boot-disk-size-gb=69</code></p>
+<ul>
+<li>Optional. Size in GB of the boot disk (default is 500GB).</li>
+</ul>
+</li>
+<li><code>boot-disk-type=eos</code><ul>
+<li>Optional. Type of the boot disk (default is &#34;pd-standard&#34;). Valid values: &#34;pd-balanced&#34; (Persistent Disk Balanced Solid State Drive), &#34;pd-ssd&#34; (Persistent Disk Solid State Drive), or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive). See Disk types (https://cloud.google.com/compute/docs/disks#disk-types).</li>
+</ul>
+</li>
+<li>
+<p><code>num-local-ssds=24</code></p>
+<ul>
+<li>Optional. Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and HDFS (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=dolores</code></p>
+<ul>
+<li>Optional. The Compute Engine image resource used for cluster instances.The URI can represent an image or image family.Image examples: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/[image-id] projects/[project_id]/global/images/[image-id] image-idImage family examples. Dataproc will use the most recent image from the family: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/family/[custom-image-family-name] projects/[project_id]/global/images/family/[custom-image-family-name]If the URI is unspecified, it will be inferred from SoftwareConfig.image_version or the system default.</li>
+</ul>
+</li>
+<li><code>instance-names=consetetur</code><ul>
+<li>Output only. The list of instance names. Dataproc derives the names from cluster_name, num_instances, and the instance group.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>is-preemptible=true</code><ul>
+<li>Output only. Specifies that this instance group contains preemptible instances.</li>
+</ul>
+</li>
+<li><code>machine-type-uri=dolor</code><ul>
+<li>Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement) feature, you must use the short name of the machine type resource, for example, n1-standard-2.</li>
+</ul>
+</li>
+<li><code>managed-group-config    instance-group-manager-name=aliquyam</code><ul>
+<li>Output only. The name of the Instance Group Manager for this group.</li>
+</ul>
+</li>
+<li>
+<p><code>instance-template-name=no</code></p>
+<ul>
+<li>Output only. The name of the Instance Template used for the Managed Instance Group.</li>
+</ul>
+</li>
+<li>
+<p><code>..    min-cpu-platform=amet.</code></p>
+<ul>
+<li>Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc -&gt; Minimum CPU Platform (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-cpu).</li>
+</ul>
+</li>
+<li><code>num-instances=51</code><ul>
+<li>Optional. The number of VM instances in the instance group. For HA cluster master_config groups, must be set to 3. For standard cluster master_config groups, must be set to 1.</li>
+</ul>
+</li>
+<li>
+<p><code>preemptibility=lorem</code></p>
+<ul>
+<li>Optional. Specifies the preemptibility of the instance group.The default value for master and worker groups is NON_PREEMPTIBLE. This default cannot be changed.The default value for secondary instances is PREEMPTIBLE.</li>
+</ul>
+</li>
+<li>
+<p><code>..metastore-config    dataproc-metastore-service=accusam</code></p>
+<ul>
+<li>Required. Resource name of an existing Dataproc Metastore service.Example: projects/[project_id]/locations/[dataproc_region]/services/[service-name]</li>
+</ul>
+</li>
+<li>
+<p><code>..secondary-worker-config.disk-config    boot-disk-size-gb=39</code></p>
+<ul>
+<li>Optional. Size in GB of the boot disk (default is 500GB).</li>
+</ul>
+</li>
+<li><code>boot-disk-type=sadipscing</code><ul>
+<li>Optional. Type of the boot disk (default is &#34;pd-standard&#34;). Valid values: &#34;pd-balanced&#34; (Persistent Disk Balanced Solid State Drive), &#34;pd-ssd&#34; (Persistent Disk Solid State Drive), or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive). See Disk types (https://cloud.google.com/compute/docs/disks#disk-types).</li>
+</ul>
+</li>
+<li>
+<p><code>num-local-ssds=74</code></p>
+<ul>
+<li>Optional. Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and HDFS (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=sit</code></p>
+<ul>
+<li>Optional. The Compute Engine image resource used for cluster instances.The URI can represent an image or image family.Image examples: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/[image-id] projects/[project_id]/global/images/[image-id] image-idImage family examples. Dataproc will use the most recent image from the family: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/family/[custom-image-family-name] projects/[project_id]/global/images/family/[custom-image-family-name]If the URI is unspecified, it will be inferred from SoftwareConfig.image_version or the system default.</li>
+</ul>
+</li>
+<li><code>instance-names=duo</code><ul>
+<li>Output only. The list of instance names. Dataproc derives the names from cluster_name, num_instances, and the instance group.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>is-preemptible=true</code><ul>
+<li>Output only. Specifies that this instance group contains preemptible instances.</li>
+</ul>
+</li>
+<li><code>machine-type-uri=magna</code><ul>
+<li>Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement) feature, you must use the short name of the machine type resource, for example, n1-standard-2.</li>
+</ul>
+</li>
+<li><code>managed-group-config    instance-group-manager-name=et</code><ul>
+<li>Output only. The name of the Instance Group Manager for this group.</li>
+</ul>
+</li>
+<li>
+<p><code>instance-template-name=rebum.</code></p>
+<ul>
+<li>Output only. The name of the Instance Template used for the Managed Instance Group.</li>
+</ul>
+</li>
+<li>
+<p><code>..    min-cpu-platform=dolor</code></p>
+<ul>
+<li>Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc -&gt; Minimum CPU Platform (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-cpu).</li>
+</ul>
+</li>
+<li><code>num-instances=95</code><ul>
+<li>Optional. The number of VM instances in the instance group. For HA cluster master_config groups, must be set to 3. For standard cluster master_config groups, must be set to 1.</li>
+</ul>
+</li>
+<li>
+<p><code>preemptibility=justo</code></p>
+<ul>
+<li>Optional. Specifies the preemptibility of the instance group.The default value for master and worker groups is NON_PREEMPTIBLE. This default cannot be changed.The default value for secondary instances is PREEMPTIBLE.</li>
+</ul>
+</li>
+<li>
+<p><code>..security-config.identity-config    user-service-account-mapping=key=amet.</code></p>
+<ul>
+<li>Required. Map of user to service account.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..kerberos-config    cross-realm-trust-admin-server=no</code></p>
+<ul>
+<li>Optional. The admin server (IP or hostname) for the remote trusted realm in a cross realm trust relationship.</li>
+</ul>
+</li>
+<li><code>cross-realm-trust-kdc=nonumy</code><ul>
+<li>Optional. The KDC (IP or hostname) for the remote trusted realm in a cross realm trust relationship.</li>
+</ul>
+</li>
+<li><code>cross-realm-trust-realm=sed</code><ul>
+<li>Optional. The remote realm the Dataproc on-cluster KDC will trust, should the user enable cross realm trust.</li>
+</ul>
+</li>
+<li><code>cross-realm-trust-shared-password-uri=kasd</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the shared password between the on-cluster Kerberos realm and the remote trusted realm, in a cross realm trust relationship.</li>
+</ul>
+</li>
+<li><code>enable-kerberos=false</code><ul>
+<li>Optional. Flag to indicate whether to Kerberize the cluster (default: false). Set this field to true to enable Kerberos on a cluster.</li>
+</ul>
+</li>
+<li><code>kdc-db-key-uri=sanctus</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the master key of the KDC database.</li>
+</ul>
+</li>
+<li><code>key-password-uri=nonumy</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the password to the user provided key. For the self-signed certificate, this password is generated by Dataproc.</li>
+</ul>
+</li>
+<li><code>keystore-password-uri=rebum.</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the password to the user provided keystore. For the self-signed certificate, this password is generated by Dataproc.</li>
+</ul>
+</li>
+<li><code>keystore-uri=tempor</code><ul>
+<li>Optional. The Cloud Storage URI of the keystore file used for SSL encryption. If not provided, Dataproc will provide a self-signed certificate.</li>
+</ul>
+</li>
+<li><code>kms-key-uri=dolore</code><ul>
+<li>Optional. The uri of the KMS key used to encrypt various sensitive files.</li>
+</ul>
+</li>
+<li><code>realm=eos</code><ul>
+<li>Optional. The name of the on-cluster Kerberos realm. If not specified, the uppercased domain of hostnames will be the realm.</li>
+</ul>
+</li>
+<li><code>root-principal-password-uri=amet.</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the root principal password.</li>
+</ul>
+</li>
+<li><code>tgt-lifetime-hours=17</code><ul>
+<li>Optional. The lifetime of the ticket granting ticket, in hours. If not specified, or user specifies 0, then default value 10 will be used.</li>
+</ul>
+</li>
+<li><code>truststore-password-uri=amet</code><ul>
+<li>Optional. The Cloud Storage URI of a KMS encrypted file containing the password to the user provided truststore. For the self-signed certificate, this password is generated by Dataproc.</li>
+</ul>
+</li>
+<li>
+<p><code>truststore-uri=ut</code></p>
+<ul>
+<li>Optional. The Cloud Storage URI of the truststore file used for SSL encryption. If not provided, Dataproc will provide a self-signed certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>...software-config    image-version=at</code></p>
+<ul>
+<li>Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions), such as &#34;1.2&#34; (including a subminor version, such as &#34;1.2.29&#34;), or the &#34;preview&#34; version (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions). If unspecified, it defaults to the latest Debian version.</li>
+</ul>
+</li>
+<li><code>optional-components=sit</code><ul>
+<li>Optional. The set of components to activate on the cluster.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>properties=key=vero</code></p>
+<ul>
+<li>Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. The following are supported prefixes and their mappings: capacity-scheduler: capacity-scheduler.xml core: core-site.xml distcp: distcp-default.xml hdfs: hdfs-site.xml hive: hive-site.xml mapred: mapred-site.xml pig: pig.properties spark: spark-defaults.conf yarn: yarn-site.xmlFor more information, see Cluster properties (https://cloud.google.com/dataproc/docs/concepts/cluster-properties).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    temp-bucket=duo</code></p>
+<ul>
+<li>Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data, such as Spark and MapReduce history files. If you do not specify a temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster&#39;s temp bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket. The default bucket has a TTL of 90 days, but you can use any TTL (or none) if you specify a bucket. This field requires a Cloud Storage bucket name, not a URI to a Cloud Storage bucket.</li>
+</ul>
+</li>
+<li><code>worker-config.disk-config    boot-disk-size-gb=56</code><ul>
+<li>Optional. Size in GB of the boot disk (default is 500GB).</li>
+</ul>
+</li>
+<li><code>boot-disk-type=ut</code><ul>
+<li>Optional. Type of the boot disk (default is &#34;pd-standard&#34;). Valid values: &#34;pd-balanced&#34; (Persistent Disk Balanced Solid State Drive), &#34;pd-ssd&#34; (Persistent Disk Solid State Drive), or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive). See Disk types (https://cloud.google.com/compute/docs/disks#disk-types).</li>
+</ul>
+</li>
+<li>
+<p><code>num-local-ssds=85</code></p>
+<ul>
+<li>Optional. Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and HDFS (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=duo</code></p>
+<ul>
+<li>Optional. The Compute Engine image resource used for cluster instances.The URI can represent an image or image family.Image examples: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/[image-id] projects/[project_id]/global/images/[image-id] image-idImage family examples. Dataproc will use the most recent image from the family: https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/family/[custom-image-family-name] projects/[project_id]/global/images/family/[custom-image-family-name]If the URI is unspecified, it will be inferred from SoftwareConfig.image_version or the system default.</li>
+</ul>
+</li>
+<li><code>instance-names=kasd</code><ul>
+<li>Output only. The list of instance names. Dataproc derives the names from cluster_name, num_instances, and the instance group.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>is-preemptible=false</code><ul>
+<li>Output only. Specifies that this instance group contains preemptible instances.</li>
+</ul>
+</li>
+<li><code>machine-type-uri=tempor</code><ul>
+<li>Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2 n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement) feature, you must use the short name of the machine type resource, for example, n1-standard-2.</li>
+</ul>
+</li>
+<li><code>managed-group-config    instance-group-manager-name=sea</code><ul>
+<li>Output only. The name of the Instance Group Manager for this group.</li>
+</ul>
+</li>
+<li>
+<p><code>instance-template-name=et</code></p>
+<ul>
+<li>Output only. The name of the Instance Template used for the Managed Instance Group.</li>
+</ul>
+</li>
+<li>
+<p><code>..    min-cpu-platform=lorem</code></p>
+<ul>
+<li>Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc -&gt; Minimum CPU Platform (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-cpu).</li>
+</ul>
+</li>
+<li><code>num-instances=68</code><ul>
+<li>Optional. The number of VM instances in the instance group. For HA cluster master_config groups, must be set to 3. For standard cluster master_config groups, must be set to 1.</li>
+</ul>
+</li>
+<li>
+<p><code>preemptibility=takimata</code></p>
+<ul>
+<li>Optional. Specifies the preemptibility of the instance group.The default value for master and worker groups is NON_PREEMPTIBLE. This default cannot be changed.The default value for secondary instances is PREEMPTIBLE.</li>
+</ul>
+</li>
+<li>
+<p><code>...    labels=key=rebum.</code></p>
+<ul>
+<li>Optional. The labels to associate with this cluster.Label keys must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given cluster.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>...    update-time=at</code></p>
+<ul>
+<li>Output only. The time template was last updated.</li>
+</ul>
+</li>
+<li><code>version=13</code><ul>
+<li>Optional. Used to perform a consistent read-modify-write.This field should be left blank for a CreateWorkflowTemplate request. It is required for an UpdateWorkflowTemplate request, and must match the current server version. A typical update template flow would fetch the current template with a GetWorkflowTemplate request, which will return the current template with the version field filled in with the current server version. The user updates other fields in the template, then returns it as part of the UpdateWorkflowTemplate request.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p request-id=string</strong><ul>
+<li>Optional. A tag that prevents multiple concurrent workflow instances with the same tag from running. This mitigates risk of concurrent instances started due to retries.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-workflow-templates-list" class="btn btn-neutral float-right" title="Locations Workflow Templates List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-workflow-templates-instantiate" class="btn btn-neutral" title="Locations Workflow Templates Instantiate"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-workflow-templates-instantiate" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-workflow-templates-list" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

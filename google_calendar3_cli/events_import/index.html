@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Import - calendar v2.0.0+20210327</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> calendar v2.0.0+20210327</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Acl</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../acl_watch">Watch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Calendar List</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendar-list_watch">Watch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Calendars</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_clear">Clear</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../calendars_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Channels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channels_stop">Stop</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Colors</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../colors_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Events</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Import</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_instances">Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_move">Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_quick-add">Quick Add</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../events_watch">Watch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Freebusy</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../freebusy_query">Query</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Settings</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../settings_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../settings_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../settings_watch">Watch</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Import</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Imports an event. This operation is used to add a private copy of an existing event to a calendar.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/calendar</em></li>
+<li><em>https://www.googleapis.com/auth/calendar.events</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/calendar</em>.
+You can set the scope for this method like this: <code>calendar3 --scope &lt;scope&gt; events import ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;calendar-id&gt;</strong> <em>(string)</em><ul>
+<li>Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the &#34;primary&#34; keyword.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Event:
+  anyone-can-add-self: boolean
+  attendees-omitted: boolean
+  color-id: string
+  conference-data:
+    conference-id: string
+    conference-solution:
+      icon-uri: string
+      key:
+        type: string
+      name: string
+    create-request:
+      conference-solution-key:
+        type: string
+      request-id: string
+      status:
+        status-code: string
+    notes: string
+    parameters:
+      add-on-parameters:
+        parameters: { string: string }
+    signature: string
+  created: string
+  creator:
+    display-name: string
+    email: string
+    id: string
+    self: boolean
+  description: string
+  end:
+    date: string
+    date-time: string
+    time-zone: string
+  end-time-unspecified: boolean
+  etag: string
+  event-type: string
+  extended-properties:
+    private: { string: string }
+    shared: { string: string }
+  gadget:
+    display: string
+    height: integer
+    icon-link: string
+    link: string
+    preferences: { string: string }
+    title: string
+    type: string
+    width: integer
+  guests-can-invite-others: boolean
+  guests-can-modify: boolean
+  guests-can-see-other-guests: boolean
+  hangout-link: string
+  html-link: string
+  i-cal-uid: string
+  id: string
+  kind: string
+  location: string
+  locked: boolean
+  organizer:
+    display-name: string
+    email: string
+    id: string
+    self: boolean
+  original-start-time:
+    date: string
+    date-time: string
+    time-zone: string
+  private-copy: boolean
+  recurrence: [string]
+  recurring-event-id: string
+  reminders:
+    use-default: boolean
+  sequence: integer
+  source:
+    title: string
+    url: string
+  start:
+    date: string
+    date-time: string
+    time-zone: string
+  status: string
+  summary: string
+  transparency: string
+  updated: string
+  visibility: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    anyone-can-add-self=false</code><ul>
+<li>Whether anyone can invite themselves to the event (currently works for Google+ events only). Optional. The default is False.</li>
+</ul>
+</li>
+<li><code>attendees-omitted=true</code><ul>
+<li>Whether attendees may have been omitted from the event&#39;s representation. When retrieving an event, this may be due to a restriction specified by the maxAttendee query parameter. When updating an event, this can be used to only update the participant&#39;s response. Optional. The default is False.</li>
+</ul>
+</li>
+<li><code>color-id=stet</code><ul>
+<li>The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.</li>
+</ul>
+</li>
+<li><code>conference-data    conference-id=est</code><ul>
+<li>The ID of the conference.
+    Can be used by developers to keep track of conferences, should not be displayed to users.
+    Values for solution types:  <ul>
+<li>&#34;eventHangout&#34;: unset.</li>
+<li>&#34;eventNamedHangout&#34;: the name of the Hangout.</li>
+<li>&#34;hangoutsMeet&#34;: the 10-letter meeting code, for example &#34;aaa-bbbb-ccc&#34;.</li>
+<li>&#34;addOn&#34;: defined by 3P conference provider.  Optional.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>conference-solution    icon-uri=aliquyam</code><ul>
+<li>The user-visible icon for this solution.</li>
+</ul>
+</li>
+<li>
+<p><code>key    type=elitr</code></p>
+<ul>
+<li>The conference solution type.
+    If a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.
+    The possible values are:  <ul>
+<li>&#34;eventHangout&#34; for Hangouts for consumers (http://hangouts.google.com)</li>
+<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (http://hangouts.google.com)</li>
+<li>&#34;hangoutsMeet&#34; for Google Meet (http://meet.google.com)</li>
+<li>&#34;addOn&#34; for 3P conference providers</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=duo</code></p>
+<ul>
+<li>The user-visible name of this solution. Not localized.</li>
+</ul>
+</li>
+<li>
+<p><code>..create-request.conference-solution-key    type=diam</code></p>
+<ul>
+<li>The conference solution type.
+    If a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.
+    The possible values are:  <ul>
+<li>&#34;eventHangout&#34; for Hangouts for consumers (http://hangouts.google.com)</li>
+<li>&#34;eventNamedHangout&#34; for classic Hangouts for Google Workspace users (http://hangouts.google.com)</li>
+<li>&#34;hangoutsMeet&#34; for Google Meet (http://meet.google.com)</li>
+<li>&#34;addOn&#34; for 3P conference providers</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..    request-id=est</code></p>
+<ul>
+<li>The client-generated unique ID for this request.
+    Clients should regenerate this ID for every new request. If an ID provided is the same as for the previous request, the request is ignored.</li>
+</ul>
+</li>
+<li>
+<p><code>status    status-code=sit</code></p>
+<ul>
+<li>The current status of the conference create request. Read-only.
+    The possible values are:  <ul>
+<li>&#34;pending&#34;: the conference create request is still being processed.</li>
+<li>&#34;success&#34;: the conference create request succeeded, the entry points are populated.</li>
+<li>&#34;failure&#34;: the conference create request failed, there are no entry points.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>...    notes=sed</code></p>
+<ul>
+<li>Additional notes (such as instructions from the domain administrator, legal notices) to display to the user. Can contain HTML. The maximum length is 2048 characters. Optional.</li>
+</ul>
+</li>
+<li>
+<p><code>parameters.add-on-parameters    parameters=key=eos</code></p>
+<ul>
+<li>No description provided.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>...    signature=lorem</code></p>
+<ul>
+<li>The signature of the conference data.
+    Generated on server side. Must be preserved while copying the conference data between events, otherwise the conference data will not be copied.
+    Unset for a conference with a failed create request.
+    Optional for a conference with a pending create request.</li>
+</ul>
+</li>
+<li>
+<p><code>..    created=ea</code></p>
+<ul>
+<li>Creation time of the event (as a RFC3339 timestamp). Read-only.</li>
+</ul>
+</li>
+<li><code>creator    display-name=stet</code><ul>
+<li>The creator&#39;s name, if available.</li>
+</ul>
+</li>
+<li><code>email=dolores</code><ul>
+<li>The creator&#39;s email address, if available.</li>
+</ul>
+</li>
+<li><code>id=eos</code><ul>
+<li>The creator&#39;s Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API</li>
+</ul>
+</li>
+<li>
+<p><code>self=true</code></p>
+<ul>
+<li>Whether the creator corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.</li>
+</ul>
+</li>
+<li>
+<p><code>..    description=sea</code></p>
+<ul>
+<li>Description of the event. Can contain HTML. Optional.</li>
+</ul>
+</li>
+<li><code>end    date=et</code><ul>
+<li>The date, in the format &#34;yyyy-mm-dd&#34;, if this is an all-day event.</li>
+</ul>
+</li>
+<li><code>date-time=at</code><ul>
+<li>The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.</li>
+</ul>
+</li>
+<li>
+<p><code>time-zone=dolore</code></p>
+<ul>
+<li>The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. &#34;Europe/Zurich&#34;.) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.</li>
+</ul>
+</li>
+<li>
+<p><code>..    end-time-unspecified=true</code></p>
+<ul>
+<li>Whether the end time is actually unspecified. An end time is still provided for compatibility reasons, even if this attribute is set to True. The default is False.</li>
+</ul>
+</li>
+<li><code>etag=lorem</code><ul>
+<li>ETag of the resource.</li>
+</ul>
+</li>
+<li><code>event-type=accusam</code><ul>
+<li>Specific type of the event. Read-only. Possible values are:  <ul>
+<li>&#34;default&#34; - A regular event or not further specified. </li>
+<li>&#34;outOfOffice&#34; - An out-of-office event.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>extended-properties    private=key=amet</code><ul>
+<li>Properties that are private to the copy of the event that appears on this calendar.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>shared=key=erat</code></p>
+<ul>
+<li>Properties that are shared between copies of the event on other attendees&#39; calendars.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..gadget    display=dolores</code></p>
+<ul>
+<li>The gadget&#39;s display mode. Deprecated. Possible values are:  <ul>
+<li>&#34;icon&#34; - The gadget displays next to the event&#39;s title in the calendar view. </li>
+<li>&#34;chip&#34; - The gadget displays when the event is clicked.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>height=20</code><ul>
+<li>The gadget&#39;s height in pixels. The height must be an integer greater than 0. Optional. Deprecated.</li>
+</ul>
+</li>
+<li><code>icon-link=accusam</code><ul>
+<li>The gadget&#39;s icon URL. The URL scheme must be HTTPS. Deprecated.</li>
+</ul>
+</li>
+<li><code>link=sea</code><ul>
+<li>The gadget&#39;s URL. The URL scheme must be HTTPS. Deprecated.</li>
+</ul>
+</li>
+<li><code>preferences=key=takimata</code><ul>
+<li>Preferences.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>title=lorem</code><ul>
+<li>The gadget&#39;s title. Deprecated.</li>
+</ul>
+</li>
+<li><code>type=et</code><ul>
+<li>The gadget&#39;s type. Deprecated.</li>
+</ul>
+</li>
+<li>
+<p><code>width=24</code></p>
+<ul>
+<li>The gadget&#39;s width in pixels. The width must be an integer greater than 0. Optional. Deprecated.</li>
+</ul>
+</li>
+<li>
+<p><code>..    guests-can-invite-others=true</code></p>
+<ul>
+<li>Whether attendees other than the organizer can invite others to the event. Optional. The default is True.</li>
+</ul>
+</li>
+<li><code>guests-can-modify=false</code><ul>
+<li>Whether attendees other than the organizer can modify the event. Optional. The default is False.</li>
+</ul>
+</li>
+<li><code>guests-can-see-other-guests=true</code><ul>
+<li>Whether attendees other than the organizer can see who the event&#39;s attendees are. Optional. The default is True.</li>
+</ul>
+</li>
+<li><code>hangout-link=et</code><ul>
+<li>An absolute link to the Google+ hangout associated with this event. Read-only.</li>
+</ul>
+</li>
+<li><code>html-link=gubergren</code><ul>
+<li>An absolute link to this event in the Google Calendar Web UI. Read-only.</li>
+</ul>
+</li>
+<li><code>i-cal-uid=justo</code><ul>
+<li>Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems and must be supplied when importing events via the import method.
+    Note that the icalUID and the id are not identical and only one of them should be supplied at event creation time. One difference in their semantics is that in recurring events, all occurrences of one event have different ids while they all share the same icalUIDs.</li>
+</ul>
+</li>
+<li><code>id=sea</code><ul>
+<li>Opaque identifier of the event. When creating new single or recurring events, you can specify their IDs. Provided IDs must follow these rules:  <ul>
+<li>characters allowed in the ID are those used in base32hex encoding, i.e. lowercase letters a-v and digits 0-9, see section 3.1.2 in RFC2938 </li>
+<li>the length of the ID must be between 5 and 1024 characters </li>
+<li>the ID must be unique per calendar  Due to the globally distributed nature of the system, we cannot guarantee that ID collisions will be detected at event creation time. To minimize the risk of collisions we recommend using an established UUID algorithm such as one described in RFC4122.
+If you do not specify an ID, it will be automatically generated by the server.
+Note that the icalUID and the id are not identical and only one of them should be supplied at event creation time. One difference in their semantics is that in recurring events, all occurrences of one event have different ids while they all share the same icalUIDs.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>kind=consetetur</code><ul>
+<li>Type of the resource (&#34;calendar#event&#34;).</li>
+</ul>
+</li>
+<li><code>location=sit</code><ul>
+<li>Geographic location of the event as free-form text. Optional.</li>
+</ul>
+</li>
+<li><code>locked=false</code><ul>
+<li>Whether this is a locked event copy where no changes can be made to the main event fields &#34;summary&#34;, &#34;description&#34;, &#34;location&#34;, &#34;start&#34;, &#34;end&#34; or &#34;recurrence&#34;. The default is False. Read-Only.</li>
+</ul>
+</li>
+<li><code>organizer    display-name=dolores</code><ul>
+<li>The organizer&#39;s name, if available.</li>
+</ul>
+</li>
+<li><code>email=consetetur</code><ul>
+<li>The organizer&#39;s email address, if available. It must be a valid email address as per RFC5322.</li>
+</ul>
+</li>
+<li><code>id=gubergren</code><ul>
+<li>The organizer&#39;s Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API</li>
+</ul>
+</li>
+<li>
+<p><code>self=true</code></p>
+<ul>
+<li>Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.</li>
+</ul>
+</li>
+<li>
+<p><code>..original-start-time    date=amet.</code></p>
+<ul>
+<li>The date, in the format &#34;yyyy-mm-dd&#34;, if this is an all-day event.</li>
+</ul>
+</li>
+<li><code>date-time=ipsum</code><ul>
+<li>The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.</li>
+</ul>
+</li>
+<li>
+<p><code>time-zone=lorem</code></p>
+<ul>
+<li>The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. &#34;Europe/Zurich&#34;.) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.</li>
+</ul>
+</li>
+<li>
+<p><code>..    private-copy=false</code></p>
+<ul>
+<li>If set to True, Event propagation is disabled. Note that it is not the same thing as Private event properties. Optional. Immutable. The default is False.</li>
+</ul>
+</li>
+<li><code>recurrence=gubergren</code><ul>
+<li>List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event, as specified in RFC5545. Note that DTSTART and DTEND lines are not allowed in this field; event start and end times are specified in the start and end fields. This field is omitted for single events or instances of recurring events.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>recurring-event-id=sadipscing</code><ul>
+<li>For an instance of a recurring event, this is the id of the recurring event to which this instance belongs. Immutable.</li>
+</ul>
+</li>
+<li>
+<p><code>reminders    use-default=true</code></p>
+<ul>
+<li>Whether the default reminders of the calendar apply to the event.</li>
+</ul>
+</li>
+<li>
+<p><code>..    sequence=81</code></p>
+<ul>
+<li>Sequence number as per iCalendar.</li>
+</ul>
+</li>
+<li><code>source    title=sit</code><ul>
+<li>Title of the source; for example a title of a web page or an email subject.</li>
+</ul>
+</li>
+<li>
+<p><code>url=magna</code></p>
+<ul>
+<li>URL of the source pointing to a resource. The URL scheme must be HTTP or HTTPS.</li>
+</ul>
+</li>
+<li>
+<p><code>..start    date=et</code></p>
+<ul>
+<li>The date, in the format &#34;yyyy-mm-dd&#34;, if this is an all-day event.</li>
+</ul>
+</li>
+<li><code>date-time=rebum.</code><ul>
+<li>The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.</li>
+</ul>
+</li>
+<li>
+<p><code>time-zone=dolor</code></p>
+<ul>
+<li>The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. &#34;Europe/Zurich&#34;.) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.</li>
+</ul>
+</li>
+<li>
+<p><code>..    status=lorem</code></p>
+<ul>
+<li>Status of the event. Optional. Possible values are:  <ul>
+<li>&#34;confirmed&#34; - The event is confirmed. This is the default status. </li>
+<li>&#34;tentative&#34; - The event is tentatively confirmed. </li>
+<li>&#34;cancelled&#34; - The event is cancelled (deleted). The list method returns cancelled events only on incremental sync (when syncToken or updatedMin are specified) or if the showDeleted flag is set to true. The get method always returns them.
+A cancelled status represents two different states depending on the event type:  </li>
+<li>Cancelled exceptions of an uncancelled recurring event indicate that this instance should no longer be presented to the user. Clients should store these events for the lifetime of the parent recurring event.
+Cancelled exceptions are only guaranteed to have values for the id, recurringEventId and originalStartTime fields populated. The other fields might be empty.  </li>
+<li>All other cancelled events represent deleted events. Clients should remove their locally synced copies. Such cancelled events will eventually disappear, so do not rely on them being available indefinitely.
+Deleted events are only guaranteed to have the id field populated.   On the organizer&#39;s calendar, cancelled events continue to expose event details (summary, location, etc.) so that they can be restored (undeleted). Similarly, the events to which the user was invited and that they manually removed continue to provide details. However, incremental sync requests with showDeleted set to false will not return these details.
+If an event changes its organizer (for example via the move operation) and the original organizer is not on the attendee list, it will leave behind a cancelled event where only the id field is guaranteed to be populated.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>summary=justo</code><ul>
+<li>Title of the event.</li>
+</ul>
+</li>
+<li><code>transparency=amet.</code><ul>
+<li>Whether the event blocks time on the calendar. Optional. Possible values are:  <ul>
+<li>&#34;opaque&#34; - Default value. The event does block time on the calendar. This is equivalent to setting Show me as to Busy in the Calendar UI. </li>
+<li>&#34;transparent&#34; - The event does not block time on the calendar. This is equivalent to setting Show me as to Available in the Calendar UI.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>updated=no</code><ul>
+<li>Last modification time of the event (as a RFC3339 timestamp). Read-only.</li>
+</ul>
+</li>
+<li><code>visibility=nonumy</code><ul>
+<li>Visibility of the event. Optional. Possible values are:  <ul>
+<li>&#34;default&#34; - Uses the default visibility for events on the calendar. This is the default value. </li>
+<li>&#34;public&#34; - The event is public and event details are visible to all readers of the calendar. </li>
+<li>&#34;private&#34; - The event is private and only event attendees may view event details. </li>
+<li>&#34;confidential&#34; - The event is private. This value is provided for compatibility reasons.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p conference-data-version=integer</strong></p>
+<ul>
+<li>Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event&#39;s body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p supports-attachments=boolean</strong></p>
+<ul>
+<li>Whether API client performing operation supports event attachments. Optional. The default is False.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../events_insert" class="btn btn-neutral float-right" title="Insert"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../events_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../events_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../events_insert" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

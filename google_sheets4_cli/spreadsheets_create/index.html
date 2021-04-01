@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Create - Sheets v2.0.0+20210322</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Sheets v2.0.0+20210322</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Spreadsheets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_batch-update">Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_developer-metadata-get">Developer Metadata Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_developer-metadata-search">Developer Metadata Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_get-by-data-filter">Get By Data Filter</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_sheets-copy-to">Sheets Copy To</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-append">Values Append</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-clear">Values Batch Clear</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-clear-by-data-filter">Values Batch Clear By Data Filter</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-get">Values Batch Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-get-by-data-filter">Values Batch Get By Data Filter</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-update">Values Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-batch-update-by-data-filter">Values Batch Update By Data Filter</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-clear">Values Clear</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-get">Values Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../spreadsheets_values-update">Values Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/sheets4-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a spreadsheet, returning the newly created spreadsheet.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/drive</em></li>
+<li><em>https://www.googleapis.com/auth/drive.file</em></li>
+<li><em>https://www.googleapis.com/auth/spreadsheets</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/drive</em>.
+You can set the scope for this method like this: <code>sheets4 --scope &lt;scope&gt; spreadsheets create ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Spreadsheet:
+  properties:
+    auto-recalc: string
+    default-format:
+      background-color:
+        alpha: number
+        blue: number
+        green: number
+        red: number
+      background-color-style:
+        rgb-color:
+          alpha: number
+          blue: number
+          green: number
+          red: number
+        theme-color: string
+      borders:
+        bottom:
+          color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          color-style:
+            rgb-color:
+              alpha: number
+              blue: number
+              green: number
+              red: number
+            theme-color: string
+          style: string
+          width: integer
+        left:
+          color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          color-style:
+            rgb-color:
+              alpha: number
+              blue: number
+              green: number
+              red: number
+            theme-color: string
+          style: string
+          width: integer
+        right:
+          color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          color-style:
+            rgb-color:
+              alpha: number
+              blue: number
+              green: number
+              red: number
+            theme-color: string
+          style: string
+          width: integer
+        top:
+          color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          color-style:
+            rgb-color:
+              alpha: number
+              blue: number
+              green: number
+              red: number
+            theme-color: string
+          style: string
+          width: integer
+      horizontal-alignment: string
+      hyperlink-display-type: string
+      number-format:
+        pattern: string
+        type: string
+      padding:
+        bottom: integer
+        left: integer
+        right: integer
+        top: integer
+      text-direction: string
+      text-format:
+        bold: boolean
+        font-family: string
+        font-size: integer
+        foreground-color:
+          alpha: number
+          blue: number
+          green: number
+          red: number
+        foreground-color-style:
+          rgb-color:
+            alpha: number
+            blue: number
+            green: number
+            red: number
+          theme-color: string
+        italic: boolean
+        link:
+          uri: string
+        strikethrough: boolean
+        underline: boolean
+      text-rotation:
+        angle: integer
+        vertical: boolean
+      vertical-alignment: string
+      wrap-strategy: string
+    iterative-calculation-settings:
+      convergence-threshold: number
+      max-iterations: integer
+    locale: string
+    spreadsheet-theme:
+      primary-font-family: string
+    time-zone: string
+    title: string
+  spreadsheet-id: string
+  spreadsheet-url: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .properties    auto-recalc=takimata</code><ul>
+<li>The amount of time to wait before volatile functions are recalculated.</li>
+</ul>
+</li>
+<li><code>default-format.background-color    alpha=0.38370480861420864</code><ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.7896128249156874</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.9217265098962596</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.30763338797950246</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..background-color-style.rgb-color    alpha=0.9922470725858205</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.20494600207758173</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.6562776331888889</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.912305342889376</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=invidunt</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..borders.bottom.color    alpha=0.42548765853373427</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.635197500875138</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.9001265173058445</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.5053930334687853</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..color-style.rgb-color    alpha=0.6681221451468909</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.888331125703361</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.4033695817113857</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.737544430792817</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=gubergren</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..    style=ea</code></p>
+<ul>
+<li>The style of the border.</li>
+</ul>
+</li>
+<li>
+<p><code>width=2</code></p>
+<ul>
+<li>The width of the border, in pixels. Deprecated; the width is determined by the &#34;style&#34; field.</li>
+</ul>
+</li>
+<li>
+<p><code>..left.color    alpha=0.8325065326181772</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.5944568076620798</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.46093367968783205</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.9575633866430626</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..color-style.rgb-color    alpha=0.7957202632117738</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.31372789799617684</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.6905413711203235</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.9150999978526841</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=sed</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..    style=et</code></p>
+<ul>
+<li>The style of the border.</li>
+</ul>
+</li>
+<li>
+<p><code>width=33</code></p>
+<ul>
+<li>The width of the border, in pixels. Deprecated; the width is determined by the &#34;style&#34; field.</li>
+</ul>
+</li>
+<li>
+<p><code>..right.color    alpha=0.8039909988714865</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.5477575441248734</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.6383502522516505</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.9694857568940014</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..color-style.rgb-color    alpha=0.9697780726648698</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.7735052857092053</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.07223777776561668</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.9625057030686941</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=et</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..    style=sadipscing</code></p>
+<ul>
+<li>The style of the border.</li>
+</ul>
+</li>
+<li>
+<p><code>width=86</code></p>
+<ul>
+<li>The width of the border, in pixels. Deprecated; the width is determined by the &#34;style&#34; field.</li>
+</ul>
+</li>
+<li>
+<p><code>..top.color    alpha=0.017140519879742522</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.19681975392268636</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.10459029141758258</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.19657477328425788</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..color-style.rgb-color    alpha=0.7491113388279885</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.9996547162401588</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.5686782919934609</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.012465497817154336</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=accusam</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..    style=takimata</code></p>
+<ul>
+<li>The style of the border.</li>
+</ul>
+</li>
+<li>
+<p><code>width=55</code></p>
+<ul>
+<li>The width of the border, in pixels. Deprecated; the width is determined by the &#34;style&#34; field.</li>
+</ul>
+</li>
+<li>
+<p><code>...    horizontal-alignment=voluptua.</code></p>
+<ul>
+<li>The horizontal alignment of the value in the cell.</li>
+</ul>
+</li>
+<li><code>hyperlink-display-type=et</code><ul>
+<li>How a hyperlink, if it exists, should be displayed in the cell.</li>
+</ul>
+</li>
+<li><code>number-format    pattern=erat</code><ul>
+<li>Pattern string used for formatting. If not set, a default pattern based on the user&#39;s locale will be used if necessary for the given type. See the <a href="..//sheets/api/guides/formats">Date and Number Formats guide</a> for more information about the supported patterns.</li>
+</ul>
+</li>
+<li>
+<p><code>type=consetetur</code></p>
+<ul>
+<li>The type of the number format. When writing, this field must be set.</li>
+</ul>
+</li>
+<li>
+<p><code>..padding    bottom=99</code></p>
+<ul>
+<li>The bottom padding of the cell.</li>
+</ul>
+</li>
+<li><code>left=71</code><ul>
+<li>The left padding of the cell.</li>
+</ul>
+</li>
+<li><code>right=92</code><ul>
+<li>The right padding of the cell.</li>
+</ul>
+</li>
+<li>
+<p><code>top=82</code></p>
+<ul>
+<li>The top padding of the cell.</li>
+</ul>
+</li>
+<li>
+<p><code>..    text-direction=gubergren</code></p>
+<ul>
+<li>The direction of the text in the cell.</li>
+</ul>
+</li>
+<li><code>text-format    bold=false</code><ul>
+<li>True if the text is bold.</li>
+</ul>
+</li>
+<li><code>font-family=accusam</code><ul>
+<li>The font family.</li>
+</ul>
+</li>
+<li><code>font-size=23</code><ul>
+<li>The size of the font.</li>
+</ul>
+</li>
+<li><code>foreground-color    alpha=0.5290758052968516</code><ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.5284480987860815</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.7753213022845796</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.05043422241780038</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..foreground-color-style.rgb-color    alpha=0.4946595631810975</code></p>
+<ul>
+<li>The fraction of this color that should be applied to the pixel. That is, the final pixel color is defined by the equation: <code>pixel color = alpha * (this color) + (1.0 - alpha) * (background color)</code> This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color. This uses a wrapper message rather than a simple float scalar so that it is possible to distinguish between a default value and the value being unset. If omitted, this color object is rendered as a solid color (as if the alpha value had been explicitly given a value of 1.0).</li>
+</ul>
+</li>
+<li><code>blue=0.7364988594037298</code><ul>
+<li>The amount of blue in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li><code>green=0.4551855025693473</code><ul>
+<li>The amount of green in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>red=0.8987894283575105</code></p>
+<ul>
+<li>The amount of red in the color as a value in the interval [0, 1].</li>
+</ul>
+</li>
+<li>
+<p><code>..    theme-color=et</code></p>
+<ul>
+<li>Theme color.</li>
+</ul>
+</li>
+<li>
+<p><code>..    italic=true</code></p>
+<ul>
+<li>True if the text is italicized.</li>
+</ul>
+</li>
+<li>
+<p><code>link    uri=aliquyam</code></p>
+<ul>
+<li>The link identifier.</li>
+</ul>
+</li>
+<li>
+<p><code>..    strikethrough=true</code></p>
+<ul>
+<li>True if the text has a strikethrough.</li>
+</ul>
+</li>
+<li>
+<p><code>underline=true</code></p>
+<ul>
+<li>True if the text is underlined.</li>
+</ul>
+</li>
+<li>
+<p><code>..text-rotation    angle=33</code></p>
+<ul>
+<li>The angle between the standard orientation and the desired orientation. Measured in degrees. Valid values are between -90 and 90. Positive angles are angled upwards, negative are angled downwards. Note: For LTR text direction positive angles are in the counterclockwise direction, whereas for RTL they are in the clockwise direction</li>
+</ul>
+</li>
+<li>
+<p><code>vertical=false</code></p>
+<ul>
+<li>If true, text reads top to bottom, but the orientation of individual characters is unchanged. For example: | V | | e | | r | | t | | i | | c | | a | | l |</li>
+</ul>
+</li>
+<li>
+<p><code>..    vertical-alignment=no</code></p>
+<ul>
+<li>The vertical alignment of the value in the cell.</li>
+</ul>
+</li>
+<li>
+<p><code>wrap-strategy=et</code></p>
+<ul>
+<li>The wrap strategy for the value in the cell.</li>
+</ul>
+</li>
+<li>
+<p><code>..iterative-calculation-settings    convergence-threshold=0.9478375320054573</code></p>
+<ul>
+<li>When iterative calculation is enabled and successive results differ by less than this threshold value, the calculation rounds stop.</li>
+</ul>
+</li>
+<li>
+<p><code>max-iterations=21</code></p>
+<ul>
+<li>When iterative calculation is enabled, the maximum number of calculation rounds to perform.</li>
+</ul>
+</li>
+<li>
+<p><code>..    locale=no</code></p>
+<ul>
+<li>The locale of the spreadsheet in one of the following formats: * an ISO 639-1 language code such as <code>en</code> * an ISO 639-2 language code such as <code>fil</code>, if no 639-1 code exists * a combination of the ISO language code and country code, such as <code>en_US</code> Note: when updating this field, not all locales/languages are supported.</li>
+</ul>
+</li>
+<li>
+<p><code>spreadsheet-theme    primary-font-family=nonumy</code></p>
+<ul>
+<li>Name of the primary font family.</li>
+</ul>
+</li>
+<li>
+<p><code>..    time-zone=at</code></p>
+<ul>
+<li>The time zone of the spreadsheet, in CLDR format such as <code>America/New_York</code>. If the time zone isn&#39;t recognized, this may be a custom time zone such as <code>GMT-07:00</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>title=sadipscing</code></p>
+<ul>
+<li>The title of the spreadsheet.</li>
+</ul>
+</li>
+<li>
+<p><code>..    spreadsheet-id=aliquyam</code></p>
+<ul>
+<li>The ID of the spreadsheet. This field is read-only.</li>
+</ul>
+</li>
+<li><code>spreadsheet-url=dolores</code><ul>
+<li>The url of the spreadsheet. This field is read-only.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../spreadsheets_developer-metadata-get" class="btn btn-neutral float-right" title="Developer Metadata Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../spreadsheets_batch-update" class="btn btn-neutral" title="Batch Update"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../spreadsheets_batch-update" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../spreadsheets_developer-metadata-get" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

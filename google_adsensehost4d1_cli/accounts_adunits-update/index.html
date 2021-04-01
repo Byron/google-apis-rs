@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Adunits Update - AdSense Host v2.0.0+20200930</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AdSense Host v2.0.0+20200930</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adclients-get">Adclients Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adclients-list">Adclients List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-delete">Adunits Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-get">Adunits Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-get-ad-code">Adunits Get Ad Code</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-insert">Adunits Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-list">Adunits List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_adunits-patch">Adunits Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Adunits Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_reports-generate">Reports Generate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Adclients</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../adclients_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../adclients_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Associationsessions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../associationsessions_start">Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../associationsessions_verify">Verify</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Customchannels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../customchannels_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Reports</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reports_generate">Generate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Urlchannels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../urlchannels_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../urlchannels_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../urlchannels_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Adunits Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/adsensehost4d1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Update the supplied ad unit in the specified publisher AdSense account.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/adsensehost</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/adsensehost</em>.
+You can set the scope for this method like this: <code>adsensehost4d1 --scope &lt;scope&gt; accounts adunits-update ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;account-id&gt;</strong> <em>(string)</em><ul>
+<li>Account which contains the ad client.</li>
+</ul>
+</li>
+<li><strong>&lt;ad-client-id&gt;</strong> <em>(string)</em><ul>
+<li>Ad client which contains the ad unit.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>AdUnit:
+  code: string
+  content-ads-settings:
+    backup-option:
+      color: string
+      type: string
+      url: string
+    size: string
+    type: string
+  custom-style:
+    colors:
+      background: string
+      border: string
+      text: string
+      title: string
+      url: string
+    corners: string
+    font:
+      family: string
+      size: string
+    kind: string
+  id: string
+  kind: string
+  mobile-content-ads-settings:
+    markup-language: string
+    scripting-language: string
+    size: string
+    type: string
+  name: string
+  status: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    code=et</code><ul>
+<li>Identity code of this ad unit, not necessarily unique across ad clients.</li>
+</ul>
+</li>
+<li><code>content-ads-settings.backup-option    color=et</code><ul>
+<li>Color to use when type is set to COLOR. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.</li>
+</ul>
+</li>
+<li><code>type=vero</code><ul>
+<li>Type of the backup option. Possible values are BLANK, COLOR and URL.</li>
+</ul>
+</li>
+<li>
+<p><code>url=erat</code></p>
+<ul>
+<li>URL to use when type is set to URL.</li>
+</ul>
+</li>
+<li>
+<p><code>..    size=sed</code></p>
+<ul>
+<li>Size of this ad unit. Size values are in the form SIZE_{width}_{height}.</li>
+</ul>
+</li>
+<li>
+<p><code>type=duo</code></p>
+<ul>
+<li>Type of this ad unit. Possible values are TEXT, TEXT_IMAGE, IMAGE and LINK.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-style.colors    background=dolore</code></p>
+<ul>
+<li>The color of the ad background.</li>
+</ul>
+</li>
+<li><code>border=et</code><ul>
+<li>The color of the ad border.</li>
+</ul>
+</li>
+<li><code>text=voluptua.</code><ul>
+<li>The color of the ad text.</li>
+</ul>
+</li>
+<li><code>title=amet.</code><ul>
+<li>The color of the ad title.</li>
+</ul>
+</li>
+<li>
+<p><code>url=consetetur</code></p>
+<ul>
+<li>The color of the ad url.</li>
+</ul>
+</li>
+<li>
+<p><code>..    corners=diam</code></p>
+<ul>
+<li>The style of the corners in the ad (deprecated: never populated, ignored).</li>
+</ul>
+</li>
+<li><code>font    family=dolor</code><ul>
+<li>The family of the font. Possible values are: ACCOUNT_DEFAULT_FAMILY, ADSENSE_DEFAULT_FAMILY, ARIAL, TIMES and VERDANA.</li>
+</ul>
+</li>
+<li>
+<p><code>size=et</code></p>
+<ul>
+<li>The size of the font. Possible values are: ACCOUNT_DEFAULT_SIZE, ADSENSE_DEFAULT_SIZE, SMALL, MEDIUM and LARGE.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=et</code></p>
+<ul>
+<li>Kind this is, in this case adsensehost#adStyle.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=sadipscing</code></p>
+<ul>
+<li>Unique identifier of this ad unit. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.</li>
+</ul>
+</li>
+<li><code>kind=stet</code><ul>
+<li>Kind of resource this is, in this case adsensehost#adUnit.</li>
+</ul>
+</li>
+<li><code>mobile-content-ads-settings    markup-language=dolor</code><ul>
+<li>The markup language to use for this ad unit.</li>
+</ul>
+</li>
+<li><code>scripting-language=duo</code><ul>
+<li>The scripting language to use for this ad unit.</li>
+</ul>
+</li>
+<li><code>size=vero</code><ul>
+<li>Size of this ad unit.</li>
+</ul>
+</li>
+<li>
+<p><code>type=vero</code></p>
+<ul>
+<li>Type of this ad unit.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=invidunt</code></p>
+<ul>
+<li>Name of this ad unit.</li>
+</ul>
+</li>
+<li><code>status=stet</code><ul>
+<li>
+<p>Status of this ad unit. Possible values are:
+    NEW: Indicates that the ad unit was created within the last seven days and does not yet have any activity associated with it.</p>
+<p>ACTIVE: Indicates that there has been activity on this ad unit in the last seven days.</p>
+<p>INACTIVE: Indicates that there has been no activity on this ad unit in the last seven days.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../accounts_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../accounts_adunits-patch" class="btn btn-neutral" title="Adunits Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../accounts_adunits-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../accounts_get" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Messages Import - Gmail v2.0.0+20210322</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Gmail v2.0.0+20210322</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-create">Drafts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-delete">Drafts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-get">Drafts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-list">Drafts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-send">Drafts Send</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_drafts-update">Drafts Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_get-profile">Get Profile</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_history-list">History List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-create">Labels Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-delete">Labels Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-get">Labels Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-list">Labels List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-patch">Labels Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_labels-update">Labels Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-attachments-get">Messages Attachments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-batch-delete">Messages Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-batch-modify">Messages Batch Modify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-delete">Messages Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-get">Messages Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Messages Import</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-upload-flags">Required Upload Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-insert">Messages Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-list">Messages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-modify">Messages Modify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-send">Messages Send</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-trash">Messages Trash</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_messages-untrash">Messages Untrash</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-delegates-create">Settings Delegates Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-delegates-delete">Settings Delegates Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-delegates-get">Settings Delegates Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-delegates-list">Settings Delegates List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-filters-create">Settings Filters Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-filters-delete">Settings Filters Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-filters-get">Settings Filters Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-filters-list">Settings Filters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-forwarding-addresses-create">Settings Forwarding Addresses Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-forwarding-addresses-delete">Settings Forwarding Addresses Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-forwarding-addresses-get">Settings Forwarding Addresses Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-forwarding-addresses-list">Settings Forwarding Addresses List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-get-auto-forwarding">Settings Get Auto Forwarding</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-get-imap">Settings Get Imap</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-get-language">Settings Get Language</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-get-pop">Settings Get Pop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-get-vacation">Settings Get Vacation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-create">Settings Send As Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-delete">Settings Send As Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-get">Settings Send As Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-list">Settings Send As List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-patch">Settings Send As Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-smime-info-delete">Settings Send As Smime Info Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-smime-info-get">Settings Send As Smime Info Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-smime-info-insert">Settings Send As Smime Info Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-smime-info-list">Settings Send As Smime Info List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-smime-info-set-default">Settings Send As Smime Info Set Default</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-update">Settings Send As Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-send-as-verify">Settings Send As Verify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-update-auto-forwarding">Settings Update Auto Forwarding</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-update-imap">Settings Update Imap</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-update-language">Settings Update Language</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-update-pop">Settings Update Pop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_settings-update-vacation">Settings Update Vacation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_stop">Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-delete">Threads Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-get">Threads Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-list">Threads List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-modify">Threads Modify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-trash">Threads Trash</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_threads-untrash">Threads Untrash</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_watch">Watch</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Messages Import</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Imports a message into only this user&#39;s mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. Does not send a message. Note: This function doesn&#39;t trigger forwarding rules or filters set up by the user.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://mail.google.com/</em></li>
+<li><em>https://www.googleapis.com/auth/gmail.insert</em></li>
+<li><em>https://www.googleapis.com/auth/gmail.modify</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://mail.google.com/</em>.
+You can set the scope for this method like this: <code>gmail1 --scope &lt;scope&gt; users messages-import ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;user-id&gt;</strong> <em>(string)</em><ul>
+<li>The user&#39;s email address. The special value <code>me</code> can be used to indicate the authenticated user.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Message:
+  history-id: string
+  id: string
+  internal-date: string
+  label-ids: [string]
+  payload:
+    body:
+      attachment-id: string
+      data: string
+      size: integer
+    filename: string
+    mime-type: string
+    part-id: string
+  raw: string
+  size-estimate: integer
+  snippet: string
+  thread-id: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    history-id=amet.</code><ul>
+<li>The ID of the last history record that modified this message.</li>
+</ul>
+</li>
+<li><code>id=sed</code><ul>
+<li>The immutable ID of the message.</li>
+</ul>
+</li>
+<li><code>internal-date=takimata</code><ul>
+<li>The internal message creation timestamp (epoch ms), which determines ordering in the inbox. For normal SMTP-received email, this represents the time the message was originally accepted by Google, which is more reliable than the <code>Date</code> header. However, for API-migrated mail, it can be configured by client to be based on the <code>Date</code> header.</li>
+</ul>
+</li>
+<li><code>label-ids=dolores</code><ul>
+<li>List of IDs of labels applied to this message.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>payload.body    attachment-id=gubergren</code><ul>
+<li>When present, contains the ID of an external attachment that can be retrieved in a separate <code>messages.attachments.get</code> request. When not present, the entire content of the message part body is contained in the data field.</li>
+</ul>
+</li>
+<li><code>data=et</code><ul>
+<li>The body data of a MIME message part as a base64url encoded string. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.</li>
+</ul>
+</li>
+<li>
+<p><code>size=78</code></p>
+<ul>
+<li>Number of bytes for the message part data (encoding notwithstanding).</li>
+</ul>
+</li>
+<li>
+<p><code>..    filename=voluptua.</code></p>
+<ul>
+<li>The filename of the attachment. Only present if this message part represents an attachment.</li>
+</ul>
+</li>
+<li><code>mime-type=dolore</code><ul>
+<li>The MIME type of the message part.</li>
+</ul>
+</li>
+<li>
+<p><code>part-id=dolore</code></p>
+<ul>
+<li>The immutable ID of the message part.</li>
+</ul>
+</li>
+<li>
+<p><code>..    raw=dolore</code></p>
+<ul>
+<li>The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in <code>messages.get</code> and <code>drafts.get</code> responses when the <code>format=RAW</code> parameter is supplied.</li>
+</ul>
+</li>
+<li><code>size-estimate=23</code><ul>
+<li>Estimated size in bytes of the message.</li>
+</ul>
+</li>
+<li><code>snippet=amet.</code><ul>
+<li>A short part of the message text.</li>
+</ul>
+</li>
+<li><code>thread-id=ea</code><ul>
+<li>The ID of the thread the message belongs to. To add a message or draft to a thread, the following criteria must be met: 1. The requested <code>threadId</code> must be specified on the <code>Message</code> or <code>Draft.Message</code> you supply with your request. 2. The <code>References</code> and <code>In-Reply-To</code> headers must be set in compliance with the <a href="https://tools.ietf.org/html/rfc2822">RFC 2822</a> standard. 3. The <code>Subject</code> headers must match. </li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="required-upload-flags">Required Upload Flags</h1>
+<p>This method supports the upload of data, which <em>requires</em> all of the following flags to be set:</p>
+<ul>
+<li><strong>-u simple</strong><ul>
+<li><strong>simple</strong> - Upload media all at once.</li>
+</ul>
+</li>
+<li><strong>-f file</strong><ul>
+<li>Path to file to upload. It must be seekable.</li>
+</ul>
+</li>
+</ul>
+<p>The following flag <em>may</em> be set: </p>
+<ul>
+<li><strong>-m mime</strong><ul>
+<li>the mime type, like 'application/octet-stream', which is the default</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p deleted=boolean</strong></p>
+<ul>
+<li>Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p internal-date-source=string</strong></p>
+<ul>
+<li>Source for Gmail&#39;s internal date of the message.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p never-mark-spam=boolean</strong></p>
+<ul>
+<li>Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p process-for-calendar=boolean</strong></p>
+<ul>
+<li>Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../users_messages-insert" class="btn btn-neutral float-right" title="Messages Insert"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../users_messages-get" class="btn btn-neutral" title="Messages Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../users_messages-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../users_messages-insert" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

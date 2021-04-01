@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Line Items List - Display Video v2.0.0+20210325</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Display Video v2.0.0+20210325</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Advertisers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_assets-upload">Assets Upload</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_audit">Audit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_bulk-edit-advertiser-assigned-targeting-options">Bulk Edit Advertiser Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_bulk-list-advertiser-assigned-targeting-options">Bulk List Advertiser Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-bulk-list-campaign-assigned-targeting-options">Campaigns Bulk List Campaign Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-create">Campaigns Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-delete">Campaigns Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-get">Campaigns Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-list">Campaigns List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-patch">Campaigns Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-targeting-types-assigned-targeting-options-get">Campaigns Targeting Types Assigned Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_campaigns-targeting-types-assigned-targeting-options-list">Campaigns Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-create">Channels Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-get">Channels Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-list">Channels List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-patch">Channels Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-sites-bulk-edit">Channels Sites Bulk Edit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-sites-create">Channels Sites Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-sites-delete">Channels Sites Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-sites-list">Channels Sites List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_channels-sites-replace">Channels Sites Replace</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_creatives-create">Creatives Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_creatives-delete">Creatives Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_creatives-get">Creatives Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_creatives-list">Creatives List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_creatives-patch">Creatives Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-bulk-list-insertion-order-assigned-targeting-options">Insertion Orders Bulk List Insertion Order Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-create">Insertion Orders Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-delete">Insertion Orders Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-get">Insertion Orders Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-list">Insertion Orders List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-patch">Insertion Orders Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-get">Insertion Orders Targeting Types Assigned Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-bulk-edit-line-item-assigned-targeting-options">Line Items Bulk Edit Line Item Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-bulk-list-line-item-assigned-targeting-options">Line Items Bulk List Line Item Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-create">Line Items Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-delete">Line Items Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-generate-default">Line Items Generate Default</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-get">Line Items Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Line Items List</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-patch">Line Items Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-targeting-types-assigned-targeting-options-create">Line Items Targeting Types Assigned Targeting Options Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-targeting-types-assigned-targeting-options-delete">Line Items Targeting Types Assigned Targeting Options Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-targeting-types-assigned-targeting-options-get">Line Items Targeting Types Assigned Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_line-items-targeting-types-assigned-targeting-options-list">Line Items Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-assigned-locations-bulk-edit">Location Lists Assigned Locations Bulk Edit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-assigned-locations-create">Location Lists Assigned Locations Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-assigned-locations-delete">Location Lists Assigned Locations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-assigned-locations-list">Location Lists Assigned Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-create">Location Lists Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-get">Location Lists Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-list">Location Lists List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_location-lists-patch">Location Lists Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-activate">Manual Triggers Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-create">Manual Triggers Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-deactivate">Manual Triggers Deactivate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-get">Manual Triggers Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-list">Manual Triggers List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_manual-triggers-patch">Manual Triggers Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-create">Negative Keyword Lists Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-delete">Negative Keyword Lists Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-get">Negative Keyword Lists Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-list">Negative Keyword Lists List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-negative-keywords-bulk-edit">Negative Keyword Lists Negative Keywords Bulk Edit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-negative-keywords-create">Negative Keyword Lists Negative Keywords Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-negative-keywords-delete">Negative Keyword Lists Negative Keywords Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-negative-keywords-list">Negative Keyword Lists Negative Keywords List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-negative-keywords-replace">Negative Keyword Lists Negative Keywords Replace</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_negative-keyword-lists-patch">Negative Keyword Lists Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_targeting-types-assigned-targeting-options-create">Targeting Types Assigned Targeting Options Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_targeting-types-assigned-targeting-options-delete">Targeting Types Assigned Targeting Options Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_targeting-types-assigned-targeting-options-get">Targeting Types Assigned Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../advertisers_targeting-types-assigned-targeting-options-list">Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Combined Audiences</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../combined-audiences_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../combined-audiences_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Custom Bidding Algorithms</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-bidding-algorithms_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Custom Lists</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-lists_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../custom-lists_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>First And Third Party Audiences</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../first-and-third-party-audiences_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Floodlight Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../floodlight-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../floodlight-groups_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Google Audiences</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../google-audiences_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../google-audiences_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Inventory Source Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_assigned-inventory-sources-bulk-edit">Assigned Inventory Sources Bulk Edit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_assigned-inventory-sources-create">Assigned Inventory Sources Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_assigned-inventory-sources-delete">Assigned Inventory Sources Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_assigned-inventory-sources-list">Assigned Inventory Sources List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-source-groups_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Inventory Sources</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-sources_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../inventory-sources_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Media</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../media_download">Download</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Partners</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_bulk-edit-partner-assigned-targeting-options">Bulk Edit Partner Assigned Targeting Options</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-create">Channels Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-get">Channels Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-list">Channels List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-patch">Channels Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-sites-bulk-edit">Channels Sites Bulk Edit</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-sites-create">Channels Sites Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-sites-delete">Channels Sites Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-sites-list">Channels Sites List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_channels-sites-replace">Channels Sites Replace</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_targeting-types-assigned-targeting-options-create">Targeting Types Assigned Targeting Options Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_targeting-types-assigned-targeting-options-delete">Targeting Types Assigned Targeting Options Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_targeting-types-assigned-targeting-options-get">Targeting Types Assigned Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../partners_targeting-types-assigned-targeting-options-list">Targeting Types Assigned Targeting Options List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Sdfdownloadtasks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../sdfdownloadtasks_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../sdfdownloadtasks_operations-get">Operations Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Targeting Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../targeting-types_targeting-options-get">Targeting Options Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../targeting-types_targeting-options-list">Targeting Options List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../targeting-types_targeting-options-search">Targeting Options Search</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Users</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_bulk-edit-assigned-user-roles">Bulk Edit Assigned User Roles</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../users_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Line Items List</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/displayvideo1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Lists line items in an advertiser. The order is defined by the order_by parameter. If a filter by entity_status is not specified, line items with <code>ENTITY_STATUS_ARCHIVED</code> will not be included in the results.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/display-video</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/display-video</em>.
+You can set the scope for this method like this: <code>displayvideo1 --scope &lt;scope&gt; advertisers line-items-list ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;advertiser-id&gt;</strong> <em>(string)</em><ul>
+<li>Required. The ID of the advertiser to list line items for.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>Allows filtering by line item properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by <code>AND</code> or <code>OR</code> logical operators. A sequence of restrictions implicitly uses <code>AND</code>. * A restriction has the form of <code>{field} {operator} {value}</code>. * The operator used on <code>flight.dateRange.endDate</code> must be LESS THAN (&lt;). * The operator used on <code>updateTime</code> must be <code>GREATER THAN OR EQUAL TO (&amp;gt;=)</code> or <code>LESS THAN OR EQUAL TO (&amp;lt;=)</code>. * The operator used on <code>warningMessages</code> must be <code>HAS (:)</code>. * The operators used on all other fields must be <code>EQUALS (=)</code>. * Supported fields: - <code>campaignId</code> - <code>displayName</code> - <code>insertionOrderId</code> - <code>entityStatus</code> - <code>lineItemId</code> - <code>lineItemType</code> - <code>flight.dateRange.endDate</code> (input formatted as YYYY-MM-DD) - <code>warningMessages</code> - <code>flight.triggerId</code> - <code>updateTime</code> (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) * The operator can be <code>NO LESS THAN (&amp;gt;=)</code> or <code>NO GREATER THAN (&amp;lt;=)</code>. - <code>updateTime</code> (format of ISO 8601) Examples: * All line items under an insertion order: <code>insertionOrderId=&amp;#34;1234&amp;#34;</code> * All <code>ENTITY_STATUS_ACTIVE</code> or <code>ENTITY_STATUS_PAUSED</code> and <code>LINE_ITEM_TYPE_DISPLAY_DEFAULT</code> line items under an advertiser: <code>(entityStatus=&amp;#34;ENTITY_STATUS_ACTIVE&amp;#34; OR entityStatus=&amp;#34;ENTITY_STATUS_PAUSED&amp;#34;) AND lineItemType=&amp;#34;LINE_ITEM_TYPE_DISPLAY_DEFAULT&amp;#34;</code> * All line items whose flight dates end before March 28, 2019: <code>flight.dateRange.endDate&amp;lt;&amp;#34;2019-03-28&amp;#34;</code> * All line items that have <code>NO_VALID_CREATIVE</code> in <code>warningMessages</code>: <code>warningMessages:&amp;#34;NO_VALID_CREATIVE&amp;#34;</code> * All line items with an update time less than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;lt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> * All line items with an update time greater than or equal to <code>2020-11-04T18:54:47Z (format of ISO 8601)</code>: <code>updateTime&amp;gt;=&amp;#34;2020-11-04T18:54:47Z&amp;#34;</code> The length of this field should be no more than 500 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p order-by=string</strong></p>
+<ul>
+<li>Field by which to sort the list. Acceptable values are: * &#34;displayName&#34; (default) * &#34;entityStatus&#34; * “flight.dateRange.endDate” * &#34;updateTime&#34; The default sorting order is ascending. To specify descending order for a field, a suffix &#34;desc&#34; should be added to the field name. Example: <code>displayName desc</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-size=integer</strong></p>
+<ul>
+<li>Requested page size. Must be between <code>1</code> and <code>100</code>. If unspecified will default to <code>100</code>. Returns error code <code>INVALID_ARGUMENT</code> if an invalid value is specified.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-token=string</strong></p>
+<ul>
+<li>A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to <code>ListLineItems</code> method. If not specified, the first page of results will be returned.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../advertisers_line-items-patch" class="btn btn-neutral float-right" title="Line Items Patch"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../advertisers_line-items-get" class="btn btn-neutral" title="Line Items Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../advertisers_line-items-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../advertisers_line-items-patch" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `api` mod in crate `google_dlp2_beta1`."><meta name="keywords" content="rust, rustlang, rust-lang, api"><title>google_dlp2_beta1::api - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../google_dlp2_beta1/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Module api</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class="location"><a href="../index.html">google_dlp2_beta1</a></p><div id="sidebar-vars" data-name="api" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">google_dlp2_beta1</a>::<wbr><a class="mod" href="">api</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/google_dlp2_beta1/api.rs.html#1-7312" title="goto source code">[src]</a></span></h1><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.ContentDeidentifyCall.html" title="google_dlp2_beta1::api::ContentDeidentifyCall struct">ContentDeidentifyCall</a></td><td class="docblock-short"><p>De-identifies potentially sensitive info from a list of strings.
+This method has limits on input size and output size.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ContentInspectCall.html" title="google_dlp2_beta1::api::ContentInspectCall struct">ContentInspectCall</a></td><td class="docblock-short"><p>Finds potentially sensitive info in a list of strings.
+This method has limits on input size, processing time, and output size.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ContentMethods.html" title="google_dlp2_beta1::api::ContentMethods struct">ContentMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>content</em> resources.
+It is not used directly, but through the <code>DLP</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ContentRedactCall.html" title="google_dlp2_beta1::api::ContentRedactCall struct">ContentRedactCall</a></td><td class="docblock-short"><p>Redacts potentially sensitive info from a list of strings.
+This method has limits on input size, processing time, and output size.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.DLP.html" title="google_dlp2_beta1::api::DLP struct">DLP</a></td><td class="docblock-short"><p>Central instance to access all DLP related resource activities</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.DataSourceAnalyzeCall.html" title="google_dlp2_beta1::api::DataSourceAnalyzeCall struct">DataSourceAnalyzeCall</a></td><td class="docblock-short"><p>Schedules a job to compute risk analysis metrics over content in a Google
+Cloud Platform repository.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.DataSourceMethods.html" title="google_dlp2_beta1::api::DataSourceMethods struct">DataSourceMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>dataSource</em> resources.
+It is not used directly, but through the <code>DLP</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleLongrunningCancelOperationRequest.html" title="google_dlp2_beta1::api::GoogleLongrunningCancelOperationRequest struct">GoogleLongrunningCancelOperationRequest</a></td><td class="docblock-short"><p>The request message for Operations.CancelOperation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleLongrunningListOperationsResponse.html" title="google_dlp2_beta1::api::GoogleLongrunningListOperationsResponse struct">GoogleLongrunningListOperationsResponse</a></td><td class="docblock-short"><p>The response message for Operations.ListOperations.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleLongrunningOperation.html" title="google_dlp2_beta1::api::GoogleLongrunningOperation struct">GoogleLongrunningOperation</a></td><td class="docblock-short"><p>This resource represents a long-running operation that is the result of a
+network API call.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest struct">GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest</a></td><td class="docblock-short"><p>Request for creating a risk analysis operation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1AuxiliaryTable.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1AuxiliaryTable struct">GooglePrivacyDlpV2beta1AuxiliaryTable</a></td><td class="docblock-short"><p>An auxiliary table contains statistical information on the relative
+frequency of different quasi-identifiers values. It has one or several
+quasi-identifiers columns, and one column that indicates the relative
+frequency of each quasi-identifier tuple.
+If a tuple is present in the data but not in the auxiliary table, the
+corresponding relative frequency is assumed to be zero (and thus, the
+tuple is highly reidentifiable).</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1BigQueryOptions.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1BigQueryOptions struct">GooglePrivacyDlpV2beta1BigQueryOptions</a></td><td class="docblock-short"><p>Options defining BigQuery table and row identifiers.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1BigQueryTable.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1BigQueryTable struct">GooglePrivacyDlpV2beta1BigQueryTable</a></td><td class="docblock-short"><p>Message defining the location of a BigQuery table. A table is uniquely
+identified  by its project_id, dataset_id, and table_name. Within a query
+a table is often referenced with a string in the format of:
+<code>&lt;project_id&gt;:&lt;dataset_id&gt;.&lt;table_id&gt;</code> or
+<code>&lt;project_id&gt;.&lt;dataset_id&gt;.&lt;table_id&gt;</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Bucket.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Bucket struct">GooglePrivacyDlpV2beta1Bucket</a></td><td class="docblock-short"><p>Buckets represented as ranges, along with replacement values. Ranges must
+be non-overlapping.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1BucketingConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1BucketingConfig struct">GooglePrivacyDlpV2beta1BucketingConfig</a></td><td class="docblock-short"><p>Generalization function that buckets values based on ranges. The ranges and
+replacement values are dynamically provided by the user for custom behavior,
+such as 1-30 -&gt; LOW 31-65 -&gt; MEDIUM 66-100 -&gt; HIGH
+This can be used on
+data of type: number, long, string, timestamp.
+If the bound <code>Value</code> type differs from the type of data being transformed, we
+will first attempt converting the type of the data to be transformed to match
+the type of the bound before comparing.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CategoricalStatsConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CategoricalStatsConfig struct">GooglePrivacyDlpV2beta1CategoricalStatsConfig</a></td><td class="docblock-short"><p>Compute numerical stats over an individual column, including
+number of distinct values and value count distribution.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CategoryDescription.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CategoryDescription struct">GooglePrivacyDlpV2beta1CategoryDescription</a></td><td class="docblock-short"><p>Info Type Category description.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CharacterMaskConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CharacterMaskConfig struct">GooglePrivacyDlpV2beta1CharacterMaskConfig</a></td><td class="docblock-short"><p>Partially mask a string by replacing a given number of characters with a
+fixed character. Masking can start from the beginning or end of the string.
+This can be used on data of any type (numbers, longs, and so on) and when
+de-identifying structured data we'll attempt to preserve the original data's
+type. (This allows you to take a long like 123 and modify it to a string like
+**3.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CharsToIgnore.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CharsToIgnore struct">GooglePrivacyDlpV2beta1CharsToIgnore</a></td><td class="docblock-short"><p>Characters to skip when doing deidentification of a value. These will be left
+alone and skipped.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CloudStorageKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CloudStorageKey struct">GooglePrivacyDlpV2beta1CloudStorageKey</a></td><td class="docblock-short"><p>Record key for a finding in a Cloud Storage file.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CloudStorageOptions.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CloudStorageOptions struct">GooglePrivacyDlpV2beta1CloudStorageOptions</a></td><td class="docblock-short"><p>Options defining a file or a set of files (path ending with *) within
+a Google Cloud Storage bucket.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CloudStoragePath.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CloudStoragePath struct">GooglePrivacyDlpV2beta1CloudStoragePath</a></td><td class="docblock-short"><p>A location in Cloud Storage.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Color.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Color struct">GooglePrivacyDlpV2beta1Color</a></td><td class="docblock-short"><p>Represents a color in the RGB color space.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Condition.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Condition struct">GooglePrivacyDlpV2beta1Condition</a></td><td class="docblock-short"><p>The field type of <code>value</code> and <code>field</code> do not need to match to be
+considered equal, but not all comparisons are possible.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Conditions.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Conditions struct">GooglePrivacyDlpV2beta1Conditions</a></td><td class="docblock-short"><p>There is no detailed description.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ContentItem.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ContentItem struct">GooglePrivacyDlpV2beta1ContentItem</a></td><td class="docblock-short"><p>Container structure for the content to inspect.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CreateInspectOperationRequest.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CreateInspectOperationRequest struct">GooglePrivacyDlpV2beta1CreateInspectOperationRequest</a></td><td class="docblock-short"><p>Request for scheduling a scan of a data subset from a Google Platform data
+repository.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CryptoHashConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CryptoHashConfig struct">GooglePrivacyDlpV2beta1CryptoHashConfig</a></td><td class="docblock-short"><p>Pseudonymization method that generates surrogates via cryptographic hashing.
+Uses SHA-256.
+Outputs a 32 byte digest as an uppercase hex string
+(for example, 41D1567F7F99F1DC2A5FAB886DEE5BEE).
+Currently, only string and integer values can be hashed.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CryptoKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CryptoKey struct">GooglePrivacyDlpV2beta1CryptoKey</a></td><td class="docblock-short"><p>This is a data encryption key (DEK) (as opposed to
+a key encryption key (KEK) stored by KMS).
+When using KMS to wrap/unwrap DEKs, be sure to set an appropriate
+IAM policy on the KMS CryptoKey (KEK) to ensure an attacker cannot
+unwrap the data crypto key.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig struct">GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig</a></td><td class="docblock-short"><p>Replaces an identifier with a surrogate using FPE with the FFX
+mode of operation.
+The identifier must be representable by the US-ASCII character set.
+For a given crypto key and context, the same identifier will be
+replaced with the same surrogate.
+Identifiers must be at least two characters long.
+In the case that the identifier is the empty string, it will be skipped.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1CustomInfoType.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1CustomInfoType struct">GooglePrivacyDlpV2beta1CustomInfoType</a></td><td class="docblock-short"><p>Custom information type provided by the user. Used to find domain-specific
+sensitive information configurable to the data in question.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DatastoreKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DatastoreKey struct">GooglePrivacyDlpV2beta1DatastoreKey</a></td><td class="docblock-short"><p>Record key for a finding in Cloud Datastore.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DatastoreOptions.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DatastoreOptions struct">GooglePrivacyDlpV2beta1DatastoreOptions</a></td><td class="docblock-short"><p>Options defining a data set within Google Cloud Datastore.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DeidentificationSummary.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DeidentificationSummary struct">GooglePrivacyDlpV2beta1DeidentificationSummary</a></td><td class="docblock-short"><p>High level summary of deidentification.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DeidentifyConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DeidentifyConfig struct">GooglePrivacyDlpV2beta1DeidentifyConfig</a></td><td class="docblock-short"><p>The configuration that controls how the data will change.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DeidentifyContentRequest.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DeidentifyContentRequest struct">GooglePrivacyDlpV2beta1DeidentifyContentRequest</a></td><td class="docblock-short"><p>Request to de-identify a list of items.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1DeidentifyContentResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1DeidentifyContentResponse struct">GooglePrivacyDlpV2beta1DeidentifyContentResponse</a></td><td class="docblock-short"><p>Results of de-identifying a list of items.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Dictionary.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Dictionary struct">GooglePrivacyDlpV2beta1Dictionary</a></td><td class="docblock-short"><p>Custom information type based on a dictionary of words or phrases. This can
+be used to match sensitive information specific to the data, such as a list
+of employee IDs or job titles.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1EntityId.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1EntityId struct">GooglePrivacyDlpV2beta1EntityId</a></td><td class="docblock-short"><p>An entity in a dataset is a field or set of fields that correspond to a
+single person. For example, in medical records the <code>EntityId</code> might be
+a patient identifier, or for financial records it might be an account
+identifier. This message is used when generalizations or analysis must be
+consistent across multiple rows pertaining to the same entity.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Expressions.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Expressions struct">GooglePrivacyDlpV2beta1Expressions</a></td><td class="docblock-short"><p>A collection of expressions</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1FieldId.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1FieldId struct">GooglePrivacyDlpV2beta1FieldId</a></td><td class="docblock-short"><p>General identifier of a data field in a storage service.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1FieldTransformation.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1FieldTransformation struct">GooglePrivacyDlpV2beta1FieldTransformation</a></td><td class="docblock-short"><p>The transformation to apply to the field.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1FileSet.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1FileSet struct">GooglePrivacyDlpV2beta1FileSet</a></td><td class="docblock-short"><p>Set of files to scan.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Finding.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Finding struct">GooglePrivacyDlpV2beta1Finding</a></td><td class="docblock-short"><p>Container structure describing a single finding within a string or image.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1FixedSizeBucketingConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1FixedSizeBucketingConfig struct">GooglePrivacyDlpV2beta1FixedSizeBucketingConfig</a></td><td class="docblock-short"><p>Buckets values based on fixed size ranges. The
+Bucketing transformation can provide all of this functionality,
+but requires more configuration. This message is provided as a convenience to
+the user for simple bucketing strategies.
+The resulting value will be a hyphenated string of
+lower_bound-upper_bound.
+This can be used on data of type: double, long.
+If the bound Value type differs from the type of data
+being transformed, we will first attempt converting the type of the data to
+be transformed to match the type of the bound before comparing.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ImageLocation.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ImageLocation struct">GooglePrivacyDlpV2beta1ImageLocation</a></td><td class="docblock-short"><p>Bounding box encompassing detected text within an image.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ImageRedactionConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ImageRedactionConfig struct">GooglePrivacyDlpV2beta1ImageRedactionConfig</a></td><td class="docblock-short"><p>Configuration for determining how redaction of images should occur.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InfoType.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InfoType struct">GooglePrivacyDlpV2beta1InfoType</a></td><td class="docblock-short"><p>Type of information detected by the API.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InfoTypeDescription.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InfoTypeDescription struct">GooglePrivacyDlpV2beta1InfoTypeDescription</a></td><td class="docblock-short"><p>Description of the information type (infoType).</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InfoTypeLimit.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InfoTypeLimit struct">GooglePrivacyDlpV2beta1InfoTypeLimit</a></td><td class="docblock-short"><p>Max findings configuration per info type, per content item or long running
+operation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InfoTypeTransformation.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InfoTypeTransformation struct">GooglePrivacyDlpV2beta1InfoTypeTransformation</a></td><td class="docblock-short"><p>A transformation to apply to text that is identified as a specific
+info_type.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InfoTypeTransformations.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InfoTypeTransformations struct">GooglePrivacyDlpV2beta1InfoTypeTransformations</a></td><td class="docblock-short"><p>A type of transformation that will scan unstructured text and
+apply various <code>PrimitiveTransformation</code>s to each finding, where the
+transformation is applied to only values that were identified as a specific
+info_type.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InspectConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InspectConfig struct">GooglePrivacyDlpV2beta1InspectConfig</a></td><td class="docblock-short"><p>Configuration description of the scanning process.
+When used with redactContent only info_types and min_likelihood are currently
+used.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InspectContentRequest.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InspectContentRequest struct">GooglePrivacyDlpV2beta1InspectContentRequest</a></td><td class="docblock-short"><p>Request to search for potentially sensitive info in a list of items.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InspectContentResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InspectContentResponse struct">GooglePrivacyDlpV2beta1InspectContentResponse</a></td><td class="docblock-short"><p>Results of inspecting a list of items.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1InspectResult.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1InspectResult struct">GooglePrivacyDlpV2beta1InspectResult</a></td><td class="docblock-short"><p>All the findings for a single scanned item.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1KAnonymityConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1KAnonymityConfig struct">GooglePrivacyDlpV2beta1KAnonymityConfig</a></td><td class="docblock-short"><p>k-anonymity metric, used for analysis of reidentification risk.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1KMapEstimationConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1KMapEstimationConfig struct">GooglePrivacyDlpV2beta1KMapEstimationConfig</a></td><td class="docblock-short"><p>Reidentifiability metric. This corresponds to a risk model similar to what
+is called &quot;journalist risk&quot; in the literature, except the attack dataset is
+statistically modeled instead of being perfectly known. This can be done
+using publicly available data (like the US Census), or using a custom
+statistical model (indicated as one or several BigQuery tables), or by
+extrapolating from the distribution of values in the input dataset.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Key.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Key struct">GooglePrivacyDlpV2beta1Key</a></td><td class="docblock-short"><p>A unique identifier for a Datastore entity.
+If a key's partition ID or any of its path kinds or names are
+reserved/read-only, the key is reserved/read-only.
+A reserved/read-only key is forbidden in certain documented contexts.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1KindExpression.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1KindExpression struct">GooglePrivacyDlpV2beta1KindExpression</a></td><td class="docblock-short"><p>A representation of a Datastore kind.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1KmsWrappedCryptoKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1KmsWrappedCryptoKey struct">GooglePrivacyDlpV2beta1KmsWrappedCryptoKey</a></td><td class="docblock-short"><p>Include to use an existing data crypto key wrapped by KMS.
+Authorization requires the following IAM permissions when sending a request
+to perform a crypto transformation using a kms-wrapped crypto key:
+dlp.kms.encrypt</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1LDiversityConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1LDiversityConfig struct">GooglePrivacyDlpV2beta1LDiversityConfig</a></td><td class="docblock-short"><p>l-diversity metric, used for analysis of reidentification risk.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ListInfoTypesResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ListInfoTypesResponse struct">GooglePrivacyDlpV2beta1ListInfoTypesResponse</a></td><td class="docblock-short"><p>Response to the ListInfoTypes request.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ListInspectFindingsResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ListInspectFindingsResponse struct">GooglePrivacyDlpV2beta1ListInspectFindingsResponse</a></td><td class="docblock-short"><p>Response to the ListInspectFindings request.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ListRootCategoriesResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ListRootCategoriesResponse struct">GooglePrivacyDlpV2beta1ListRootCategoriesResponse</a></td><td class="docblock-short"><p>Response for ListRootCategories request.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Location.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Location struct">GooglePrivacyDlpV2beta1Location</a></td><td class="docblock-short"><p>Specifies the location of a finding within its source item.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1NumericalStatsConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1NumericalStatsConfig struct">GooglePrivacyDlpV2beta1NumericalStatsConfig</a></td><td class="docblock-short"><p>Compute numerical stats over an individual column, including
+min, max, and quantiles.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1OperationConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1OperationConfig struct">GooglePrivacyDlpV2beta1OperationConfig</a></td><td class="docblock-short"><p>Additional configuration for inspect long running operations.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1OutputStorageConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1OutputStorageConfig struct">GooglePrivacyDlpV2beta1OutputStorageConfig</a></td><td class="docblock-short"><p>Cloud repository for storing output.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1PartitionId.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1PartitionId struct">GooglePrivacyDlpV2beta1PartitionId</a></td><td class="docblock-short"><p>Datastore partition ID.
+A partition ID identifies a grouping of entities. The grouping is always
+by project and namespace, however the namespace ID may be empty.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1PathElement.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1PathElement struct">GooglePrivacyDlpV2beta1PathElement</a></td><td class="docblock-short"><p>A (kind, ID/name) pair used to construct a key path.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1PrimitiveTransformation.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1PrimitiveTransformation struct">GooglePrivacyDlpV2beta1PrimitiveTransformation</a></td><td class="docblock-short"><p>A rule for transforming a value.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1PrivacyMetric.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1PrivacyMetric struct">GooglePrivacyDlpV2beta1PrivacyMetric</a></td><td class="docblock-short"><p>Privacy metric to compute for reidentification risk analysis.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Projection.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Projection struct">GooglePrivacyDlpV2beta1Projection</a></td><td class="docblock-short"><p>A representation of a Datastore property in a projection.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1PropertyReference.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1PropertyReference struct">GooglePrivacyDlpV2beta1PropertyReference</a></td><td class="docblock-short"><p>A reference to a property relative to the Datastore kind expressions.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1QuasiIdField.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1QuasiIdField struct">GooglePrivacyDlpV2beta1QuasiIdField</a></td><td class="docblock-short"><p>A quasi-identifier column has a custom_tag, used to know which column
+in the data corresponds to which column in the statistical model.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Range.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Range struct">GooglePrivacyDlpV2beta1Range</a></td><td class="docblock-short"><p>Generic half-open interval [start, end)</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RecordCondition.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RecordCondition struct">GooglePrivacyDlpV2beta1RecordCondition</a></td><td class="docblock-short"><p>A condition for determining whether a transformation should be applied to
+a field.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RecordKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RecordKey struct">GooglePrivacyDlpV2beta1RecordKey</a></td><td class="docblock-short"><p>Message for a unique key indicating a record that contains a finding.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RecordSuppression.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RecordSuppression struct">GooglePrivacyDlpV2beta1RecordSuppression</a></td><td class="docblock-short"><p>Configuration to suppress records whose suppression conditions evaluate to
+true.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RecordTransformations.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RecordTransformations struct">GooglePrivacyDlpV2beta1RecordTransformations</a></td><td class="docblock-short"><p>A type of transformation that is applied over structured data such as a
+table.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RedactConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RedactConfig struct">GooglePrivacyDlpV2beta1RedactConfig</a></td><td class="docblock-short"><p>Redact a given value. For example, if used with an <code>InfoTypeTransformation</code>
+transforming PHONE_NUMBER, and input 'My phone number is 206-555-0123', the
+output would be 'My phone number is '.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RedactContentRequest.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RedactContentRequest struct">GooglePrivacyDlpV2beta1RedactContentRequest</a></td><td class="docblock-short"><p>Request to search for potentially sensitive info in a list of items
+and replace it with a default or provided content.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1RedactContentResponse.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1RedactContentResponse struct">GooglePrivacyDlpV2beta1RedactContentResponse</a></td><td class="docblock-short"><p>Results of redacting a list of items.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ReplaceConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ReplaceConfig struct">GooglePrivacyDlpV2beta1ReplaceConfig</a></td><td class="docblock-short"><p>There is no detailed description.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ReplaceValueConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ReplaceValueConfig struct">GooglePrivacyDlpV2beta1ReplaceValueConfig</a></td><td class="docblock-short"><p>Replace each input value with a given <code>Value</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig struct">GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig</a></td><td class="docblock-short"><p>Replace each matching finding with the name of the info_type.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Row.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Row struct">GooglePrivacyDlpV2beta1Row</a></td><td class="docblock-short"><p>There is no detailed description.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1StorageConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1StorageConfig struct">GooglePrivacyDlpV2beta1StorageConfig</a></td><td class="docblock-short"><p>Shared message indicating Cloud storage type.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1SummaryResult.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1SummaryResult struct">GooglePrivacyDlpV2beta1SummaryResult</a></td><td class="docblock-short"><p>A collection that informs the user the number of times a particular
+<code>TransformationResultCode</code> and error details occurred.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1SurrogateType.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1SurrogateType struct">GooglePrivacyDlpV2beta1SurrogateType</a></td><td class="docblock-short"><p>Message for detecting output from deidentification transformations
+such as
+<a href="/dlp/docs/reference/rest/v2beta1/content/deidentify#CryptoReplaceFfxFpeConfig"><code>CryptoReplaceFfxFpeConfig</code></a>.
+These types of transformations are
+those that perform pseudonymization, thereby producing a &quot;surrogate&quot; as
+output. This should be used in conjunction with a field on the
+transformation such as <code>surrogate_info_type</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Table.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Table struct">GooglePrivacyDlpV2beta1Table</a></td><td class="docblock-short"><p>Structured content to inspect. Up to 50,000 <code>Value</code>s per request allowed.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1TableLocation.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1TableLocation struct">GooglePrivacyDlpV2beta1TableLocation</a></td><td class="docblock-short"><p>Location of a finding within a <code>ContentItem.Table</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1TaggedField.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1TaggedField struct">GooglePrivacyDlpV2beta1TaggedField</a></td><td class="docblock-short"><p>A column with a semantic tag attached.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1TimePartConfig.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1TimePartConfig struct">GooglePrivacyDlpV2beta1TimePartConfig</a></td><td class="docblock-short"><p>For use with <code>Date</code>, <code>Timestamp</code>, and <code>TimeOfDay</code>, extract or preserve a
+portion of the value.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1TransformationSummary.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1TransformationSummary struct">GooglePrivacyDlpV2beta1TransformationSummary</a></td><td class="docblock-short"><p>Summary of a single tranformation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1TransientCryptoKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1TransientCryptoKey struct">GooglePrivacyDlpV2beta1TransientCryptoKey</a></td><td class="docblock-short"><p>Use this to have a random data crypto key generated.
+It will be discarded after the operation/request finishes.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1UnwrappedCryptoKey.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1UnwrappedCryptoKey struct">GooglePrivacyDlpV2beta1UnwrappedCryptoKey</a></td><td class="docblock-short"><p>Using raw keys is prone to security risks due to accidentally
+leaking the key. Choose another type of key if possible.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1Value.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1Value struct">GooglePrivacyDlpV2beta1Value</a></td><td class="docblock-short"><p>Set of primitive values supported by the system.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GooglePrivacyDlpV2beta1WordList.html" title="google_dlp2_beta1::api::GooglePrivacyDlpV2beta1WordList struct">GooglePrivacyDlpV2beta1WordList</a></td><td class="docblock-short"><p>Message defining a list of words or phrases to search for in the data.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleProtobufEmpty.html" title="google_dlp2_beta1::api::GoogleProtobufEmpty struct">GoogleProtobufEmpty</a></td><td class="docblock-short"><p>A generic empty message that you can re-use to avoid defining duplicated
+empty messages in your APIs. A typical example is to use it as the request
+or the response type of an API method. For instance:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleRpcStatus.html" title="google_dlp2_beta1::api::GoogleRpcStatus struct">GoogleRpcStatus</a></td><td class="docblock-short"><p>The <code>Status</code> type defines a logical error model that is suitable for different
+programming environments, including REST APIs and RPC APIs. It is used by
+<a href="https://github.com/grpc">gRPC</a>. The error model is designed to be:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleTypeDate.html" title="google_dlp2_beta1::api::GoogleTypeDate struct">GoogleTypeDate</a></td><td class="docblock-short"><p>Represents a whole calendar date, e.g. date of birth. The time of day and
+time zone are either specified elsewhere or are not significant. The date
+is relative to the Proleptic Gregorian Calendar. The day may be 0 to
+represent a year and month where the day is not significant, e.g. credit card
+expiration date. The year may be 0 to represent a month and day independent
+of year, e.g. anniversary date. Related types are google.type.TimeOfDay
+and <code>google.protobuf.Timestamp</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GoogleTypeTimeOfDay.html" title="google_dlp2_beta1::api::GoogleTypeTimeOfDay struct">GoogleTypeTimeOfDay</a></td><td class="docblock-short"><p>Represents a time of day. The date and time zone are either not significant
+or are specified elsewhere. An API may choose to allow leap seconds. Related
+types are google.type.Date and <code>google.protobuf.Timestamp</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectMethods.html" title="google_dlp2_beta1::api::InspectMethods struct">InspectMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>inspect</em> resources.
+It is not used directly, but through the <code>DLP</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectOperationCancelCall.html" title="google_dlp2_beta1::api::InspectOperationCancelCall struct">InspectOperationCancelCall</a></td><td class="docblock-short"><p>Cancels an operation. Use the <code>inspect.operations.get</code> to check whether the cancellation succeeded or the operation completed despite cancellation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectOperationCreateCall.html" title="google_dlp2_beta1::api::InspectOperationCreateCall struct">InspectOperationCreateCall</a></td><td class="docblock-short"><p>Schedules a job scanning content in a Google Cloud Platform data
+repository.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectOperationDeleteCall.html" title="google_dlp2_beta1::api::InspectOperationDeleteCall struct">InspectOperationDeleteCall</a></td><td class="docblock-short"><p>This method is not supported and the server returns <code>UNIMPLEMENTED</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectOperationGetCall.html" title="google_dlp2_beta1::api::InspectOperationGetCall struct">InspectOperationGetCall</a></td><td class="docblock-short"><p>Gets the latest state of a long-running operation.  Clients can use this
+method to poll the operation result at intervals as recommended by the API
+service.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectOperationListCall.html" title="google_dlp2_beta1::api::InspectOperationListCall struct">InspectOperationListCall</a></td><td class="docblock-short"><p>Fetches the list of long running operations.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InspectResultFindingListCall.html" title="google_dlp2_beta1::api::InspectResultFindingListCall struct">InspectResultFindingListCall</a></td><td class="docblock-short"><p>Returns list of results for given inspect operation result set id.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RiskAnalysiMethods.html" title="google_dlp2_beta1::api::RiskAnalysiMethods struct">RiskAnalysiMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>riskAnalysi</em> resources.
+It is not used directly, but through the <code>DLP</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RiskAnalysiOperationCancelCall.html" title="google_dlp2_beta1::api::RiskAnalysiOperationCancelCall struct">RiskAnalysiOperationCancelCall</a></td><td class="docblock-short"><p>Cancels an operation. Use the <code>inspect.operations.get</code> to check whether the cancellation succeeded or the operation completed despite cancellation.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RiskAnalysiOperationDeleteCall.html" title="google_dlp2_beta1::api::RiskAnalysiOperationDeleteCall struct">RiskAnalysiOperationDeleteCall</a></td><td class="docblock-short"><p>This method is not supported and the server returns <code>UNIMPLEMENTED</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RiskAnalysiOperationGetCall.html" title="google_dlp2_beta1::api::RiskAnalysiOperationGetCall struct">RiskAnalysiOperationGetCall</a></td><td class="docblock-short"><p>Gets the latest state of a long-running operation.  Clients can use this
+method to poll the operation result at intervals as recommended by the API
+service.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RiskAnalysiOperationListCall.html" title="google_dlp2_beta1::api::RiskAnalysiOperationListCall struct">RiskAnalysiOperationListCall</a></td><td class="docblock-short"><p>Fetches the list of long running operations.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RootCategoryInfoTypeListCall.html" title="google_dlp2_beta1::api::RootCategoryInfoTypeListCall struct">RootCategoryInfoTypeListCall</a></td><td class="docblock-short"><p>Returns sensitive information types for given category.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RootCategoryListCall.html" title="google_dlp2_beta1::api::RootCategoryListCall struct">RootCategoryListCall</a></td><td class="docblock-short"><p>Returns the list of root categories of sensitive information.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.RootCategoryMethods.html" title="google_dlp2_beta1::api::RootCategoryMethods struct">RootCategoryMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>rootCategory</em> resources.
+It is not used directly, but through the <code>DLP</code> hub.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Scope.html" title="google_dlp2_beta1::api::Scope enum">Scope</a></td><td class="docblock-short"><p>Identifies the an OAuth2 authorization scope.
+A scope is needed when requesting an
+<a href="https://developers.google.com/youtube/v3/guides/authentication">authorization token</a>.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="google_dlp2_beta1"></div>
+    <script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

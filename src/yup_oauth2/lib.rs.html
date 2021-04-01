@@ -1,0 +1,197 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/Users/byron/.cargo/registry/src/github.com-1ecc6299db9ec823/yup-oauth2-5.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../yup_oauth2/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! This library can be used to acquire oauth2.0 authentication for services.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For your application to use this library, you will have to obtain an application</span>
+<span class="doccomment">//! id and secret by</span>
+<span class="doccomment">//! [following this guide](https://developers.google.com/youtube/registering_an_application) (for</span>
+<span class="doccomment">//! Google services) respectively the documentation of the API provider you want to connect to.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Device Flow Usage</span>
+<span class="doccomment">//! With an application secret you can get started right away, building a `DeviceFlowAuthenticator`</span>
+<span class="doccomment">//! and obtaining tokens from it.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Service account &quot;flow&quot;</span>
+<span class="doccomment">//! When using service account credentials, no user interaction is required. The access token</span>
+<span class="doccomment">//! can be obtained automatically using the private key of the client (which you can download</span>
+<span class="doccomment">//! from the API provider). See `examples/service_account/` for an example on how to use service</span>
+<span class="doccomment">//! account credentials. See</span>
+<span class="doccomment">//! [developers.google.com](https://developers.google.com/identity/protocols/OAuth2ServiceAccount)</span>
+<span class="doccomment">//! for a detailed description of the protocol. This crate implements OAuth for Service Accounts</span>
+<span class="doccomment">//! based on the Google APIs; it may or may not work with other providers.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Installed Flow Usage</span>
+<span class="doccomment">//! The installed flow involves showing a URL to the user (or opening it in a browser)</span>
+<span class="doccomment">//! and then either prompting the user to enter a displayed code, or make the authorizing</span>
+<span class="doccomment">//! website redirect to a web server spun up by this library and running on localhost.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In order to use the interactive method, use the `Interactive` `InstalledFlowReturnMethod`;</span>
+<span class="doccomment">//! for the redirect method, use `HTTPRedirect`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You can implement your own `AuthenticatorDelegate` in order to customize the flow;</span>
+<span class="doccomment">//! the installed flow uses the `present_user_url` method.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The returned `Token` will be stored in memory in order to authorize future</span>
+<span class="doccomment">//! API requests to the same scopes. The tokens can optionally be persisted to</span>
+<span class="doccomment">//! disk by using `persist_tokens_to_disk` when creating the authenticator.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The following example, which is derived from the (actual and runnable) example in</span>
+<span class="doccomment">//! `examples/test-installed/`, shows the basics of using this crate:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```test_harness,no_run</span>
+<span class="doccomment">//! use yup_oauth2::{InstalledFlowAuthenticator, InstalledFlowReturnMethod};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[tokio::main]</span>
+<span class="doccomment">//! async fn main() {</span>
+<span class="doccomment">//!     // Read application secret from a file. Sometimes it&#39;s easier to compile it directly into</span>
+<span class="doccomment">//!     // the binary. The clientsecret file contains JSON like `{&quot;installed&quot;:{&quot;client_id&quot;: ... }}`</span>
+<span class="doccomment">//!     let secret = yup_oauth2::read_application_secret(&quot;clientsecret.json&quot;)</span>
+<span class="doccomment">//!         .await</span>
+<span class="doccomment">//!         .expect(&quot;clientsecret.json&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     // Create an authenticator that uses an InstalledFlow to authenticate. The</span>
+<span class="doccomment">//!     // authentication tokens are persisted to a file named tokencache.json. The</span>
+<span class="doccomment">//!     // authenticator takes care of caching tokens to disk and refreshing tokens once</span>
+<span class="doccomment">//!     // they&#39;ve expired.</span>
+<span class="doccomment">//!     let mut auth = InstalledFlowAuthenticator::builder(secret, InstalledFlowReturnMethod::HTTPRedirect)</span>
+<span class="doccomment">//!     .persist_tokens_to_disk(&quot;tokencache.json&quot;)</span>
+<span class="doccomment">//!     .build()</span>
+<span class="doccomment">//!     .await</span>
+<span class="doccomment">//!     .unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     let scopes = &amp;[&quot;https://www.googleapis.com/auth/drive.file&quot;];</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     // token(&lt;scopes&gt;) is the one important function of this crate; it does everything to</span>
+<span class="doccomment">//!     // obtain a token that can be sent e.g. as Bearer token.</span>
+<span class="doccomment">//!     match auth.token(scopes).await {</span>
+<span class="doccomment">//!         Ok(token) =&gt; println!(&quot;The token is {:?}&quot;, token),</span>
+<span class="doccomment">//!         Err(e) =&gt; println!(&quot;error: {:?}&quot;, e),</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">authenticator</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">authenticator_delegate</span>;
+<span class="kw">mod</span> <span class="ident">device</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod</span> <span class="ident">helper</span>;
+<span class="kw">mod</span> <span class="ident">installed</span>;
+<span class="kw">mod</span> <span class="ident">refresh</span>;
+<span class="kw">mod</span> <span class="ident">service_account</span>;
+<span class="kw">mod</span> <span class="ident">storage</span>;
+<span class="kw">mod</span> <span class="ident">types</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">authenticator</span>::{
+    <span class="ident">DeviceFlowAuthenticator</span>, <span class="ident">InstalledFlowAuthenticator</span>, <span class="ident">ServiceAccountAuthenticator</span>,
+};
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helper</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">installed</span>::<span class="ident">InstalledFlowReturnMethod</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">service_account</span>::<span class="ident">ServiceAccountKey</span>;
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::{<span class="ident">AccessToken</span>, <span class="ident">ApplicationSecret</span>, <span class="ident">ConsoleApplicationSecret</span>};
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="yup_oauth2"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

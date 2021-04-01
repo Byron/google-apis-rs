@@ -1,0 +1,433 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../google_fcm1/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// DO NOT EDIT !</span>
+<span class="comment">// This file was generated automatically from &#39;src/mako/api/lib.rs.mako&#39;</span>
+<span class="comment">// DO NOT EDIT !</span>
+
+<span class="doccomment">//! This documentation was generated from *Firebase Cloud Messaging* crate version *2.0.0+20210329*, where *20210329* is the exact revision of the *fcm:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Everything else about the *Firebase Cloud Messaging* *v1* API can be found at the</span>
+<span class="doccomment">//! [official documentation site](https://firebase.google.com/docs/cloud-messaging).</span>
+<span class="doccomment">//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/fcm1).</span>
+<span class="doccomment">//! # Features</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Handle the following *Resources* with ease from the central [hub](FirebaseCloudMessaging) ... </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! * projects</span>
+<span class="doccomment">//!  * [*messages send*](api::ProjectMessageSendCall)</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](http://byron.github.io/google-apis-rs).</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! # Structure of this Library</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! The API is structured into the following primary items:</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! * **[Hub](FirebaseCloudMessaging)**</span>
+<span class="doccomment">//!     * a central object to maintain state and allow accessing all *Activities*</span>
+<span class="doccomment">//!     * creates [*Method Builders*](client::MethodsBuilder) which in turn</span>
+<span class="doccomment">//!       allow access to individual [*Call Builders*](client::CallBuilder)</span>
+<span class="doccomment">//! * **[Resources](client::Resource)**</span>
+<span class="doccomment">//!     * primary types that you can apply *Activities* to</span>
+<span class="doccomment">//!     * a collection of properties and *Parts*</span>
+<span class="doccomment">//!     * **[Parts](client::Part)**</span>
+<span class="doccomment">//!         * a collection of properties</span>
+<span class="doccomment">//!         * never directly used in *Activities*</span>
+<span class="doccomment">//! * **[Activities](client::CallBuilder)**</span>
+<span class="doccomment">//!     * operations to apply to *Resources*</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! All *structures* are marked with applicable traits to further categorize them and ease browsing.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Generally speaking, you can invoke *Activities* like this:</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ```Rust,ignore</span>
+<span class="doccomment">//! let r = hub.resource().activity(...).doit().await</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Or specifically ...</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ```ignore</span>
+<span class="doccomment">//! let r = hub.projects().messages_send(...).doit().await</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` </span>
+<span class="doccomment">//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be </span>
+<span class="doccomment">//! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.</span>
+<span class="doccomment">//! The `doit()` method performs the actual communication with the server and returns the respective result.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! # Usage</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## Setting up your Project</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! To use this library, you would put the following lines into your `Cargo.toml` file:</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies]</span>
+<span class="doccomment">//! google-fcm1 = &quot;*&quot;</span>
+<span class="doccomment">//! # This project intentionally uses an old version of Hyper. See</span>
+<span class="doccomment">//! # https://github.com/Byron/google-apis-rs/issues/173 for more</span>
+<span class="doccomment">//! # information.</span>
+<span class="doccomment">//! hyper = &quot;^0.14&quot;</span>
+<span class="doccomment">//! hyper-rustls = &quot;^0.22&quot;</span>
+<span class="doccomment">//! serde = &quot;^1.0&quot;</span>
+<span class="doccomment">//! serde_json = &quot;^1.0&quot;</span>
+<span class="doccomment">//! yup-oauth2 = &quot;^5.0&quot;</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## A complete example</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ```test_harness,no_run</span>
+<span class="doccomment">//! extern crate hyper;</span>
+<span class="doccomment">//! extern crate hyper_rustls;</span>
+<span class="doccomment">//! extern crate yup_oauth2 as oauth2;</span>
+<span class="doccomment">//! extern crate google_fcm1 as fcm1;</span>
+<span class="doccomment">//! use fcm1::api::SendMessageRequest;</span>
+<span class="doccomment">//! use fcm1::{Result, Error};</span>
+<span class="doccomment">//! # async fn dox() {</span>
+<span class="doccomment">//! use std::default::Default;</span>
+<span class="doccomment">//! use oauth2;</span>
+<span class="doccomment">//! use fcm1::FirebaseCloudMessaging;</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and </span>
+<span class="doccomment">//! // `client_secret`, among other things.</span>
+<span class="doccomment">//! let secret: oauth2::ApplicationSecret = Default::default();</span>
+<span class="doccomment">//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, </span>
+<span class="doccomment">//! // unless you replace  `None` with the desired Flow.</span>
+<span class="doccomment">//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about </span>
+<span class="doccomment">//! // what&#39;s going on. You probably want to bring in your own `TokenStorage` to persist tokens and</span>
+<span class="doccomment">//! // retrieve them from storage.</span>
+<span class="doccomment">//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(</span>
+<span class="doccomment">//!         secret,</span>
+<span class="doccomment">//!         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,</span>
+<span class="doccomment">//!     ).build().await.unwrap();</span>
+<span class="doccomment">//! let mut hub = FirebaseCloudMessaging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);</span>
+<span class="doccomment">//! // As the method needs a request, you would usually fill it with the desired information</span>
+<span class="doccomment">//! // into the respective structure. Some of the parts shown here might not be applicable !</span>
+<span class="doccomment">//! // Values shown here are possibly random and not representative !</span>
+<span class="doccomment">//! let mut req = SendMessageRequest::default();</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! // You can configure optional parameters by calling the respective setters at will, and</span>
+<span class="doccomment">//! // execute the final call using `doit()`.</span>
+<span class="doccomment">//! // Values shown here are possibly random and not representative !</span>
+<span class="doccomment">//! let result = hub.projects().messages_send(req, &quot;parent&quot;)</span>
+<span class="doccomment">//!              .doit().await;</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! match result {</span>
+<span class="doccomment">//!     Err(e) =&gt; match e {</span>
+<span class="doccomment">//!         // The Error enum provides details about what exactly happened.</span>
+<span class="doccomment">//!         // You can also just use its `Debug`, `Display` or `Error` traits</span>
+<span class="doccomment">//!          Error::HttpError(_)</span>
+<span class="doccomment">//!         |Error::Io(_)</span>
+<span class="doccomment">//!         |Error::MissingAPIKey</span>
+<span class="doccomment">//!         |Error::MissingToken(_)</span>
+<span class="doccomment">//!         |Error::Cancelled</span>
+<span class="doccomment">//!         |Error::UploadSizeLimitExceeded(_, _)</span>
+<span class="doccomment">//!         |Error::Failure(_)</span>
+<span class="doccomment">//!         |Error::BadRequest(_)</span>
+<span class="doccomment">//!         |Error::FieldClash(_)</span>
+<span class="doccomment">//!         |Error::JsonDecodeError(_, _) =&gt; println!(&quot;{}&quot;, e),</span>
+<span class="doccomment">//!     },</span>
+<span class="doccomment">//!     Ok(res) =&gt; println!(&quot;Success: {:?}&quot;, res),</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! ## Handling Errors</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! All errors produced by the system are provided either as [Result](client::Result) enumeration as return value of</span>
+<span class="doccomment">//! the doit() methods, or handed as possibly intermediate results to either the </span>
+<span class="doccomment">//! [Hub Delegate](client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This </span>
+<span class="doccomment">//! makes the system potentially resilient to all kinds of errors.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## Uploads and Downloads</span>
+<span class="doccomment">//! If a method supports downloads, the response body, which is part of the [Result](client::Result), should be</span>
+<span class="doccomment">//! read by you to obtain the media.</span>
+<span class="doccomment">//! If such a method also supports a [Response Result](client::ResponseResult), it will return that by default.</span>
+<span class="doccomment">//! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making</span>
+<span class="doccomment">//! this call: `.param(&quot;alt&quot;, &quot;media&quot;)`.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Methods supporting uploads can do so using up to 2 different protocols: </span>
+<span class="doccomment">//! *simple* and *resumable*. The distinctiveness of each is represented by customized </span>
+<span class="doccomment">//! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## Customization and Callbacks</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! You may alter the way an `doit()` method is called by providing a [delegate](client::Delegate) to the </span>
+<span class="doccomment">//! [Method Builder](client::CallBuilder) before making the final `doit()` call. </span>
+<span class="doccomment">//! Respective methods will be called to provide progress information, as well as determine whether the system should </span>
+<span class="doccomment">//! retry on failure.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! The [delegate trait](client::Delegate) is default-implemented, allowing you to customize it with minimal effort.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## Optional Parts in Server-Requests</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! All structures provided by this library are made to be [encodable](client::RequestValue) and </span>
+<span class="doccomment">//! [decodable](client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses </span>
+<span class="doccomment">//! are valid.</span>
+<span class="doccomment">//! Most optionals are are considered [Parts](client::Part) which are identifiable by name, which will be sent to </span>
+<span class="doccomment">//! the server to indicate either the set parts of the request or the desired parts in the response.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! ## Builder Arguments</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Using [method builders](client::CallBuilder), you are able to prepare an action call by repeatedly calling it&#39;s methods.</span>
+<span class="doccomment">//! These will always take a single argument, for which the following statements are true.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! * [PODs][wiki-pod] are handed by copy</span>
+<span class="doccomment">//! * strings are passed as `&amp;str`</span>
+<span class="doccomment">//! * [request values](client::RequestValue) are moved</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure</span>
+<span class="doccomment">//! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern</span>
+<span class="doccomment">//! [google-go-api]: https://github.com/google/google-api-go-client</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! </span>
+
+<span class="comment">// Unused attributes happen thanks to defined, but unused structures</span>
+<span class="comment">// We don&#39;t warn about this, as depending on the API, some data structures or facilities are never used.</span>
+<span class="comment">// Instead of pre-determining this, we just disable the lint. It&#39;s manually tuned to not have any</span>
+<span class="comment">// unused imports in fully featured APIs. Same with unused_mut ... .</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_imports</span>, <span class="ident">unused_mut</span>, <span class="ident">dead_code</span>)]</span>
+
+<span class="comment">// DO NOT EDIT !</span>
+<span class="comment">// This file was generated automatically from &#39;src/mako/api/lib.rs.mako&#39;</span>
+<span class="comment">// DO NOT EDIT !</span>
+
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
+
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hyper</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_json</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">yup_oauth2</span> <span class="kw">as</span> <span class="ident">oauth2</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">mime</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">url</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">api</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span>;
+
+<span class="comment">// Re-export the hub type and some basic client structs</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">api</span>::<span class="ident">FirebaseCloudMessaging</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">client</span>::{<span class="prelude-ty">Result</span>, <span class="ident">Error</span>, <span class="ident">Delegate</span>};
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="google_fcm1"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

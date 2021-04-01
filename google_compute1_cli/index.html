@@ -1,0 +1,4263 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compute v2.0.0+20210316</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script>
+  <script src="./js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> compute v2.0.0+20210316</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accelerator Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accelerator-types_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accelerator-types_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="accelerator-types_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Addresses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="addresses_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="addresses_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="addresses_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="addresses_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="addresses_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Autoscalers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="autoscalers_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Backend Buckets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_add-signed-url-key/">Add Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_delete-signed-url-key/">Delete Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-buckets_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Backend Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_add-signed-url-key/">Add Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_delete-signed-url-key/">Delete Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_get-health/">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_set-security-policy/">Set Security Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="backend-services_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Disk Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disk-types_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disk-types_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disk-types_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Disks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_add-resource-policies/">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_create-snapshot/">Create Snapshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_remove-resource-policies/">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_resize/">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="disks_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>External Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="external-vpn-gateways_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Firewall Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_add-association/">Add Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_add-rule/">Add Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_clone-rules/">Clone Rules</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_get-association/">Get Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_get-rule/">Get Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_list-associations/">List Associations</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_move/">Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_patch-rule/">Patch Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_remove-association/">Remove Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_remove-rule/">Remove Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewall-policies_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Firewalls</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="firewalls_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Forwarding Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="forwarding-rules_set-target/">Set Target</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Addresses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-addresses_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-addresses_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-addresses_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-addresses_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Forwarding Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-forwarding-rules_set-target/">Set Target</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_attach-network-endpoints/">Attach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_detach-network-endpoints/">Detach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-network-endpoint-groups_list-network-endpoints/">List Network Endpoints</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-operations_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-operations_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-operations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-operations_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-operations_wait/">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Organization Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-organization-operations_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-organization-operations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-organization-operations_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Public Delegated Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-public-delegated-prefixes_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-public-delegated-prefixes_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-public-delegated-prefixes_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-public-delegated-prefixes_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="global-public-delegated-prefixes_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="health-checks_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Http Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="http-health-checks_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Https Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="https-health-checks_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Images</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_deprecate/">Deprecate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_get-from-family/">Get From Family</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="images_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Group Managers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_abandon-instances/">Abandon Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_apply-updates-to-instances/">Apply Updates To Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_create-instances/">Create Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_delete-instances/">Delete Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_delete-per-instance-configs/">Delete Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_list-errors/">List Errors</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_list-managed-instances/">List Managed Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_list-per-instance-configs/">List Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_patch-per-instance-configs/">Patch Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_recreate-instances/">Recreate Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_resize/">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_set-instance-template/">Set Instance Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_set-target-pools/">Set Target Pools</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-group-managers_update-per-instance-configs/">Update Per Instance Configs</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_add-instances/">Add Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_list-instances/">List Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_remove-instances/">Remove Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-groups_set-named-ports/">Set Named Ports</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Templates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instance-templates_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_add-access-config/">Add Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_add-resource-policies/">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_attach-disk/">Attach Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_bulk-insert/">Bulk Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_delete-access-config/">Delete Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_detach-disk/">Detach Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-effective-firewalls/">Get Effective Firewalls</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-guest-attributes/">Get Guest Attributes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-screenshot/">Get Screenshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-serial-port-output/">Get Serial Port Output</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_get-shielded-instance-identity/">Get Shielded Instance Identity</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_list-referrers/">List Referrers</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_remove-resource-policies/">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_reset/">Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-deletion-protection/">Set Deletion Protection</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-disk-auto-delete/">Set Disk Auto Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-machine-resources/">Set Machine Resources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-machine-type/">Set Machine Type</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-metadata/">Set Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-min-cpu-platform/">Set Min Cpu Platform</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-scheduling/">Set Scheduling</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-service-account/">Set Service Account</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-shielded-instance-integrity-policy/">Set Shielded Instance Integrity Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_set-tags/">Set Tags</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_simulate-maintenance-event/">Simulate Maintenance Event</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_start/">Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_start-with-encryption-key/">Start With Encryption Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_stop/">Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_update/">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_update-access-config/">Update Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_update-display-device/">Update Display Device</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_update-network-interface/">Update Network Interface</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="instances_update-shielded-instance-config/">Update Shielded Instance Config</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnect Attachments</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-attachments_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnect Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-locations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnect-locations_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_get-diagnostics/">Get Diagnostics</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="interconnects_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>License Codes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="license-codes_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="license-codes_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Licenses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="licenses_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Machine Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="machine-types_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="machine-types_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="machine-types_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_attach-network-endpoints/">Attach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_detach-network-endpoints/">Detach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_list-network-endpoints/">List Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="network-endpoint-groups_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Networks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_add-peering/">Add Peering</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_get-effective-firewalls/">Get Effective Firewalls</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_list-peering-routes/">List Peering Routes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_remove-peering/">Remove Peering</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_switch-to-custom-mode/">Switch To Custom Mode</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="networks_update-peering/">Update Peering</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_add-nodes/">Add Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_delete-nodes/">Delete Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_list-nodes/">List Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_set-node-template/">Set Node Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-groups_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Templates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-templates_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-types_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-types_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="node-types_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Packet Mirrorings</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="packet-mirrorings_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_disable-xpn-host/">Disable Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_disable-xpn-resource/">Disable Xpn Resource</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_enable-xpn-host/">Enable Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_enable-xpn-resource/">Enable Xpn Resource</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_get-xpn-host/">Get Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_get-xpn-resources/">Get Xpn Resources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_list-xpn-hosts/">List Xpn Hosts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_move-disk/">Move Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_move-instance/">Move Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_set-common-instance-metadata/">Set Common Instance Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_set-default-network-tier/">Set Default Network Tier</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_set-usage-export-bucket/">Set Usage Export Bucket</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Public Advertised Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-advertised-prefixes_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-advertised-prefixes_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-advertised-prefixes_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-advertised-prefixes_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-advertised-prefixes_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Public Delegated Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="public-delegated-prefixes_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Autoscalers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-autoscalers_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Backend Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_get-health/">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-backend-services_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Commitments</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-commitments_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-commitments_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-commitments_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-commitments_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Disk Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disk-types_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disk-types_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Disks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_add-resource-policies/">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_create-snapshot/">Create Snapshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_remove-resource-policies/">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_resize/">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-disks_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Health Check Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-check-services_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-check-services_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-check-services_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-check-services_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-check-services_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-health-checks_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instance Group Managers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_abandon-instances/">Abandon Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_apply-updates-to-instances/">Apply Updates To Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_create-instances/">Create Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_delete-instances/">Delete Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_delete-per-instance-configs/">Delete Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_list-errors/">List Errors</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_list-managed-instances/">List Managed Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_list-per-instance-configs/">List Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_patch-per-instance-configs/">Patch Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_recreate-instances/">Recreate Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_resize/">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_set-instance-template/">Set Instance Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_set-target-pools/">Set Target Pools</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-group-managers_update-per-instance-configs/">Update Per Instance Configs</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instance Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-groups_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-groups_list-instances/">List Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instance-groups_set-named-ports/">Set Named Ports</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-instances_bulk-insert/">Bulk Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-network-endpoint-groups_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-network-endpoint-groups_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-network-endpoint-groups_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-network-endpoint-groups_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Notification Endpoints</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-notification-endpoints_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-notification-endpoints_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-notification-endpoints_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-notification-endpoints_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-operations_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-operations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-operations_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-operations_wait/">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Ssl Certificates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-ssl-certificates_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-ssl-certificates_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-ssl-certificates_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-ssl-certificates_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Target Http Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-http-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-http-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-http-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-http-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-http-proxies_set-url-map/">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Target Https Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-target-https-proxies_set-url-map/">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Url Maps</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_update/">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="region-url-maps_validate/">Validate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Regions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="regions_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="regions_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Reservations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_resize/">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="reservations_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Resource Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="resource-policies_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Routers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_get-nat-mapping-info/">Get Nat Mapping Info</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_get-router-status/">Get Router Status</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_preview/">Preview</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routers_update/">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Routes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routes_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routes_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routes_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="routes_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Security Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_add-rule/">Add Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_get-rule/">Get Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_list-preconfigured-expression-sets/">List Preconfigured Expression Sets</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_patch-rule/">Patch Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="security-policies_remove-rule/">Remove Rule</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Snapshots</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="snapshots_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Ssl Certificates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-certificates_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-certificates_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-certificates_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-certificates_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-certificates_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Ssl Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_list-available-features/">List Available Features</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="ssl-policies_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Subnetworks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_expand-ip-cidr-range/">Expand Ip Cidr Range</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_get-iam-policy/">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_list-usable/">List Usable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_set-iam-policy/">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_set-private-ip-google-access/">Set Private Ip Google Access</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="subnetworks_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Grpc Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-grpc-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-grpc-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-grpc-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-grpc-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-grpc-proxies_patch/">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Http Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-http-proxies_set-url-map/">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Https Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_set-quic-override/">Set Quic Override</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_set-ssl-policy/">Set Ssl Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-https-proxies_set-url-map/">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-instances_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-instances_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-instances_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-instances_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-instances_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Pools</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_add-health-check/">Add Health Check</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_add-instance/">Add Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_get-health/">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_remove-health-check/">Remove Health Check</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_remove-instance/">Remove Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-pools_set-backup/">Set Backup</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Ssl Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_set-backend-service/">Set Backend Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_set-proxy-header/">Set Proxy Header</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-ssl-proxies_set-ssl-policy/">Set Ssl Policy</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Tcp Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_set-backend-service/">Set Backend Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-tcp-proxies_set-proxy-header/">Set Proxy Header</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-vpn-gateways_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-vpn-gateways_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-vpn-gateways_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-vpn-gateways_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="target-vpn-gateways_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Url Maps</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_invalidate-cache/">Invalidate Cache</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_patch/">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_update/">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="url-maps_validate/">Validate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_get-status/">Get Status</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_set-labels/">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-gateways_test-iam-permissions/">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Vpn Tunnels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-tunnels_aggregated-list/">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-tunnels_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-tunnels_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-tunnels_insert/">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="vpn-tunnels_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Zone Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zone-operations_delete/">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zone-operations_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zone-operations_list/">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zone-operations_wait/">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Zones</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zones_get/">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="zones_list/">List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    <li>Home</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/compute1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/cli/README.md.mako'
+DO NOT EDIT !
+-->
+
+<p>The <code>compute1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google compute</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>compute</em> API can be found at the
+<a href="https://developers.google.com/compute/docs/reference/latest/">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="bash">cargo install google-compute1-cli
+</code></pre>
+
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/compute1-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>compute</em> API at revision <em>20210316</em>. The CLI is at version <em>2.0.0</em>.</p>
+<pre><code class="bash">compute1 [options]
+        accelerator-types
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;accelerator-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        addresses
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;address&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;address&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        autoscalers
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;autoscaler&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;autoscaler&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        backend-buckets
+                add-signed-url-key &lt;project&gt; &lt;backend-bucket&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;backend-bucket&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-signed-url-key &lt;project&gt; &lt;backend-bucket&gt; &lt;key-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;backend-bucket&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;backend-bucket&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;backend-bucket&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        backend-services
+                add-signed-url-key &lt;project&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;backend-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-signed-url-key &lt;project&gt; &lt;backend-service&gt; &lt;key-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;backend-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-health &lt;project&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-security-policy &lt;project&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        disk-types
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;disk-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        disks
+                add-resource-policies &lt;project&gt; &lt;zone&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-snapshot &lt;project&gt; &lt;zone&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;disk&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;disk&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-resource-policies &lt;project&gt; &lt;zone&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                resize &lt;project&gt; &lt;zone&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        external-vpn-gateways
+                delete &lt;project&gt; &lt;external-vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;external-vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        firewall-policies
+                add-association &lt;firewall-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                add-rule &lt;firewall-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clone-rules &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-association &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-rule &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-associations [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                move &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;firewall-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch-rule &lt;firewall-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-association &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-rule &lt;firewall-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        firewalls
+                delete &lt;project&gt; &lt;firewall&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;firewall&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;firewall&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;firewall&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        forwarding-rules
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;forwarding-rule&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;forwarding-rule&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;forwarding-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-target &lt;project&gt; &lt;region&gt; &lt;forwarding-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-addresses
+                delete &lt;project&gt; &lt;address&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;address&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-forwarding-rules
+                delete &lt;project&gt; &lt;forwarding-rule&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;forwarding-rule&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;forwarding-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-target &lt;project&gt; &lt;forwarding-rule&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-network-endpoint-groups
+                attach-network-endpoints &lt;project&gt; &lt;network-endpoint-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                detach-network-endpoints &lt;project&gt; &lt;network-endpoint-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-network-endpoints &lt;project&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-operations
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;operation&gt; [-p &lt;v&gt;]...
+                get &lt;project&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                wait &lt;project&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-organization-operations
+                delete &lt;operation&gt; [-p &lt;v&gt;]...
+                get &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        global-public-delegated-prefixes
+                delete &lt;project&gt; &lt;public-delegated-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;public-delegated-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;public-delegated-prefix&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        health-checks
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        http-health-checks
+                delete &lt;project&gt; &lt;http-health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;http-health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;http-health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;http-health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        https-health-checks
+                delete &lt;project&gt; &lt;https-health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;https-health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;https-health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;https-health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        images
+                delete &lt;project&gt; &lt;image&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                deprecate &lt;project&gt; &lt;image&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;image&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-from-family &lt;project&gt; &lt;family&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;image&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        instance-group-managers
+                abandon-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apply-updates-to-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-per-instance-configs &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-errors &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-managed-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-per-instance-configs &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch-per-instance-configs &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                recreate-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                resize &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; &lt;size&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-instance-template &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-target-pools &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-per-instance-configs &lt;project&gt; &lt;zone&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        instance-groups
+                add-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-instances &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-named-ports &lt;project&gt; &lt;zone&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        instance-templates
+                delete &lt;project&gt; &lt;instance-template&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;instance-template&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        instances
+                add-access-config &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;network-interface&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                add-resource-policies &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                attach-disk &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bulk-insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-access-config &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;access-config&gt; &lt;network-interface&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                detach-disk &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;device-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-effective-firewalls &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;network-interface&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-guest-attributes &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-screenshot &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-serial-port-output &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-shielded-instance-identity &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-referrers &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-resource-policies &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                reset &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-deletion-protection &lt;project&gt; &lt;zone&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-disk-auto-delete &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;auto-delete&gt; &lt;device-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-machine-resources &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-machine-type &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-metadata &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-min-cpu-platform &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-scheduling &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-service-account &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-shielded-instance-integrity-policy &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-tags &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                simulate-maintenance-event &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                start &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                start-with-encryption-key &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                stop &lt;project&gt; &lt;zone&gt; &lt;instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-access-config &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;network-interface&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-display-device &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-network-interface &lt;project&gt; &lt;zone&gt; &lt;instance&gt; &lt;network-interface&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-shielded-instance-config &lt;project&gt; &lt;zone&gt; &lt;instance&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        interconnect-attachments
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;interconnect-attachment&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;interconnect-attachment&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;interconnect-attachment&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        interconnect-locations
+                get &lt;project&gt; &lt;interconnect-location&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        interconnects
+                delete &lt;project&gt; &lt;interconnect&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;interconnect&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-diagnostics &lt;project&gt; &lt;interconnect&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;interconnect&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        license-codes
+                get &lt;project&gt; &lt;license-code&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        licenses
+                delete &lt;project&gt; &lt;license&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;license&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        machine-types
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;machine-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        network-endpoint-groups
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                attach-network-endpoints &lt;project&gt; &lt;zone&gt; &lt;network-endpoint-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                detach-network-endpoints &lt;project&gt; &lt;zone&gt; &lt;network-endpoint-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-network-endpoints &lt;project&gt; &lt;zone&gt; &lt;network-endpoint-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        networks
+                add-peering &lt;project&gt; &lt;network&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;network&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;network&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-effective-firewalls &lt;project&gt; &lt;network&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-peering-routes &lt;project&gt; &lt;network&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;network&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-peering &lt;project&gt; &lt;network&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                switch-to-custom-mode &lt;project&gt; &lt;network&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-peering &lt;project&gt; &lt;network&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        node-groups
+                add-nodes &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-nodes &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; &lt;initial-node-count&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-nodes &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-node-template &lt;project&gt; &lt;zone&gt; &lt;node-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        node-templates
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;node-template&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;node-template&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        node-types
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;node-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        packet-mirrorings
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;packet-mirroring&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;packet-mirroring&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;packet-mirroring&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        projects
+                disable-xpn-host &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                disable-xpn-resource &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                enable-xpn-host &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                enable-xpn-resource &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-xpn-host &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-xpn-resources &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-xpn-hosts &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                move-disk &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                move-instance &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-common-instance-metadata &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-default-network-tier &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-usage-export-bucket &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        public-advertised-prefixes
+                delete &lt;project&gt; &lt;public-advertised-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;public-advertised-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;public-advertised-prefix&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        public-delegated-prefixes
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;public-delegated-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;public-delegated-prefix&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;public-delegated-prefix&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-autoscalers
+                delete &lt;project&gt; &lt;region&gt; &lt;autoscaler&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;autoscaler&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-backend-services
+                delete &lt;project&gt; &lt;region&gt; &lt;backend-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;backend-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-health &lt;project&gt; &lt;region&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;region&gt; &lt;backend-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-commitments
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;commitment&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-disk-types
+                get &lt;project&gt; &lt;region&gt; &lt;disk-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-disks
+                add-resource-policies &lt;project&gt; &lt;region&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-snapshot &lt;project&gt; &lt;region&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;disk&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;disk&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-resource-policies &lt;project&gt; &lt;region&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                resize &lt;project&gt; &lt;region&gt; &lt;disk&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-health-check-services
+                delete &lt;project&gt; &lt;region&gt; &lt;health-check-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;health-check-service&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;health-check-service&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-health-checks
+                delete &lt;project&gt; &lt;region&gt; &lt;health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;health-check&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;region&gt; &lt;health-check&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-instance-group-managers
+                abandon-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apply-updates-to-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-per-instance-configs &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-errors &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-managed-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-per-instance-configs &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch-per-instance-configs &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                recreate-instances &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                resize &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; &lt;size&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-instance-template &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-target-pools &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-per-instance-configs &lt;project&gt; &lt;region&gt; &lt;instance-group-manager&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-instance-groups
+                get &lt;project&gt; &lt;region&gt; &lt;instance-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-instances &lt;project&gt; &lt;region&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-named-ports &lt;project&gt; &lt;region&gt; &lt;instance-group&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-instances
+                bulk-insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-network-endpoint-groups
+                delete &lt;project&gt; &lt;region&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;network-endpoint-group&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-notification-endpoints
+                delete &lt;project&gt; &lt;region&gt; &lt;notification-endpoint&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;notification-endpoint&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-operations
+                delete &lt;project&gt; &lt;region&gt; &lt;operation&gt; [-p &lt;v&gt;]...
+                get &lt;project&gt; &lt;region&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                wait &lt;project&gt; &lt;region&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-ssl-certificates
+                delete &lt;project&gt; &lt;region&gt; &lt;ssl-certificate&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;ssl-certificate&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-target-http-proxies
+                delete &lt;project&gt; &lt;region&gt; &lt;target-http-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;target-http-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-url-map &lt;project&gt; &lt;region&gt; &lt;target-http-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-target-https-proxies
+                delete &lt;project&gt; &lt;region&gt; &lt;target-https-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;target-https-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-ssl-certificates &lt;project&gt; &lt;region&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-url-map &lt;project&gt; &lt;region&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        region-url-maps
+                delete &lt;project&gt; &lt;region&gt; &lt;url-map&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;url-map&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;region&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                validate &lt;project&gt; &lt;region&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        regions
+                get &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        reservations
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;reservation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;reservation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                resize &lt;project&gt; &lt;zone&gt; &lt;reservation&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;zone&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        resource-policies
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;resource-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;resource-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        routers
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;router&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;router&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-nat-mapping-info &lt;project&gt; &lt;region&gt; &lt;router&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-router-status &lt;project&gt; &lt;region&gt; &lt;router&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;router&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                preview &lt;project&gt; &lt;region&gt; &lt;router&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;region&gt; &lt;router&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        routes
+                delete &lt;project&gt; &lt;route&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;route&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        security-policies
+                add-rule &lt;project&gt; &lt;security-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;security-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;security-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-rule &lt;project&gt; &lt;security-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-preconfigured-expression-sets &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;security-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch-rule &lt;project&gt; &lt;security-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-rule &lt;project&gt; &lt;security-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        snapshots
+                delete &lt;project&gt; &lt;snapshot&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;snapshot&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        ssl-certificates
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;ssl-certificate&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;ssl-certificate&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        ssl-policies
+                delete &lt;project&gt; &lt;ssl-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;ssl-policy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-available-features &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;ssl-policy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        subnetworks
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;subnetwork&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                expand-ip-cidr-range &lt;project&gt; &lt;region&gt; &lt;subnetwork&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;subnetwork&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-usable &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;region&gt; &lt;subnetwork&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-iam-policy &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-private-ip-google-access &lt;project&gt; &lt;region&gt; &lt;subnetwork&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-grpc-proxies
+                delete &lt;project&gt; &lt;target-grpc-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;target-grpc-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;target-grpc-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-http-proxies
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;target-http-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;target-http-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;target-http-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-url-map &lt;project&gt; &lt;target-http-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-https-proxies
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;target-https-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;target-https-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-quic-override &lt;project&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-ssl-certificates &lt;project&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-ssl-policy &lt;project&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-url-map &lt;project&gt; &lt;target-https-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-instances
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;zone&gt; &lt;target-instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;zone&gt; &lt;target-instance&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;zone&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-pools
+                add-health-check &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                add-instance &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-health &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-health-check &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                remove-instance &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-backup &lt;project&gt; &lt;region&gt; &lt;target-pool&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-ssl-proxies
+                delete &lt;project&gt; &lt;target-ssl-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;target-ssl-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-backend-service &lt;project&gt; &lt;target-ssl-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-proxy-header &lt;project&gt; &lt;target-ssl-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-ssl-certificates &lt;project&gt; &lt;target-ssl-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-ssl-policy &lt;project&gt; &lt;target-ssl-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-tcp-proxies
+                delete &lt;project&gt; &lt;target-tcp-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;target-tcp-proxy&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-backend-service &lt;project&gt; &lt;target-tcp-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-proxy-header &lt;project&gt; &lt;target-tcp-proxy&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        target-vpn-gateways
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;target-vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;target-vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        url-maps
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;url-map&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;url-map&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                invalidate-cache &lt;project&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;project&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;project&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                validate &lt;project&gt; &lt;url-map&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        vpn-gateways
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-status &lt;project&gt; &lt;region&gt; &lt;vpn-gateway&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-labels &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                test-iam-permissions &lt;project&gt; &lt;region&gt; &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        vpn-tunnels
+                aggregated-list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;project&gt; &lt;region&gt; &lt;vpn-tunnel&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;project&gt; &lt;region&gt; &lt;vpn-tunnel&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;project&gt; &lt;region&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;region&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        zone-operations
+                delete &lt;project&gt; &lt;zone&gt; &lt;operation&gt; [-p &lt;v&gt;]...
+                get &lt;project&gt; &lt;zone&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                wait &lt;project&gt; &lt;zone&gt; &lt;operation&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        zones
+                get &lt;project&gt; &lt;zone&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;project&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  compute1 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>compute1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/compute1-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/compute1-secret.json</code>, assuming that the required <em>compute</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>compute1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="accelerator-types_aggregated-list/" class="btn btn-neutral float-right" title="Aggregated List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="accelerator-types_aggregated-list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Update - mirror v2.0.0+20190424</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> mirror v2.0.0+20190424</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_insert">Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Contacts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../contacts_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../locations_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Settings</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../settings_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Subscriptions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Timeline</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_attachments-delete">Attachments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_attachments-get">Attachments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_attachments-insert">Attachments Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_attachments-list">Attachments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../timeline_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-upload-flags">Required Upload Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates a timeline item in place.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/glass.location</em></li>
+<li><em>https://www.googleapis.com/auth/glass.timeline</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/glass.location</em>.
+You can set the scope for this method like this: <code>mirror1 --scope &lt;scope&gt; timeline update ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;id&gt;</strong> <em>(string)</em><ul>
+<li>The ID of the timeline item.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>TimelineItem:
+  bundle-id: string
+  canonical-url: string
+  created: string
+  creator:
+    accept-types: [string]
+    display-name: string
+    id: string
+    image-urls: [string]
+    kind: string
+    phone-number: string
+    priority: integer
+    sharing-features: [string]
+    source: string
+    speakable-name: string
+    type: string
+  display-time: string
+  etag: string
+  html: string
+  id: string
+  in-reply-to: string
+  is-bundle-cover: boolean
+  is-deleted: boolean
+  is-pinned: boolean
+  kind: string
+  location:
+    accuracy: number
+    address: string
+    display-name: string
+    id: string
+    kind: string
+    latitude: number
+    longitude: number
+    timestamp: string
+  notification:
+    delivery-time: string
+    level: string
+  pin-score: integer
+  self-link: string
+  source-item-id: string
+  speakable-text: string
+  speakable-type: string
+  text: string
+  title: string
+  updated: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    bundle-id=sea</code><ul>
+<li>The bundle ID for this item. Services can specify a bundleId to group many items together. They appear under a single top-level item on the device.</li>
+</ul>
+</li>
+<li><code>canonical-url=et</code><ul>
+<li>A canonical URL pointing to the canonical/high quality version of the data represented by the timeline item.</li>
+</ul>
+</li>
+<li><code>created=at</code><ul>
+<li>The time at which this item was created, formatted according to RFC 3339.</li>
+</ul>
+</li>
+<li><code>creator    accept-types=dolore</code><ul>
+<li>A list of MIME types that a contact supports. The contact will be shown to the user if any of its acceptTypes matches any of the types of the attachments on the item. If no acceptTypes are given, the contact will be shown for all items.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>display-name=eirmod</code><ul>
+<li>The name to display for this contact.</li>
+</ul>
+</li>
+<li><code>id=lorem</code><ul>
+<li>An ID for this contact. This is generated by the application and is treated as an opaque token.</li>
+</ul>
+</li>
+<li><code>image-urls=accusam</code><ul>
+<li>Set of image URLs to display for a contact. Most contacts will have a single image, but a &#34;group&#34; contact may include up to 8 image URLs and they will be resized and cropped into a mosaic on the client.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>kind=amet</code><ul>
+<li>The type of resource. This is always mirror#contact.</li>
+</ul>
+</li>
+<li><code>phone-number=erat</code><ul>
+<li>Primary phone number for the contact. This can be a fully-qualified number, with country calling code and area code, or a local number.</li>
+</ul>
+</li>
+<li><code>priority=32</code><ul>
+<li>Priority for the contact to determine ordering in a list of contacts. Contacts with higher priorities will be shown before ones with lower priorities.</li>
+</ul>
+</li>
+<li><code>sharing-features=erat</code><ul>
+<li>A list of sharing features that a contact can handle. Allowed values are:  <ul>
+<li>ADD_CAPTION</li>
+</ul>
+</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>source=accusam</code><ul>
+<li>The ID of the application that created this contact. This is populated by the API</li>
+</ul>
+</li>
+<li><code>speakable-name=sea</code><ul>
+<li>Name of this contact as it should be pronounced. If this contact&#39;s name must be spoken as part of a voice disambiguation menu, this name is used as the expected pronunciation. This is useful for contact names with unpronounceable characters or whose display spelling is otherwise not phonetic.</li>
+</ul>
+</li>
+<li>
+<p><code>type=takimata</code></p>
+<ul>
+<li>The type for this contact. This is used for sorting in UIs. Allowed values are:  <ul>
+<li>INDIVIDUAL - Represents a single person. This is the default. </li>
+<li>GROUP - Represents more than a single person.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..    display-time=lorem</code></p>
+<ul>
+<li>The time that should be displayed when this item is viewed in the timeline, formatted according to RFC 3339. This user&#39;s timeline is sorted chronologically on display time, so this will also determine where the item is displayed in the timeline. If not set by the service, the display time defaults to the updated time.</li>
+</ul>
+</li>
+<li><code>etag=et</code><ul>
+<li>ETag for this item.</li>
+</ul>
+</li>
+<li>
+<p><code>html=at</code></p>
+<ul>
+<li>
+<p>HTML content for this item. If both text and html are provided for an item, the html will be rendered in the timeline.
+    Allowed HTML elements - You can use these elements in your timeline cards.</p>
+<ul>
+<li>Headers: h1, h2, h3, h4, h5, h6 </li>
+<li>Images: img </li>
+<li>Lists: li, ol, ul </li>
+<li>HTML5 semantics: article, aside, details, figure, figcaption, footer, header, nav, section, summary, time </li>
+<li>Structural: blockquote, br, div, hr, p, span </li>
+<li>Style: b, big, center, em, i, u, s, small, strike, strong, style, sub, sup </li>
+<li>
+<p>Tables: table, tbody, td, tfoot, th, thead, tr<br />
+Blocked HTML elements: These elements and their contents are removed from HTML payloads.</p>
+</li>
+<li>
+<p>Document headers: head, title </p>
+</li>
+<li>Embeds: audio, embed, object, source, video </li>
+<li>Frames: frame, frameset </li>
+<li>Scripting: applet, script<br />
+Other elements: Any elements that aren&#39;t listed are removed, but their contents are preserved.</li>
+<li><code>id=dolor</code><ul>
+<li>The ID of the timeline item. This is unique within a user&#39;s timeline.</li>
+</ul>
+</li>
+<li><code>in-reply-to=et</code><ul>
+<li>If this item was generated as a reply to another item, this field will be set to the ID of the item being replied to. This can be used to attach a reply to the appropriate conversation or post.</li>
+</ul>
+</li>
+<li><code>is-bundle-cover=true</code><ul>
+<li>Whether this item is a bundle cover.</li>
+</ul>
+</li>
+</ul>
+<p>If an item is marked as a bundle cover, it will be the entry point to the bundle of items that have the same bundleId as that item. It will be shown only on the main timeline — not within the opened bundle.</p>
+<p>On the main timeline, items that are shown are:<br />
+- Items that have isBundleCover set to true<br />
+- Items that do not have a bundleId  In a bundle sub-timeline, items that are shown are:<br />
+- Items that have the bundleId in question AND isBundleCover set to false
+<em> <code>is-deleted=false</code>
+    - When true, indicates this item is deleted, and only the ID property is set.
+</em> <code>is-pinned=true</code>
+    - When true, indicates this item is pinned, which means it&#39;s grouped alongside &#34;active&#34; items like navigation and hangouts, on the opposite side of the home screen from historical (non-pinned) timeline items. You can allow the user to toggle the value of this property with the TOGGLE_PINNED built-in menu item.
+<em> <code>kind=et</code>
+    - The type of resource. This is always mirror#timelineItem.
+</em> <code>location    accuracy=0.6976549448756626</code>
+    - The accuracy of the location fix in meters.
+<em> <code>address=sea</code>
+    - The full address of the location.
+</em> <code>display-name=consetetur</code>
+    - The name to be displayed. This may be a business name or a user-defined place, such as &#34;Home&#34;.
+<em> <code>id=sit</code>
+    - The ID of the location.
+</em> <code>kind=aliquyam</code>
+    - The type of resource. This is always mirror#location.
+<em> <code>latitude=0.5999462320813541</code>
+    - The latitude, in degrees.
+</em> <code>longitude=0.6413061576894121</code>
+    - The longitude, in degrees.
+* <code>timestamp=gubergren</code>
+    - The time at which this location was captured, formatted according to RFC 3339.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..notification    delivery-time=dolor</code></p>
+<ul>
+<li>The time at which the notification should be delivered.</li>
+</ul>
+</li>
+<li>
+<p><code>level=aliquyam</code></p>
+<ul>
+<li>Describes how important the notification is. Allowed values are:  <ul>
+<li>DEFAULT - Notifications of default importance. A chime will be played to alert users.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..    pin-score=40</code></p>
+<ul>
+<li>For pinned items, this determines the order in which the item is displayed in the timeline, with a higher score appearing closer to the clock. Note: setting this field is currently not supported.</li>
+</ul>
+</li>
+<li><code>self-link=amet.</code><ul>
+<li>A URL that can be used to retrieve this item.</li>
+</ul>
+</li>
+<li><code>source-item-id=ipsum</code><ul>
+<li>Opaque string you can use to map a timeline item to data in your own service.</li>
+</ul>
+</li>
+<li><code>speakable-text=lorem</code><ul>
+<li>
+<p>The speakable version of the content of this item. Along with the READ_ALOUD menu item, use this field to provide text that would be clearer when read aloud, or to provide extended information to what is displayed visually on Glass.</p>
+<p>Glassware should also specify the speakableType field, which will be spoken before this text in cases where the additional context is useful, for example when the user requests that the item be read aloud following a notification.
+* <code>speakable-type=accusam</code>
+    - A speakable description of the type of this item. This will be announced to the user prior to reading the content of the item in cases where the additional context is useful, for example when the user requests that the item be read aloud following a notification.</p>
+<p>This should be a short, simple noun phrase such as &#34;Email&#34;, &#34;Text message&#34;, or &#34;Daily Planet News Update&#34;.</p>
+<p>Glassware are encouraged to populate this field for every timeline item, even if the item does not contain speakableText or text so that the user can learn the type of the item without looking at the screen.
+<em> <code>text=gubergren</code>
+    - Text content of this item.
+</em> <code>title=sadipscing</code>
+    - The title of this item.
+* <code>updated=at</code>
+    - The time at which this item was last modified, formatted according to RFC 3339.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="required-upload-flags">Required Upload Flags</h1>
+<p>This method supports the upload of data, which <em>requires</em> all of the following flags to be set:</p>
+<ul>
+<li><strong>-u simple</strong><ul>
+<li><strong>simple</strong> - Upload media all at once.</li>
+</ul>
+</li>
+<li><strong>-f file</strong><ul>
+<li>Path to file to upload. It must be seekable.</li>
+</ul>
+</li>
+</ul>
+<p>The following flag <em>may</em> be set: </p>
+<ul>
+<li><strong>-m mime</strong><ul>
+<li>the mime type, like 'application/octet-stream', which is the default</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../timeline_patch" class="btn btn-neutral" title="Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../timeline_patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

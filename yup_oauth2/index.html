@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `yup_oauth2` crate."><meta name="keywords" content="rust, rustlang, rust-lang, yup_oauth2"><title>yup_oauth2 - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../yup_oauth2/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate yup_oauth2</p><div class="block version"><p>Version 5.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all yup_oauth2's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="yup_oauth2" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">yup_oauth2</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/yup_oauth2/lib.rs.html#1-95" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This library can be used to acquire oauth2.0 authentication for services.</p>
+<p>For your application to use this library, you will have to obtain an application
+id and secret by
+<a href="https://developers.google.com/youtube/registering_an_application">following this guide</a> (for
+Google services) respectively the documentation of the API provider you want to connect to.</p>
+<h1 id="device-flow-usage" class="section-header"><a href="#device-flow-usage">Device Flow Usage</a></h1>
+<p>With an application secret you can get started right away, building a <code>DeviceFlowAuthenticator</code>
+and obtaining tokens from it.</p>
+<h1 id="service-account-flow" class="section-header"><a href="#service-account-flow">Service account &quot;flow&quot;</a></h1>
+<p>When using service account credentials, no user interaction is required. The access token
+can be obtained automatically using the private key of the client (which you can download
+from the API provider). See <code>examples/service_account/</code> for an example on how to use service
+account credentials. See
+<a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">developers.google.com</a>
+for a detailed description of the protocol. This crate implements OAuth for Service Accounts
+based on the Google APIs; it may or may not work with other providers.</p>
+<h1 id="installed-flow-usage" class="section-header"><a href="#installed-flow-usage">Installed Flow Usage</a></h1>
+<p>The installed flow involves showing a URL to the user (or opening it in a browser)
+and then either prompting the user to enter a displayed code, or make the authorizing
+website redirect to a web server spun up by this library and running on localhost.</p>
+<p>In order to use the interactive method, use the <code>Interactive</code> <code>InstalledFlowReturnMethod</code>;
+for the redirect method, use <code>HTTPRedirect</code>.</p>
+<p>You can implement your own <code>AuthenticatorDelegate</code> in order to customize the flow;
+the installed flow uses the <code>present_user_url</code> method.</p>
+<p>The returned <code>Token</code> will be stored in memory in order to authorize future
+API requests to the same scopes. The tokens can optionally be persisted to
+disk by using <code>persist_tokens_to_disk</code> when creating the authenticator.</p>
+<p>The following example, which is derived from the (actual and runnable) example in
+<code>examples/test-installed/</code>, shows the basics of using this crate:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">yup_oauth2</span>::{<span class="ident">InstalledFlowAuthenticator</span>, <span class="ident">InstalledFlowReturnMethod</span>};
+
+<span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="comment">// Read application secret from a file. Sometimes it&#39;s easier to compile it directly into</span>
+    <span class="comment">// the binary. The clientsecret file contains JSON like `{&quot;installed&quot;:{&quot;client_id&quot;: ... }}`</span>
+    <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">yup_oauth2</span>::<span class="ident">read_application_secret</span>(<span class="string">&quot;clientsecret.json&quot;</span>)
+        .<span class="kw">await</span>
+        .<span class="ident">expect</span>(<span class="string">&quot;clientsecret.json&quot;</span>);
+
+    <span class="comment">// Create an authenticator that uses an InstalledFlow to authenticate. The</span>
+    <span class="comment">// authentication tokens are persisted to a file named tokencache.json. The</span>
+    <span class="comment">// authenticator takes care of caching tokens to disk and refreshing tokens once</span>
+    <span class="comment">// they&#39;ve expired.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">InstalledFlowAuthenticator</span>::<span class="ident">builder</span>(<span class="ident">secret</span>, <span class="ident">InstalledFlowReturnMethod</span>::<span class="ident">HTTPRedirect</span>)
+    .<span class="ident">persist_tokens_to_disk</span>(<span class="string">&quot;tokencache.json&quot;</span>)
+    .<span class="ident">build</span>()
+    .<span class="kw">await</span>
+    .<span class="ident">unwrap</span>();
+
+    <span class="kw">let</span> <span class="ident">scopes</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;https://www.googleapis.com/auth/drive.file&quot;</span>];
+
+    <span class="comment">// token(&lt;scopes&gt;) is the one important function of this crate; it does everything to</span>
+    <span class="comment">// obtain a token that can be sent e.g. as Bearer token.</span>
+    <span class="kw">match</span> <span class="ident">auth</span>.<span class="ident">token</span>(<span class="ident">scopes</span>).<span class="kw">await</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">token</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;The token is {:?}&quot;</span>, <span class="ident">token</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;error: {:?}&quot;</span>, <span class="ident">e</span>),
+    }
+}</pre></div>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="authenticator/index.html" title="yup_oauth2::authenticator mod">authenticator</a></td><td class="docblock-short"><p>Module contianing the core functionality for OAuth2 Authentication.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="authenticator_delegate/index.html" title="yup_oauth2::authenticator_delegate mod">authenticator_delegate</a></td><td class="docblock-short"><p>Module containing types related to delegates.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="error/index.html" title="yup_oauth2::error mod">error</a></td><td class="docblock-short"><p>Module containing various error types.</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.AccessToken.html" title="yup_oauth2::AccessToken struct">AccessToken</a></td><td class="docblock-short"><p>Represents an access token returned by oauth2 servers. All access tokens are
+Bearer tokens. Other types of tokens are not supported.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ApplicationSecret.html" title="yup_oauth2::ApplicationSecret struct">ApplicationSecret</a></td><td class="docblock-short"><p>Represents either 'installed' or 'web' applications in a json secrets file.
+See <code>ConsoleApplicationSecret</code> for more information</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ConsoleApplicationSecret.html" title="yup_oauth2::ConsoleApplicationSecret struct">ConsoleApplicationSecret</a></td><td class="docblock-short"><p>A type to facilitate reading and writing the json secret file
+as returned by the <a href="https://code.google.com/apis/console">google developer console</a></p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.DeviceFlowAuthenticator.html" title="yup_oauth2::DeviceFlowAuthenticator struct">DeviceFlowAuthenticator</a></td><td class="docblock-short"><p>Create an authenticator that uses the device flow.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InstalledFlowAuthenticator.html" title="yup_oauth2::InstalledFlowAuthenticator struct">InstalledFlowAuthenticator</a></td><td class="docblock-short"><p>Create an authenticator that uses the installed flow.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ServiceAccountAuthenticator.html" title="yup_oauth2::ServiceAccountAuthenticator struct">ServiceAccountAuthenticator</a></td><td class="docblock-short"><p>Create an authenticator that uses a service account.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ServiceAccountKey.html" title="yup_oauth2::ServiceAccountKey struct">ServiceAccountKey</a></td><td class="docblock-short"><p>JSON schema of secret service account key. You can obtain the key from
+the Cloud Console at https://console.cloud.google.com/.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Error.html" title="yup_oauth2::Error enum">Error</a></td><td class="docblock-short"><p>Encapsulates all possible results of the <code>token(...)</code> operation</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.InstalledFlowReturnMethod.html" title="yup_oauth2::InstalledFlowReturnMethod enum">InstalledFlowReturnMethod</a></td><td class="docblock-short"><p>cf. https://developers.google.com/identity/protocols/OAuth2InstalledApp#choosingredirecturi</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.parse_application_secret.html" title="yup_oauth2::parse_application_secret fn">parse_application_secret</a></td><td class="docblock-short"><p>Read an application secret from a JSON string.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.read_application_secret.html" title="yup_oauth2::read_application_secret fn">read_application_secret</a></td><td class="docblock-short"><p>Read an application secret from a file.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.read_service_account_key.html" title="yup_oauth2::read_service_account_key fn">read_service_account_key</a></td><td class="docblock-short"><p>Read a service account key from a JSON file. You can download the JSON keys from the Google
+Cloud Console or the respective console of your service provider.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="yup_oauth2"></div>
+    <script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

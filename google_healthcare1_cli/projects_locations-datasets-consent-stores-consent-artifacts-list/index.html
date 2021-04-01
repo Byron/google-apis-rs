@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Datasets Consent Stores Consent Artifacts List - Cloud Healthcare v2.0.0+20210317</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Healthcare v2.0.0+20210317</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-attribute-definitions-create">Locations Datasets Consent Stores Attribute Definitions Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-attribute-definitions-delete">Locations Datasets Consent Stores Attribute Definitions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-attribute-definitions-get">Locations Datasets Consent Stores Attribute Definitions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-attribute-definitions-list">Locations Datasets Consent Stores Attribute Definitions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-attribute-definitions-patch">Locations Datasets Consent Stores Attribute Definitions Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-check-data-access">Locations Datasets Consent Stores Check Data Access</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consent-artifacts-create">Locations Datasets Consent Stores Consent Artifacts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consent-artifacts-delete">Locations Datasets Consent Stores Consent Artifacts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consent-artifacts-get">Locations Datasets Consent Stores Consent Artifacts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Datasets Consent Stores Consent Artifacts List</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-activate">Locations Datasets Consent Stores Consents Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-create">Locations Datasets Consent Stores Consents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-delete">Locations Datasets Consent Stores Consents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-delete-revision">Locations Datasets Consent Stores Consents Delete Revision</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-get">Locations Datasets Consent Stores Consents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-list">Locations Datasets Consent Stores Consents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-list-revisions">Locations Datasets Consent Stores Consents List Revisions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-patch">Locations Datasets Consent Stores Consents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-reject">Locations Datasets Consent Stores Consents Reject</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-consents-revoke">Locations Datasets Consent Stores Consents Revoke</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-create">Locations Datasets Consent Stores Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-delete">Locations Datasets Consent Stores Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-evaluate-user-consents">Locations Datasets Consent Stores Evaluate User Consents</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-get">Locations Datasets Consent Stores Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-get-iam-policy">Locations Datasets Consent Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-list">Locations Datasets Consent Stores List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-patch">Locations Datasets Consent Stores Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-query-accessible-data">Locations Datasets Consent Stores Query Accessible Data</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-set-iam-policy">Locations Datasets Consent Stores Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-test-iam-permissions">Locations Datasets Consent Stores Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-archive">Locations Datasets Consent Stores User Data Mappings Archive</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-create">Locations Datasets Consent Stores User Data Mappings Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-delete">Locations Datasets Consent Stores User Data Mappings Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-get">Locations Datasets Consent Stores User Data Mappings Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-list">Locations Datasets Consent Stores User Data Mappings List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-consent-stores-user-data-mappings-patch">Locations Datasets Consent Stores User Data Mappings Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-create">Locations Datasets Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-deidentify">Locations Datasets Deidentify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-delete">Locations Datasets Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-create">Locations Datasets Dicom Stores Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-deidentify">Locations Datasets Dicom Stores Deidentify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-delete">Locations Datasets Dicom Stores Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-export">Locations Datasets Dicom Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-get">Locations Datasets Dicom Stores Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-get-iam-policy">Locations Datasets Dicom Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-import">Locations Datasets Dicom Stores Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-list">Locations Datasets Dicom Stores List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-patch">Locations Datasets Dicom Stores Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-search-for-instances">Locations Datasets Dicom Stores Search For Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-search-for-series">Locations Datasets Dicom Stores Search For Series</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-search-for-studies">Locations Datasets Dicom Stores Search For Studies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-set-iam-policy">Locations Datasets Dicom Stores Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-store-instances">Locations Datasets Dicom Stores Store Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-delete">Locations Datasets Dicom Stores Studies Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-retrieve-metadata">Locations Datasets Dicom Stores Studies Retrieve Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-retrieve-study">Locations Datasets Dicom Stores Studies Retrieve Study</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-search-for-instances">Locations Datasets Dicom Stores Studies Search For Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-search-for-series">Locations Datasets Dicom Stores Studies Search For Series</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-delete">Locations Datasets Dicom Stores Studies Series Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-delete">Locations Datasets Dicom Stores Studies Series Instances Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames">Locations Datasets Dicom Stores Studies Series Instances Frames Retrieve Frames</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered">Locations Datasets Dicom Stores Studies Series Instances Frames Retrieve Rendered</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-instance">Locations Datasets Dicom Stores Studies Series Instances Retrieve Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata">Locations Datasets Dicom Stores Studies Series Instances Retrieve Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered">Locations Datasets Dicom Stores Studies Series Instances Retrieve Rendered</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-retrieve-metadata">Locations Datasets Dicom Stores Studies Series Retrieve Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-retrieve-series">Locations Datasets Dicom Stores Studies Series Retrieve Series</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-series-search-for-instances">Locations Datasets Dicom Stores Studies Series Search For Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-studies-store-instances">Locations Datasets Dicom Stores Studies Store Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-dicom-stores-test-iam-permissions">Locations Datasets Dicom Stores Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-create">Locations Datasets Fhir Stores Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-deidentify">Locations Datasets Fhir Stores Deidentify</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-delete">Locations Datasets Fhir Stores Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-export">Locations Datasets Fhir Stores Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--patient-everything">Locations Datasets Fhir Stores Fhir  Patient Everything</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir--resource-purge">Locations Datasets Fhir Stores Fhir  Resource Purge</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-capabilities">Locations Datasets Fhir Stores Fhir Capabilities</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-create">Locations Datasets Fhir Stores Fhir Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-delete">Locations Datasets Fhir Stores Fhir Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-execute-bundle">Locations Datasets Fhir Stores Fhir Execute Bundle</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-history">Locations Datasets Fhir Stores Fhir History</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-patch">Locations Datasets Fhir Stores Fhir Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-read">Locations Datasets Fhir Stores Fhir Read</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-search">Locations Datasets Fhir Stores Fhir Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-search-type">Locations Datasets Fhir Stores Fhir Search Type</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-update">Locations Datasets Fhir Stores Fhir Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-fhir-vread">Locations Datasets Fhir Stores Fhir Vread</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-get">Locations Datasets Fhir Stores Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-get-iam-policy">Locations Datasets Fhir Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-import">Locations Datasets Fhir Stores Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-list">Locations Datasets Fhir Stores List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-patch">Locations Datasets Fhir Stores Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-set-iam-policy">Locations Datasets Fhir Stores Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-fhir-stores-test-iam-permissions">Locations Datasets Fhir Stores Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-get">Locations Datasets Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-get-iam-policy">Locations Datasets Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-create">Locations Datasets Hl7 V2 Stores Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-delete">Locations Datasets Hl7 V2 Stores Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-get">Locations Datasets Hl7 V2 Stores Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-get-iam-policy">Locations Datasets Hl7 V2 Stores Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-list">Locations Datasets Hl7 V2 Stores List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-create">Locations Datasets Hl7 V2 Stores Messages Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-delete">Locations Datasets Hl7 V2 Stores Messages Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-get">Locations Datasets Hl7 V2 Stores Messages Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-ingest">Locations Datasets Hl7 V2 Stores Messages Ingest</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-list">Locations Datasets Hl7 V2 Stores Messages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-messages-patch">Locations Datasets Hl7 V2 Stores Messages Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-patch">Locations Datasets Hl7 V2 Stores Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-set-iam-policy">Locations Datasets Hl7 V2 Stores Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-hl7-v2-stores-test-iam-permissions">Locations Datasets Hl7 V2 Stores Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-list">Locations Datasets List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-operations-cancel">Locations Datasets Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-operations-get">Locations Datasets Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-operations-list">Locations Datasets Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-patch">Locations Datasets Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-set-iam-policy">Locations Datasets Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-datasets-test-iam-permissions">Locations Datasets Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Datasets Consent Stores Consent Artifacts List</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/healthcare1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Lists the Consent artifacts in the specified consent store.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>healthcare1 --scope &lt;scope&gt; projects locations-datasets-consent-stores-consent-artifacts-list ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. Name of the consent store to retrieve consent artifacts from.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>Optional. Restricts the artifacts returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example <code>&amp;#34;query text&amp;#34;</code>. The only valid relational operation for text fields is equality (<code>=</code>), where text is searched within the field, rather than having the field be equal to the text. For example, <code>&amp;#34;Comment = great&amp;#34;</code> returns messages with <code>great</code> in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (<code>=</code>), along with the less than/greater than operators (<code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;</code>, <code>&amp;gt;=</code>). Note that there is no inequality (<code>!=</code>) operator. You can prepend the <code>NOT</code> operator to an expression to negate it. * A date field value must be written in <code>yyyy-mm-dd</code> form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (<code>=</code>) , along with the less than/greater than operators (<code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;</code>, <code>&amp;gt;=</code>). Note that there is no inequality (<code>!=</code>) operator. You can prepend the <code>NOT</code> operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding <code>AND</code> or <code>OR</code> operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it&#39;s just another part of the character string to be matched. You can prepend the <code>NOT</code> operator to an expression to negate it. The fields available for filtering are: - user_id. For example, <code>filter=user_id=\&amp;#34;user123\&amp;#34;</code>. - consent_content_version - metadata. For example, <code>filter=Metadata(\&amp;#34;testkey\&amp;#34;)=\&amp;#34;value\&amp;#34;</code> or <code>filter=HasMetadata(\&amp;#34;testkey\&amp;#34;)</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-size=integer</strong></p>
+<ul>
+<li>Optional. Limit on the number of consent artifacts to return in a single response. If not specified, 100 is used. May not be larger than 1000.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-token=string</strong></p>
+<ul>
+<li>Optional. The next_page_token value returned from the previous List request, if any.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-datasets-consent-stores-consents-activate" class="btn btn-neutral float-right" title="Locations Datasets Consent Stores Consents Activate"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-datasets-consent-stores-consent-artifacts-get" class="btn btn-neutral" title="Locations Datasets Consent Stores Consent Artifacts Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-datasets-consent-stores-consent-artifacts-get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-datasets-consent-stores-consents-activate" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

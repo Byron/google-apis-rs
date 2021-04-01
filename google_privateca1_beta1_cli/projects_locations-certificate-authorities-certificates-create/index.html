@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Certificate Authorities Certificates Create - Certificate Authority Service v2.0.0+20210322</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Certificate Authority Service v2.0.0+20210322</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-activate">Locations Certificate Authorities Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-get">Locations Certificate Authorities Certificate Revocation Lists Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-get-iam-policy">Locations Certificate Authorities Certificate Revocation Lists Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-list">Locations Certificate Authorities Certificate Revocation Lists List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-patch">Locations Certificate Authorities Certificate Revocation Lists Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-set-iam-policy">Locations Certificate Authorities Certificate Revocation Lists Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions">Locations Certificate Authorities Certificate Revocation Lists Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Certificate Authorities Certificates Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificates-get">Locations Certificate Authorities Certificates Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificates-list">Locations Certificate Authorities Certificates List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificates-patch">Locations Certificate Authorities Certificates Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-certificates-revoke">Locations Certificate Authorities Certificates Revoke</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-create">Locations Certificate Authorities Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-disable">Locations Certificate Authorities Disable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-enable">Locations Certificate Authorities Enable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-fetch">Locations Certificate Authorities Fetch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-get">Locations Certificate Authorities Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-get-iam-policy">Locations Certificate Authorities Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-list">Locations Certificate Authorities List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-patch">Locations Certificate Authorities Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-restore">Locations Certificate Authorities Restore</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-schedule-delete">Locations Certificate Authorities Schedule Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-set-iam-policy">Locations Certificate Authorities Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-certificate-authorities-test-iam-permissions">Locations Certificate Authorities Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-reusable-configs-get">Locations Reusable Configs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-reusable-configs-get-iam-policy">Locations Reusable Configs Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-reusable-configs-list">Locations Reusable Configs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-reusable-configs-set-iam-policy">Locations Reusable Configs Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-reusable-configs-test-iam-permissions">Locations Reusable Configs Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Certificate Authorities Certificates Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/privateca1_beta1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Create a new Certificate in a given Project, Location from a particular CertificateAuthority.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>privateca1-beta1 --scope &lt;scope&gt; projects locations-certificate-authorities-certificates-create ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The resource name of the location and CertificateAuthority associated with the Certificate, in the format <code>projects/*/locations/*/certificateAuthorities/*</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Certificate:
+  certificate-description:
+    aia-issuing-certificate-urls: [string]
+    authority-key-id:
+      key-id: string
+    cert-fingerprint:
+      sha256-hash: string
+    config-values:
+      aia-ocsp-servers: [string]
+      ca-options:
+        is-ca: boolean
+        max-issuer-path-length: integer
+      key-usage:
+        base-key-usage:
+          cert-sign: boolean
+          content-commitment: boolean
+          crl-sign: boolean
+          data-encipherment: boolean
+          decipher-only: boolean
+          digital-signature: boolean
+          encipher-only: boolean
+          key-agreement: boolean
+          key-encipherment: boolean
+        extended-key-usage:
+          client-auth: boolean
+          code-signing: boolean
+          email-protection: boolean
+          ocsp-signing: boolean
+          server-auth: boolean
+          time-stamping: boolean
+    crl-distribution-points: [string]
+    public-key:
+      key: string
+      type: string
+    subject-description:
+      common-name: string
+      hex-serial-number: string
+      lifetime: string
+      not-after-time: string
+      not-before-time: string
+      subject:
+        country-code: string
+        locality: string
+        organization: string
+        organizational-unit: string
+        postal-code: string
+        province: string
+        street-address: string
+      subject-alt-name:
+        dns-names: [string]
+        email-addresses: [string]
+        ip-addresses: [string]
+        uris: [string]
+    subject-key-id:
+      key-id: string
+  config:
+    public-key:
+      key: string
+      type: string
+    reusable-config:
+      reusable-config: string
+      reusable-config-values:
+        aia-ocsp-servers: [string]
+        ca-options:
+          is-ca: boolean
+          max-issuer-path-length: integer
+        key-usage:
+          base-key-usage:
+            cert-sign: boolean
+            content-commitment: boolean
+            crl-sign: boolean
+            data-encipherment: boolean
+            decipher-only: boolean
+            digital-signature: boolean
+            encipher-only: boolean
+            key-agreement: boolean
+            key-encipherment: boolean
+          extended-key-usage:
+            client-auth: boolean
+            code-signing: boolean
+            email-protection: boolean
+            ocsp-signing: boolean
+            server-auth: boolean
+            time-stamping: boolean
+    subject-config:
+      common-name: string
+      subject:
+        country-code: string
+        locality: string
+        organization: string
+        organizational-unit: string
+        postal-code: string
+        province: string
+        street-address: string
+      subject-alt-name:
+        dns-names: [string]
+        email-addresses: [string]
+        ip-addresses: [string]
+        uris: [string]
+  create-time: string
+  labels: { string: string }
+  lifetime: string
+  name: string
+  pem-certificate: string
+  pem-certificate-chain: [string]
+  pem-csr: string
+  revocation-details:
+    revocation-state: string
+    revocation-time: string
+  update-time: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .certificate-description    aia-issuing-certificate-urls=eos</code><ul>
+<li>Describes lists of issuer CA certificate URLs that appear in the &#34;Authority Information Access&#34; extension in the certificate.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>authority-key-id    key-id=dolor</code></p>
+<ul>
+<li>Optional. The value of this KeyId encoded in lowercase hexadecimal. This is most likely the 160 bit SHA-1 hash of the public key.</li>
+</ul>
+</li>
+<li>
+<p><code>..cert-fingerprint    sha256-hash=ea</code></p>
+<ul>
+<li>The SHA 256 hash, encoded in hexadecimal, of the DER x509 certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>..config-values    aia-ocsp-servers=ipsum</code></p>
+<ul>
+<li>Optional. Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the &#34;Authority Information Access&#34; extension in the certificate.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ca-options    is-ca=false</code><ul>
+<li>Optional. Refers to the &#34;CA&#34; X.509 extension, which is a boolean value. When this value is missing, the extension will be omitted from the CA certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>max-issuer-path-length=54</code></p>
+<ul>
+<li>Optional. Refers to the path length restriction X.509 extension. For a CA certificate, this value describes the depth of subordinate CA certificates that are allowed. If this value is less than 0, the request will fail. If this value is missing, the max path length will be omitted from the CA certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>..key-usage.base-key-usage    cert-sign=true</code></p>
+<ul>
+<li>The key may be used to sign certificates.</li>
+</ul>
+</li>
+<li><code>content-commitment=false</code><ul>
+<li>The key may be used for cryptographic commitments. Note that this may also be referred to as &#34;non-repudiation&#34;.</li>
+</ul>
+</li>
+<li><code>crl-sign=true</code><ul>
+<li>The key may be used sign certificate revocation lists.</li>
+</ul>
+</li>
+<li><code>data-encipherment=true</code><ul>
+<li>The key may be used to encipher data.</li>
+</ul>
+</li>
+<li><code>decipher-only=true</code><ul>
+<li>The key may be used to decipher only.</li>
+</ul>
+</li>
+<li><code>digital-signature=true</code><ul>
+<li>The key may be used for digital signatures.</li>
+</ul>
+</li>
+<li><code>encipher-only=false</code><ul>
+<li>The key may be used to encipher only.</li>
+</ul>
+</li>
+<li><code>key-agreement=true</code><ul>
+<li>The key may be used in a key agreement protocol.</li>
+</ul>
+</li>
+<li>
+<p><code>key-encipherment=false</code></p>
+<ul>
+<li>The key may be used to encipher other keys.</li>
+</ul>
+</li>
+<li>
+<p><code>..extended-key-usage    client-auth=true</code></p>
+<ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as &#34;TLS WWW client authentication&#34;, though regularly used for non-WWW TLS.</li>
+</ul>
+</li>
+<li><code>code-signing=false</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as &#34;Signing of downloadable executable code client authentication&#34;.</li>
+</ul>
+</li>
+<li><code>email-protection=false</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.4. Officially described as &#34;Email protection&#34;.</li>
+</ul>
+</li>
+<li><code>ocsp-signing=true</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.9. Officially described as &#34;Signing OCSP responses&#34;.</li>
+</ul>
+</li>
+<li><code>server-auth=true</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.1. Officially described as &#34;TLS WWW server authentication&#34;, though regularly used for non-WWW TLS.</li>
+</ul>
+</li>
+<li>
+<p><code>time-stamping=true</code></p>
+<ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.8. Officially described as &#34;Binding the hash of an object to a time&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>....    crl-distribution-points=vero</code></p>
+<ul>
+<li>Describes a list of locations to obtain CRL information, i.e. the DistributionPoint.fullName described by https://tools.ietf.org/html/rfc5280#section-4.2.1.13</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>public-key    key=erat</code><ul>
+<li>Required. A public key. When this is specified in a request, the padding and encoding can be any of the options described by the respective &#39;KeyType&#39; value. When this is generated by the service, it will always be an RFC 5280 <a href="https://tools.ietf.org/html/rfc5280#section-4.1">SubjectPublicKeyInfo</a> structure containing an algorithm identifier and a key.</li>
+</ul>
+</li>
+<li>
+<p><code>type=sed</code></p>
+<ul>
+<li>Optional. The type of public key. If specified, it must match the public key used for the<code>key</code> field.</li>
+</ul>
+</li>
+<li>
+<p><code>..subject-description    common-name=duo</code></p>
+<ul>
+<li>The &#34;common name&#34; of the distinguished name.</li>
+</ul>
+</li>
+<li><code>hex-serial-number=dolore</code><ul>
+<li>The serial number encoded in lowercase hexadecimal.</li>
+</ul>
+</li>
+<li><code>lifetime=et</code><ul>
+<li>For convenience, the actual lifetime of an issued certificate. Corresponds to &#39;not_after_time&#39; - &#39;not_before_time&#39;.</li>
+</ul>
+</li>
+<li><code>not-after-time=voluptua.</code><ul>
+<li>The time at which the certificate expires.</li>
+</ul>
+</li>
+<li><code>not-before-time=amet.</code><ul>
+<li>The time at which the certificate becomes valid.</li>
+</ul>
+</li>
+<li><code>subject    country-code=consetetur</code><ul>
+<li>The country code of the subject.</li>
+</ul>
+</li>
+<li><code>locality=diam</code><ul>
+<li>The locality or city of the subject.</li>
+</ul>
+</li>
+<li><code>organization=dolor</code><ul>
+<li>The organization of the subject.</li>
+</ul>
+</li>
+<li><code>organizational-unit=et</code><ul>
+<li>The organizational_unit of the subject.</li>
+</ul>
+</li>
+<li><code>postal-code=et</code><ul>
+<li>The postal code of the subject.</li>
+</ul>
+</li>
+<li><code>province=sadipscing</code><ul>
+<li>The province, territory, or regional state of the subject.</li>
+</ul>
+</li>
+<li>
+<p><code>street-address=stet</code></p>
+<ul>
+<li>The street address of the subject.</li>
+</ul>
+</li>
+<li>
+<p><code>..subject-alt-name    dns-names=dolor</code></p>
+<ul>
+<li>Contains only valid, fully-qualified host names.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>email-addresses=duo</code><ul>
+<li>Contains only valid RFC 2822 E-mail addresses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ip-addresses=vero</code><ul>
+<li>Contains only valid 32-bit IPv4 addresses or RFC 4291 IPv6 addresses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>uris=vero</code></p>
+<ul>
+<li>Contains only valid RFC 3986 URIs.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...subject-key-id    key-id=invidunt</code></p>
+<ul>
+<li>Optional. The value of this KeyId encoded in lowercase hexadecimal. This is most likely the 160 bit SHA-1 hash of the public key.</li>
+</ul>
+</li>
+<li>
+<p><code>...config.public-key    key=stet</code></p>
+<ul>
+<li>Required. A public key. When this is specified in a request, the padding and encoding can be any of the options described by the respective &#39;KeyType&#39; value. When this is generated by the service, it will always be an RFC 5280 <a href="https://tools.ietf.org/html/rfc5280#section-4.1">SubjectPublicKeyInfo</a> structure containing an algorithm identifier and a key.</li>
+</ul>
+</li>
+<li>
+<p><code>type=vero</code></p>
+<ul>
+<li>Optional. The type of public key. If specified, it must match the public key used for the<code>key</code> field.</li>
+</ul>
+</li>
+<li>
+<p><code>..reusable-config    reusable-config=elitr</code></p>
+<ul>
+<li>Required. A resource path to a ReusableConfig in the format <code>projects/*/locations/*/reusableConfigs/*</code>.</li>
+</ul>
+</li>
+<li><code>reusable-config-values    aia-ocsp-servers=lorem</code><ul>
+<li>Optional. Describes Online Certificate Status Protocol (OCSP) endpoint addresses that appear in the &#34;Authority Information Access&#34; extension in the certificate.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ca-options    is-ca=true</code><ul>
+<li>Optional. Refers to the &#34;CA&#34; X.509 extension, which is a boolean value. When this value is missing, the extension will be omitted from the CA certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>max-issuer-path-length=1</code></p>
+<ul>
+<li>Optional. Refers to the path length restriction X.509 extension. For a CA certificate, this value describes the depth of subordinate CA certificates that are allowed. If this value is less than 0, the request will fail. If this value is missing, the max path length will be omitted from the CA certificate.</li>
+</ul>
+</li>
+<li>
+<p><code>..key-usage.base-key-usage    cert-sign=true</code></p>
+<ul>
+<li>The key may be used to sign certificates.</li>
+</ul>
+</li>
+<li><code>content-commitment=true</code><ul>
+<li>The key may be used for cryptographic commitments. Note that this may also be referred to as &#34;non-repudiation&#34;.</li>
+</ul>
+</li>
+<li><code>crl-sign=false</code><ul>
+<li>The key may be used sign certificate revocation lists.</li>
+</ul>
+</li>
+<li><code>data-encipherment=false</code><ul>
+<li>The key may be used to encipher data.</li>
+</ul>
+</li>
+<li><code>decipher-only=true</code><ul>
+<li>The key may be used to decipher only.</li>
+</ul>
+</li>
+<li><code>digital-signature=false</code><ul>
+<li>The key may be used for digital signatures.</li>
+</ul>
+</li>
+<li><code>encipher-only=false</code><ul>
+<li>The key may be used to encipher only.</li>
+</ul>
+</li>
+<li><code>key-agreement=false</code><ul>
+<li>The key may be used in a key agreement protocol.</li>
+</ul>
+</li>
+<li>
+<p><code>key-encipherment=false</code></p>
+<ul>
+<li>The key may be used to encipher other keys.</li>
+</ul>
+</li>
+<li>
+<p><code>..extended-key-usage    client-auth=true</code></p>
+<ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.2. Officially described as &#34;TLS WWW client authentication&#34;, though regularly used for non-WWW TLS.</li>
+</ul>
+</li>
+<li><code>code-signing=true</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.3. Officially described as &#34;Signing of downloadable executable code client authentication&#34;.</li>
+</ul>
+</li>
+<li><code>email-protection=false</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.4. Officially described as &#34;Email protection&#34;.</li>
+</ul>
+</li>
+<li><code>ocsp-signing=true</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.9. Officially described as &#34;Signing OCSP responses&#34;.</li>
+</ul>
+</li>
+<li><code>server-auth=true</code><ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.1. Officially described as &#34;TLS WWW server authentication&#34;, though regularly used for non-WWW TLS.</li>
+</ul>
+</li>
+<li>
+<p><code>time-stamping=true</code></p>
+<ul>
+<li>Corresponds to OID 1.3.6.1.5.5.7.3.8. Officially described as &#34;Binding the hash of an object to a time&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>.....subject-config    common-name=et</code></p>
+<ul>
+<li>Optional. The &#34;common name&#34; of the distinguished name.</li>
+</ul>
+</li>
+<li><code>subject    country-code=sed</code><ul>
+<li>The country code of the subject.</li>
+</ul>
+</li>
+<li><code>locality=no</code><ul>
+<li>The locality or city of the subject.</li>
+</ul>
+</li>
+<li><code>organization=et</code><ul>
+<li>The organization of the subject.</li>
+</ul>
+</li>
+<li><code>organizational-unit=elitr</code><ul>
+<li>The organizational_unit of the subject.</li>
+</ul>
+</li>
+<li><code>postal-code=sed</code><ul>
+<li>The postal code of the subject.</li>
+</ul>
+</li>
+<li><code>province=no</code><ul>
+<li>The province, territory, or regional state of the subject.</li>
+</ul>
+</li>
+<li>
+<p><code>street-address=nonumy</code></p>
+<ul>
+<li>The street address of the subject.</li>
+</ul>
+</li>
+<li>
+<p><code>..subject-alt-name    dns-names=at</code></p>
+<ul>
+<li>Contains only valid, fully-qualified host names.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>email-addresses=sadipscing</code><ul>
+<li>Contains only valid RFC 2822 E-mail addresses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ip-addresses=aliquyam</code><ul>
+<li>Contains only valid 32-bit IPv4 addresses or RFC 4291 IPv6 addresses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>uris=dolores</code></p>
+<ul>
+<li>Contains only valid RFC 3986 URIs.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>....    create-time=sadipscing</code></p>
+<ul>
+<li>Output only. The time at which this Certificate was created.</li>
+</ul>
+</li>
+<li><code>labels=key=erat</code><ul>
+<li>Optional. Labels with user-defined metadata.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>lifetime=aliquyam</code><ul>
+<li>Required. Immutable. The desired lifetime of a certificate. Used to create the &#34;not_before_time&#34; and &#34;not_after_time&#34; fields inside an X.509 certificate. Note that the lifetime may be truncated if it would extend past the life of any certificate authority in the issuing chain.</li>
+</ul>
+</li>
+<li><code>name=amet</code><ul>
+<li>Output only. The resource path for this Certificate in the format <code>projects/*/locations/*/certificateAuthorities/*/certificates/*</code>.</li>
+</ul>
+</li>
+<li><code>pem-certificate=est</code><ul>
+<li>Output only. The pem-encoded, signed X.509 certificate.</li>
+</ul>
+</li>
+<li><code>pem-certificate-chain=et</code><ul>
+<li>Output only. The chain that may be used to verify the X.509 certificate. Expected to be in issuer-to-root order according to RFC 5246.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>pem-csr=sea</code><ul>
+<li>Immutable. A pem-encoded X.509 certificate signing request (CSR).</li>
+</ul>
+</li>
+<li><code>revocation-details    revocation-state=consetetur</code><ul>
+<li>Indicates why a Certificate was revoked.</li>
+</ul>
+</li>
+<li>
+<p><code>revocation-time=consetetur</code></p>
+<ul>
+<li>The time at which this Certificate was revoked.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-time=stet</code></p>
+<ul>
+<li>Output only. The time at which this Certificate was updated.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p certificate-id=string</strong></p>
+<ul>
+<li>Optional. It must be unique within a location and match the regular expression <code>[a-zA-Z0-9_-]{1,63}</code>. This field is required when using a CertificateAuthority in the Enterprise CertificateAuthority.Tier, but is optional and its value is ignored otherwise.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p request-id=string</strong></p>
+<ul>
+<li>Optional. An ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and t he request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-certificate-authorities-certificates-get" class="btn btn-neutral float-right" title="Locations Certificate Authorities Certificates Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions" class="btn btn-neutral" title="Locations Certificate Authorities Certificate Revocation Lists Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-certificate-authorities-certificates-get" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

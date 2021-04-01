@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dialogflow v2.0.0+20210329</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script>
+  <script src="./js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Dialogflow v2.0.0+20210329</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-create/">Locations Agents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-delete/">Locations Agents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-entity-types-create/">Locations Agents Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-entity-types-delete/">Locations Agents Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-entity-types-get/">Locations Agents Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-entity-types-list/">Locations Agents Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-entity-types-patch/">Locations Agents Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-create/">Locations Agents Environments Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-delete/">Locations Agents Environments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-create/">Locations Agents Environments Experiments Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-delete/">Locations Agents Environments Experiments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-get/">Locations Agents Environments Experiments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-list/">Locations Agents Environments Experiments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-patch/">Locations Agents Environments Experiments Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-start/">Locations Agents Environments Experiments Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-experiments-stop/">Locations Agents Environments Experiments Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-get/">Locations Agents Environments Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-list/">Locations Agents Environments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-lookup-environment-history/">Locations Agents Environments Lookup Environment History</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-patch/">Locations Agents Environments Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-detect-intent/">Locations Agents Environments Sessions Detect Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-entity-types-create/">Locations Agents Environments Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-entity-types-delete/">Locations Agents Environments Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-entity-types-get/">Locations Agents Environments Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-entity-types-list/">Locations Agents Environments Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-entity-types-patch/">Locations Agents Environments Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-fulfill-intent/">Locations Agents Environments Sessions Fulfill Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-environments-sessions-match-intent/">Locations Agents Environments Sessions Match Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-export/">Locations Agents Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-create/">Locations Agents Flows Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-delete/">Locations Agents Flows Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-get/">Locations Agents Flows Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-get-validation-result/">Locations Agents Flows Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-list/">Locations Agents Flows List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-pages-create/">Locations Agents Flows Pages Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-pages-delete/">Locations Agents Flows Pages Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-pages-get/">Locations Agents Flows Pages Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-pages-list/">Locations Agents Flows Pages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-pages-patch/">Locations Agents Flows Pages Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-patch/">Locations Agents Flows Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-train/">Locations Agents Flows Train</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-transition-route-groups-create/">Locations Agents Flows Transition Route Groups Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-transition-route-groups-delete/">Locations Agents Flows Transition Route Groups Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-transition-route-groups-get/">Locations Agents Flows Transition Route Groups Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-transition-route-groups-list/">Locations Agents Flows Transition Route Groups List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-transition-route-groups-patch/">Locations Agents Flows Transition Route Groups Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-validate/">Locations Agents Flows Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-create/">Locations Agents Flows Versions Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-delete/">Locations Agents Flows Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-get/">Locations Agents Flows Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-list/">Locations Agents Flows Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-load/">Locations Agents Flows Versions Load</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-flows-versions-patch/">Locations Agents Flows Versions Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-get/">Locations Agents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-get-validation-result/">Locations Agents Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-intents-create/">Locations Agents Intents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-intents-delete/">Locations Agents Intents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-intents-get/">Locations Agents Intents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-intents-list/">Locations Agents Intents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-intents-patch/">Locations Agents Intents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-list/">Locations Agents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-patch/">Locations Agents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-restore/">Locations Agents Restore</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-detect-intent/">Locations Agents Sessions Detect Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-entity-types-create/">Locations Agents Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-entity-types-delete/">Locations Agents Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-entity-types-get/">Locations Agents Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-entity-types-list/">Locations Agents Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-entity-types-patch/">Locations Agents Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-fulfill-intent/">Locations Agents Sessions Fulfill Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-sessions-match-intent/">Locations Agents Sessions Match Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-batch-delete/">Locations Agents Test Cases Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-batch-run/">Locations Agents Test Cases Batch Run</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-calculate-coverage/">Locations Agents Test Cases Calculate Coverage</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-create/">Locations Agents Test Cases Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-export/">Locations Agents Test Cases Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-get/">Locations Agents Test Cases Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-import/">Locations Agents Test Cases Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-list/">Locations Agents Test Cases List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-patch/">Locations Agents Test Cases Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-results-get/">Locations Agents Test Cases Results Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-results-list/">Locations Agents Test Cases Results List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-test-cases-run/">Locations Agents Test Cases Run</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-validate/">Locations Agents Validate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-webhooks-create/">Locations Agents Webhooks Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-webhooks-delete/">Locations Agents Webhooks Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-webhooks-get/">Locations Agents Webhooks Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-webhooks-list/">Locations Agents Webhooks List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-agents-webhooks-patch/">Locations Agents Webhooks Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-operations-get/">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-security-settings-create/">Locations Security Settings Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-security-settings-delete/">Locations Security Settings Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-security-settings-get/">Locations Security Settings Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-security-settings-list/">Locations Security Settings List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_locations-security-settings-patch/">Locations Security Settings Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_operations-cancel/">Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_operations-get/">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="projects_operations-list/">Operations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    <li>Home</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow3-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/cli/README.md.mako'
+DO NOT EDIT !
+-->
+
+<p>The <code>dialogflow3</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google Dialogflow</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>Dialogflow</em> API can be found at the
+<a href="https://cloud.google.com/dialogflow/">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="bash">cargo install google-dialogflow3-cli
+</code></pre>
+
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow3-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>Dialogflow</em> API at revision <em>20210329</em>. The CLI is at version <em>2.0.0</em>.</p>
+<pre><code class="bash">dialogflow3 [options]
+        projects
+                locations-agents-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-entity-types-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-entity-types-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-entity-types-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-entity-types-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-entity-types-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-start &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-experiments-stop &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-lookup-environment-history &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-detect-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-entity-types-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-entity-types-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-entity-types-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-entity-types-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-entity-types-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-fulfill-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-environments-sessions-match-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-export &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-get-validation-result &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-pages-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-pages-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-pages-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-pages-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-pages-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-train &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-transition-route-groups-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-transition-route-groups-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-transition-route-groups-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-transition-route-groups-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-transition-route-groups-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-validate &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-load &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-flows-versions-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-get-validation-result &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-intents-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-intents-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-intents-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-intents-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-intents-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-restore &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-detect-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-entity-types-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-entity-types-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-entity-types-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-entity-types-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-entity-types-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-fulfill-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-sessions-match-intent &lt;session&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-batch-delete &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-batch-run &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-calculate-coverage &lt;agent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-export &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-import &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-results-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-results-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-test-cases-run &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-validate &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-webhooks-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-webhooks-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-webhooks-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-webhooks-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-agents-webhooks-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-operations-cancel &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-security-settings-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-security-settings-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-security-settings-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-security-settings-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-security-settings-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                operations-cancel &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                operations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                operations-list &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  dialogflow3 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>dialogflow3-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/dialogflow3-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/dialogflow3-secret.json</code>, assuming that the required <em>dialogflow</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>dialogflow3 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="projects_locations-agents-create/" class="btn btn-neutral float-right" title="Locations Agents Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="projects_locations-agents-create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

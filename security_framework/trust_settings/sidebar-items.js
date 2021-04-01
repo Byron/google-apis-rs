@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Domain","Which set of trust settings to query"],["TrustSettingsForCertificate","Trust settings for a specific certificate in a specific domain"]],"struct":[["TrustSettings","Allows access to the certificates and their trust settings in a given domain."],["TrustSettingsIter","Iterator over certificates."]]});

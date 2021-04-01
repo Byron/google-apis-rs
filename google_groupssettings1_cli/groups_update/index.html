@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Update - groupssettings v2.0.0+20210325</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> groupssettings v2.0.0+20210325</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../groups_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates an existing resource.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/apps.groups.settings</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/apps.groups.settings</em>.
+You can set the scope for this method like this: <code>groupssettings1 --scope &lt;scope&gt; groups update ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;group-unique-id&gt;</strong> <em>(string)</em><ul>
+<li>The group&#39;s email address.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Groups:
+  allow-external-members: string
+  allow-google-communication: string
+  allow-web-posting: string
+  archive-only: string
+  custom-footer-text: string
+  custom-reply-to: string
+  custom-roles-enabled-for-settings-to-be-merged: string
+  default-message-deny-notification-text: string
+  description: string
+  email: string
+  enable-collaborative-inbox: string
+  favorite-replies-on-top: string
+  include-custom-footer: string
+  include-in-global-address-list: string
+  is-archived: string
+  kind: string
+  max-message-bytes: integer
+  members-can-post-as-the-group: string
+  message-display-font: string
+  message-moderation-level: string
+  name: string
+  primary-language: string
+  reply-to: string
+  send-message-deny-notification: string
+  show-in-group-directory: string
+  spam-moderation-level: string
+  who-can-add: string
+  who-can-add-references: string
+  who-can-approve-members: string
+  who-can-approve-messages: string
+  who-can-assign-topics: string
+  who-can-assist-content: string
+  who-can-ban-users: string
+  who-can-contact-owner: string
+  who-can-delete-any-post: string
+  who-can-delete-topics: string
+  who-can-discover-group: string
+  who-can-enter-free-form-tags: string
+  who-can-hide-abuse: string
+  who-can-invite: string
+  who-can-join: string
+  who-can-leave-group: string
+  who-can-lock-topics: string
+  who-can-make-topics-sticky: string
+  who-can-mark-duplicate: string
+  who-can-mark-favorite-reply-on-any-topic: string
+  who-can-mark-favorite-reply-on-own-topic: string
+  who-can-mark-no-response-needed: string
+  who-can-moderate-content: string
+  who-can-moderate-members: string
+  who-can-modify-members: string
+  who-can-modify-tags-and-categories: string
+  who-can-move-topics-in: string
+  who-can-move-topics-out: string
+  who-can-post-announcements: string
+  who-can-post-message: string
+  who-can-take-topics: string
+  who-can-unassign-topic: string
+  who-can-unmark-favorite-reply-on-any-topic: string
+  who-can-view-group: string
+  who-can-view-membership: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    allow-external-members=sadipscing</code><ul>
+<li>Identifies whether members external to your organization can join the group. Possible values are:  <ul>
+<li>true: G Suite users external to your organization can become members of this group. </li>
+<li>false: Users not belonging to the organization are not allowed to become members of this group.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>allow-google-communication=stet</code><ul>
+<li>Deprecated. Allows Google to contact administrator of the group.  <ul>
+<li>true: Allow Google to contact managers of this group. Occasionally Google may send updates on the latest features, ask for input on new features, or ask for permission to highlight your group. </li>
+<li>false: Google can not contact managers of this group.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>allow-web-posting=dolor</code><ul>
+<li>Allows posting from web. Possible values are:  <ul>
+<li>true: Allows any member to post to the group forum. </li>
+<li>false: Members only use Gmail to communicate with the group.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>archive-only=duo</code><ul>
+<li>Allows the group to be archived only. Possible values are:  <ul>
+<li>true: Group is archived and the group is inactive. New messages to this group are rejected. The older archived messages are browseable and searchable.  </li>
+<li>If true, the whoCanPostMessage property is set to NONE_CAN_POST.  </li>
+<li>If reverted from true to false, whoCanPostMessages is set to ALL_MANAGERS_CAN_POST.  </li>
+<li>false: The group is active and can receive messages.  </li>
+<li>When false, updating whoCanPostMessage to NONE_CAN_POST, results in an error.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>custom-footer-text=vero</code><ul>
+<li>Set the content of custom footer text. The maximum number of characters is 1,000.</li>
+</ul>
+</li>
+<li><code>custom-reply-to=vero</code><ul>
+<li>An email address used when replying to a message if the replyTo property is set to REPLY_TO_CUSTOM. This address is defined by an account administrator.  <ul>
+<li>When the group&#39;s ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property holds a custom email address used when replying to a message. </li>
+<li>If the group&#39;s ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property must have a text value or an error is returned.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>custom-roles-enabled-for-settings-to-be-merged=invidunt</code><ul>
+<li>Specifies whether the group has a custom role that&#39;s included in one of the settings being merged. This field is read-only and update/patch requests to it are ignored. Possible values are:  <ul>
+<li>true </li>
+<li>false</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>default-message-deny-notification-text=stet</code><ul>
+<li>When a message is rejected, this is text for the rejection notification sent to the message&#39;s author. By default, this property is empty and has no value in the API&#39;s response body. The maximum notification text size is 10,000 characters. Note: Requires sendMessageDenyNotification property to be true.</li>
+</ul>
+</li>
+<li><code>description=vero</code><ul>
+<li>Description of the group. This property value may be an empty string if no group description has been entered. If entered, the maximum group description is no more than 300 characters.</li>
+</ul>
+</li>
+<li><code>email=elitr</code><ul>
+<li>The group&#39;s email address. This property can be updated using the Directory API. Note: Only a group owner can change a group&#39;s email address. A group manager can&#39;t do this.
+    When you change your group&#39;s address using the Directory API or the control panel, you are changing the address your subscribers use to send email and the web address people use to access your group. People can&#39;t reach your group by visiting the old address.</li>
+</ul>
+</li>
+<li><code>enable-collaborative-inbox=lorem</code><ul>
+<li>Specifies whether a collaborative inbox will remain turned on for the group. Possible values are:  <ul>
+<li>true </li>
+<li>false</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>favorite-replies-on-top=diam</code><ul>
+<li>Indicates if favorite replies should be displayed above other replies.  <ul>
+<li>true: Favorite replies will be displayed above other replies. </li>
+<li>false: Favorite replies will not be displayed above other replies.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>include-custom-footer=no</code><ul>
+<li>Whether to include custom footer. Possible values are:  <ul>
+<li>true </li>
+<li>false</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>include-in-global-address-list=ipsum</code><ul>
+<li>Enables the group to be included in the Global Address List. For more information, see the help center. Possible values are:  <ul>
+<li>true: Group is included in the Global Address List. </li>
+<li>false: Group is not included in the Global Address List.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>is-archived=accusam</code><ul>
+<li>Allows the Group contents to be archived. Possible values are:  <ul>
+<li>true: Archive messages sent to the group. </li>
+<li>false: Do not keep an archive of messages sent to this group. If false, previously archived messages remain in the archive.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>kind=takimata</code><ul>
+<li>The type of the resource. It is always groupsSettings#groups.</li>
+</ul>
+</li>
+<li><code>max-message-bytes=55</code><ul>
+<li>Deprecated. The maximum size of a message is 25Mb.</li>
+</ul>
+</li>
+<li><code>members-can-post-as-the-group=voluptua.</code><ul>
+<li>Enables members to post messages as the group. Possible values are:  <ul>
+<li>true: Group member can post messages using the group&#39;s email address instead of their own email address. Message appear to originate from the group itself. Note: When true, any message moderation settings on individual users or new members do not apply to posts made on behalf of the group. </li>
+<li>false: Members can not post in behalf of the group&#39;s email address.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>message-display-font=et</code><ul>
+<li>Deprecated. The default message display font always has a value of &#34;DEFAULT_FONT&#34;.</li>
+</ul>
+</li>
+<li><code>message-moderation-level=erat</code><ul>
+<li>Moderation level of incoming messages. Possible values are:  <ul>
+<li>MODERATE_ALL_MESSAGES: All messages are sent to the group owner&#39;s email address for approval. If approved, the message is sent to the group. </li>
+<li>MODERATE_NON_MEMBERS: All messages from non group members are sent to the group owner&#39;s email address for approval. If approved, the message is sent to the group. </li>
+<li>MODERATE_NEW_MEMBERS: All messages from new members are sent to the group owner&#39;s email address for approval. If approved, the message is sent to the group. </li>
+<li>MODERATE_NONE: No moderator approval is required. Messages are delivered directly to the group. Note: When the whoCanPostMessage is set to ANYONE_CAN_POST, we recommend the messageModerationLevel be set to MODERATE_NON_MEMBERS to protect the group from possible spam.
+When memberCanPostAsTheGroup is true, any message moderation settings on individual users or new members will not apply to posts made on behalf of the group.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>name=consetetur</code><ul>
+<li>Name of the group, which has a maximum size of 75 characters.</li>
+</ul>
+</li>
+<li><code>primary-language=amet.</code><ul>
+<li>The primary language for group. For a group&#39;s primary language use the language tags from the G Suite languages found at G Suite Email Settings API Email Language Tags.</li>
+</ul>
+</li>
+<li><code>reply-to=sed</code><ul>
+<li>
+<p>Specifies who receives the default reply. Possible values are:  </p>
+<ul>
+<li>
+<p>REPLY_TO_CUSTOM: For replies to messages, use the group&#39;s custom email address.
+When the group&#39;s ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property holds the custom email address used when replying to a message. If the group&#39;s ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property must have a value. Otherwise an error is returned.</p>
+</li>
+<li>
+<p>REPLY_TO_SENDER: The reply sent to author of message. </p>
+</li>
+<li>REPLY_TO_LIST: This reply message is sent to the group. </li>
+<li>REPLY_TO_OWNER: The reply is sent to the owner(s) of the group. This does not include the group&#39;s managers. </li>
+<li>REPLY_TO_IGNORE: Group users individually decide where the message reply is sent. </li>
+<li>REPLY_TO_MANAGERS: This reply message is sent to the group&#39;s managers, which includes all managers and the group owner.</li>
+<li><code>send-message-deny-notification=takimata</code><ul>
+<li>Allows a member to be notified if the member&#39;s message to the group is denied by the group owner. Possible values are:  </li>
+</ul>
+</li>
+<li>
+<p>true: When a message is rejected, send the deny message notification to the message author.
+The defaultMessageDenyNotificationText property is dependent on the sendMessageDenyNotification property being true.</p>
+</li>
+<li>
+<p>false: When a message is rejected, no notification is sent.</p>
+</li>
+<li><code>show-in-group-directory=dolores</code><ul>
+<li>Deprecated. This is merged into the new whoCanDiscoverGroup setting. Allows the group to be visible in the Groups Directory. Possible values are:  </li>
+</ul>
+</li>
+<li>true: All groups in the account are listed in the Groups directory. </li>
+<li>false: All groups in the account are not listed in the directory.</li>
+<li><code>spam-moderation-level=gubergren</code><ul>
+<li>Specifies moderation levels for messages detected as spam. Possible values are:  </li>
+</ul>
+</li>
+<li>ALLOW: Post the message to the group. </li>
+<li>MODERATE: Send the message to the moderation queue. This is the default. </li>
+<li>SILENTLY_MODERATE: Send the message to the moderation queue, but do not send notification to moderators. </li>
+<li>REJECT: Immediately reject the message.</li>
+<li><code>who-can-add=et</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to add members. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS_CAN_ADD: Managers and members can directly add new members. </li>
+<li>ALL_MANAGERS_CAN_ADD: Only managers can directly add new members. this includes the group&#39;s owner. </li>
+<li>ALL_OWNERS_CAN_ADD: Only owners can directly add new members. </li>
+<li>NONE_CAN_ADD: No one can directly add new members.</li>
+<li><code>who-can-add-references=accusam</code><ul>
+<li>Deprecated. This functionality is no longer supported in the Google Groups UI. The value is always &#34;NONE&#34;.</li>
+</ul>
+</li>
+<li><code>who-can-approve-members=voluptua.</code><ul>
+<li>Specifies who can approve members who ask to join groups. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS_CAN_APPROVE </li>
+<li>ALL_MANAGERS_CAN_APPROVE </li>
+<li>ALL_OWNERS_CAN_APPROVE </li>
+<li>NONE_CAN_APPROVE</li>
+<li><code>who-can-approve-messages=dolore</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can approve pending messages in the moderation queue. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-assign-topics=dolore</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to assign topics in a forum to another user. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-assist-content=dolore</code><ul>
+<li>Specifies who can moderate metadata. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-ban-users=voluptua.</code><ul>
+<li>Specifies who can deny membership to users. This permission will be deprecated once it is merged into the new whoCanModerateMembers setting. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-contact-owner=amet.</code><ul>
+<li>Permission to contact owner of the group via web UI. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_IN_DOMAIN_CAN_CONTACT </li>
+<li>ALL_MANAGERS_CAN_CONTACT </li>
+<li>ALL_MEMBERS_CAN_CONTACT </li>
+<li>ANYONE_CAN_CONTACT </li>
+<li>ALL_OWNERS_CAN_CONTACT</li>
+<li><code>who-can-delete-any-post=ea</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete replies to topics. (Authors can always delete their own posts). Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-delete-topics=sadipscing</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can delete topics. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-discover-group=lorem</code><ul>
+<li>Specifies the set of users for whom this group is discoverable. Possible values are:  </li>
+</ul>
+</li>
+<li>ANYONE_CAN_DISCOVER </li>
+<li>ALL_IN_DOMAIN_CAN_DISCOVER </li>
+<li>ALL_MEMBERS_CAN_DISCOVER</li>
+<li><code>who-can-enter-free-form-tags=invidunt</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to enter free form tags for topics in a forum. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-hide-abuse=no</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can hide posts by reporting them as abuse. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-invite=est</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateMembers setting. Permissions to invite new members. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS_CAN_INVITE: Managers and members can invite a new member candidate. </li>
+<li>ALL_MANAGERS_CAN_INVITE: Only managers can invite a new member. This includes the group&#39;s owner. </li>
+<li>ALL_OWNERS_CAN_INVITE: Only owners can invite a new member. </li>
+<li>NONE_CAN_INVITE: No one can invite a new member candidate.</li>
+<li><code>who-can-join=at</code><ul>
+<li>Permission to join group. Possible values are:  </li>
+</ul>
+</li>
+<li>ANYONE_CAN_JOIN: Anyone in the account domain can join. This includes accounts with multiple domains. </li>
+<li>ALL_IN_DOMAIN_CAN_JOIN: Any Internet user who is outside your domain can access your Google Groups service and view the list of groups in your Groups directory. Warning: Group owners can add external addresses, outside of the domain to their groups. They can also allow people outside your domain to join their groups. If you later disable this option, any external addresses already added to users&#39; groups remain in those groups. </li>
+<li>INVITED_CAN_JOIN: Candidates for membership can be invited to join.  </li>
+<li>CAN_REQUEST_TO_JOIN: Non members can request an invitation to join.</li>
+<li><code>who-can-leave-group=sed</code><ul>
+<li>Permission to leave the group. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MANAGERS_CAN_LEAVE </li>
+<li>ALL_MEMBERS_CAN_LEAVE </li>
+<li>NONE_CAN_LEAVE</li>
+<li><code>who-can-lock-topics=sit</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can prevent users from posting replies to topics. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-make-topics-sticky=et</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can make topics appear at the top of the topic list. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-mark-duplicate=tempor</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as a duplicate of another topic. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-mark-favorite-reply-on-any-topic=aliquyam</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark any other user&#39;s post as a favorite reply. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-mark-favorite-reply-on-own-topic=ipsum</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a post for a topic they started as a favorite reply. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-mark-no-response-needed=et</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to mark a topic as not needing a response. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-moderate-content=sanctus</code><ul>
+<li>Specifies who can moderate content. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-moderate-members=lorem</code><ul>
+<li>Specifies who can manage members. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-modify-members=est</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateMembers setting. Specifies who can change group members&#39; roles. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-modify-tags-and-categories=sed</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to change tags and categories. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-move-topics-in=diam</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics into the group or forum. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-move-topics-out=dolores</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can move topics out of the group or forum. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-post-announcements=dolores</code><ul>
+<li>Deprecated. This is merged into the new whoCanModerateContent setting. Specifies who can post announcements, a special topic type. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-post-message=et</code><ul>
+<li>Permissions to post messages. Possible values are:  </li>
+</ul>
+</li>
+<li>NONE_CAN_POST: The group is disabled and archived. No one can post a message to this group.  </li>
+<li>When archiveOnly is false, updating whoCanPostMessage to NONE_CAN_POST, results in an error. </li>
+<li>If archiveOnly is reverted from true to false, whoCanPostMessages is set to ALL_MANAGERS_CAN_POST.  </li>
+<li>ALL_MANAGERS_CAN_POST: Managers, including group owners, can post messages. </li>
+<li>ALL_MEMBERS_CAN_POST: Any group member can post a message. </li>
+<li>ALL_OWNERS_CAN_POST: Only group owners can post a message. </li>
+<li>ALL_IN_DOMAIN_CAN_POST: Anyone in the account can post a message.  </li>
+<li>ANYONE_CAN_POST: Any Internet user who outside your account can access your Google Groups service and post a message. Note: When whoCanPostMessage is set to ANYONE_CAN_POST, we recommend the messageModerationLevel be set to MODERATE_NON_MEMBERS to protect the group from possible spam.</li>
+<li><code>who-can-take-topics=sed</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to take topics in a forum. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-unassign-topic=no</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unassign any topic in a forum. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-unmark-favorite-reply-on-any-topic=et</code><ul>
+<li>Deprecated. This is merged into the new whoCanAssistContent setting. Permission to unmark any post from a favorite reply. Possible values are:  </li>
+</ul>
+</li>
+<li>ALL_MEMBERS </li>
+<li>OWNERS_AND_MANAGERS </li>
+<li>MANAGERS_ONLY </li>
+<li>OWNERS_ONLY </li>
+<li>NONE</li>
+<li><code>who-can-view-group=elitr</code><ul>
+<li>Permissions to view group messages. Possible values are:  </li>
+</ul>
+</li>
+<li>ANYONE_CAN_VIEW: Any Internet user can view the group&#39;s messages.  </li>
+<li>ALL_IN_DOMAIN_CAN_VIEW: Anyone in your account can view this group&#39;s messages. </li>
+<li>ALL_MEMBERS_CAN_VIEW: All group members can view the group&#39;s messages. </li>
+<li>ALL_MANAGERS_CAN_VIEW: Any group manager can view this group&#39;s messages.</li>
+<li><code>who-can-view-membership=sed</code><ul>
+<li>Permissions to view membership. Possible values are:  </li>
+</ul>
+</li>
+<li>
+<p>ALL_IN_DOMAIN_CAN_VIEW: Anyone in the account can view the group members list.
+If a group already has external members, those members can still send email to this group.</p>
+</li>
+<li>
+<p>ALL_MEMBERS_CAN_VIEW: The group members can view the group members list. </p>
+</li>
+<li>ALL_MANAGERS_CAN_VIEW: The group managers can view group members list.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../groups_patch" class="btn btn-neutral" title="Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../groups_patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

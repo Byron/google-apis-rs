@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `api` mod in crate `google_proximitybeacon1_beta1`."><meta name="keywords" content="rust, rustlang, rust-lang, api"><title>google_proximitybeacon1_beta1::api - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../google_proximitybeacon1_beta1/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Module api</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class="location"><a href="../index.html">google_proximitybeacon1_beta1</a></p><div id="sidebar-vars" data-name="api" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">google_proximitybeacon1_beta1</a>::<wbr><a class="mod" href="">api</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/google_proximitybeacon1_beta1/api.rs.html#1-6577" title="goto source code">[src]</a></span></h1><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.AdvertisedId.html" title="google_proximitybeacon1_beta1::api::AdvertisedId struct">AdvertisedId</a></td><td class="docblock-short"><p>Defines a unique identifier of a beacon as broadcast by the device.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.AttachmentInfo.html" title="google_proximitybeacon1_beta1::api::AttachmentInfo struct">AttachmentInfo</a></td><td class="docblock-short"><p>A subset of attachment information served via the
+<code>beaconinfo.getforobserved</code> method, used when your users encounter your
+beacons.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Beacon.html" title="google_proximitybeacon1_beta1::api::Beacon struct">Beacon</a></td><td class="docblock-short"><p>Details of a beacon device.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconActivateCall.html" title="google_proximitybeacon1_beta1::api::BeaconActivateCall struct">BeaconActivateCall</a></td><td class="docblock-short"><p>Activates a beacon. A beacon that is active will return information
+and attachment data when queried via <code>beaconinfo.getforobserved</code>.
+Calling this method on an already active beacon will do nothing (but
+will return a successful response code).</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconAttachment.html" title="google_proximitybeacon1_beta1::api::BeaconAttachment struct">BeaconAttachment</a></td><td class="docblock-short"><p>Project-specific data associated with a beacon.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconAttachmentBatchDeleteCall.html" title="google_proximitybeacon1_beta1::api::BeaconAttachmentBatchDeleteCall struct">BeaconAttachmentBatchDeleteCall</a></td><td class="docblock-short"><p>Deletes multiple attachments on a given beacon. This operation is
+permanent and cannot be undone.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconAttachmentCreateCall.html" title="google_proximitybeacon1_beta1::api::BeaconAttachmentCreateCall struct">BeaconAttachmentCreateCall</a></td><td class="docblock-short"><p>Associates the given data with the specified beacon. Attachment data must
+contain two parts:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconAttachmentDeleteCall.html" title="google_proximitybeacon1_beta1::api::BeaconAttachmentDeleteCall struct">BeaconAttachmentDeleteCall</a></td><td class="docblock-short"><p>Deletes the specified attachment for the given beacon. Each attachment has
+a unique attachment name (<code>attachmentName</code>) which is returned when you
+fetch the attachment data via this API. You specify this with the delete
+request to control which attachment is removed. This operation cannot be
+undone.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconAttachmentListCall.html" title="google_proximitybeacon1_beta1::api::BeaconAttachmentListCall struct">BeaconAttachmentListCall</a></td><td class="docblock-short"><p>Returns the attachments for the specified beacon that match the specified
+namespaced-type pattern.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconDeactivateCall.html" title="google_proximitybeacon1_beta1::api::BeaconDeactivateCall struct">BeaconDeactivateCall</a></td><td class="docblock-short"><p>Deactivates a beacon. Once deactivated, the API will not return
+information nor attachment data for the beacon when queried via
+<code>beaconinfo.getforobserved</code>. Calling this method on an already inactive
+beacon will do nothing (but will return a successful response code).</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconDecommissionCall.html" title="google_proximitybeacon1_beta1::api::BeaconDecommissionCall struct">BeaconDecommissionCall</a></td><td class="docblock-short"><p>Decommissions the specified beacon in the service. This beacon will no
+longer be returned from <code>beaconinfo.getforobserved</code>. This operation is
+permanent -- you will not be able to re-register a beacon with this ID
+again.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconDeleteCall.html" title="google_proximitybeacon1_beta1::api::BeaconDeleteCall struct">BeaconDeleteCall</a></td><td class="docblock-short"><p>Deletes the specified beacon including all diagnostics data for the beacon
+as well as any attachments on the beacon (including those belonging to
+other projects). This operation cannot be undone.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconDiagnosticListCall.html" title="google_proximitybeacon1_beta1::api::BeaconDiagnosticListCall struct">BeaconDiagnosticListCall</a></td><td class="docblock-short"><p>List the diagnostics for a single beacon. You can also list diagnostics for
+all the beacons owned by your Google Developers Console project by using
+the beacon name <code>beacons/-</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconGetCall.html" title="google_proximitybeacon1_beta1::api::BeaconGetCall struct">BeaconGetCall</a></td><td class="docblock-short"><p>Returns detailed information about the specified beacon.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconInfo.html" title="google_proximitybeacon1_beta1::api::BeaconInfo struct">BeaconInfo</a></td><td class="docblock-short"><p>A subset of beacon information served via the <code>beaconinfo.getforobserved</code>
+method, which you call when users of your app encounter your beacons.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconListCall.html" title="google_proximitybeacon1_beta1::api::BeaconListCall struct">BeaconListCall</a></td><td class="docblock-short"><p>Searches the beacon registry for beacons that match the given search
+criteria. Only those beacons that the client has permission to list
+will be returned.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconMethods.html" title="google_proximitybeacon1_beta1::api::BeaconMethods struct">BeaconMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>beacon</em> resources.
+It is not used directly, but through the <code>Proximitybeacon</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconRegisterCall.html" title="google_proximitybeacon1_beta1::api::BeaconRegisterCall struct">BeaconRegisterCall</a></td><td class="docblock-short"><p>Registers a previously unregistered beacon given its <code>advertisedId</code>.
+These IDs are unique within the system. An ID can be registered only once.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconUpdateCall.html" title="google_proximitybeacon1_beta1::api::BeaconUpdateCall struct">BeaconUpdateCall</a></td><td class="docblock-short"><p>Updates the information about the specified beacon. <strong>Any field that you do
+not populate in the submitted beacon will be permanently erased</strong>, so you
+should follow the &quot;read, modify, write&quot; pattern to avoid inadvertently
+destroying data.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconinfoGetforobservedCall.html" title="google_proximitybeacon1_beta1::api::BeaconinfoGetforobservedCall struct">BeaconinfoGetforobservedCall</a></td><td class="docblock-short"><p>Given one or more beacon observations, returns any beacon information
+and attachments accessible to your application. Authorize by using the
+<a href="https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key">API
+key</a>
+for the application.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BeaconinfoMethods.html" title="google_proximitybeacon1_beta1::api::BeaconinfoMethods struct">BeaconinfoMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>beaconinfo</em> resources.
+It is not used directly, but through the <code>Proximitybeacon</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Date.html" title="google_proximitybeacon1_beta1::api::Date struct">Date</a></td><td class="docblock-short"><p>Represents a whole or partial calendar date, e.g. a birthday. The time of day
+and time zone are either specified elsewhere or are not significant. The date
+is relative to the Proleptic Gregorian Calendar. This can represent:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.DeleteAttachmentsResponse.html" title="google_proximitybeacon1_beta1::api::DeleteAttachmentsResponse struct">DeleteAttachmentsResponse</a></td><td class="docblock-short"><p>Response for a request to delete attachments.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Diagnostics.html" title="google_proximitybeacon1_beta1::api::Diagnostics struct">Diagnostics</a></td><td class="docblock-short"><p>Diagnostics for a single beacon.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Empty.html" title="google_proximitybeacon1_beta1::api::Empty struct">Empty</a></td><td class="docblock-short"><p>A generic empty message that you can re-use to avoid defining duplicated
+empty messages in your APIs. A typical example is to use it as the request
+or the response type of an API method. For instance:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.EphemeralIdRegistration.html" title="google_proximitybeacon1_beta1::api::EphemeralIdRegistration struct">EphemeralIdRegistration</a></td><td class="docblock-short"><p>Write-only registration parameters for beacons using Eddystone-EID format.
+Two ways of securely registering an Eddystone-EID beacon with the service
+are supported:</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.EphemeralIdRegistrationParams.html" title="google_proximitybeacon1_beta1::api::EphemeralIdRegistrationParams struct">EphemeralIdRegistrationParams</a></td><td class="docblock-short"><p>Information a client needs to provision and register beacons that
+broadcast Eddystone-EID format beacon IDs, using Elliptic curve
+Diffie-Hellman key exchange. See
+<a href="https://github.com/google/eddystone/tree/master/eddystone-eid">the Eddystone
+specification</a>
+at GitHub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GetInfoForObservedBeaconsRequest.html" title="google_proximitybeacon1_beta1::api::GetInfoForObservedBeaconsRequest struct">GetInfoForObservedBeaconsRequest</a></td><td class="docblock-short"><p>Request for beacon and attachment information about beacons that
+a mobile client has encountered &quot;in the wild&quot;.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GetInfoForObservedBeaconsResponse.html" title="google_proximitybeacon1_beta1::api::GetInfoForObservedBeaconsResponse struct">GetInfoForObservedBeaconsResponse</a></td><td class="docblock-short"><p>Information about the requested beacons, optionally including attachment
+data.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.IndoorLevel.html" title="google_proximitybeacon1_beta1::api::IndoorLevel struct">IndoorLevel</a></td><td class="docblock-short"><p>Indoor level, a human-readable string as returned by Google Maps APIs,
+useful to indicate which floor of a building a beacon is located on.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.LatLng.html" title="google_proximitybeacon1_beta1::api::LatLng struct">LatLng</a></td><td class="docblock-short"><p>An object representing a latitude/longitude pair. This is expressed as a pair
+of doubles representing degrees latitude and degrees longitude. Unless
+specified otherwise, this must conform to the
+<a href="http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf">WGS84
+standard</a>. Values must be within normalized ranges.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ListBeaconAttachmentsResponse.html" title="google_proximitybeacon1_beta1::api::ListBeaconAttachmentsResponse struct">ListBeaconAttachmentsResponse</a></td><td class="docblock-short"><p>Response to <code>ListBeaconAttachments</code> that contains the requested attachments.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ListBeaconsResponse.html" title="google_proximitybeacon1_beta1::api::ListBeaconsResponse struct">ListBeaconsResponse</a></td><td class="docblock-short"><p>Response that contains list beacon results and pagination help.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ListDiagnosticsResponse.html" title="google_proximitybeacon1_beta1::api::ListDiagnosticsResponse struct">ListDiagnosticsResponse</a></td><td class="docblock-short"><p>Response that contains the requested diagnostics.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ListNamespacesResponse.html" title="google_proximitybeacon1_beta1::api::ListNamespacesResponse struct">ListNamespacesResponse</a></td><td class="docblock-short"><p>Response to ListNamespacesRequest that contains all the project's namespaces.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MethodGetEidparamCall.html" title="google_proximitybeacon1_beta1::api::MethodGetEidparamCall struct">MethodGetEidparamCall</a></td><td class="docblock-short"><p>Gets the Proximity Beacon API's current public key and associated
+parameters used to initiate the Diffie-Hellman key exchange required to
+register a beacon that broadcasts the Eddystone-EID format. This key
+changes periodically; clients may cache it and re-use the same public key
+to provision and register multiple beacons. However, clients should be
+prepared to refresh this key when they encounter an error registering an
+Eddystone-EID beacon.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MethodMethods.html" title="google_proximitybeacon1_beta1::api::MethodMethods struct">MethodMethods</a></td><td class="docblock-short"><p>A builder providing access to all free methods, which are not associated with a particular resource.
+It is not used directly, but through the <code>Proximitybeacon</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Namespace.html" title="google_proximitybeacon1_beta1::api::Namespace struct">Namespace</a></td><td class="docblock-short"><p>An attachment namespace defines read and write access for all the attachments
+created under it. Each namespace is globally unique, and owned by one
+project which is the only project that can create attachments under it.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.NamespaceListCall.html" title="google_proximitybeacon1_beta1::api::NamespaceListCall struct">NamespaceListCall</a></td><td class="docblock-short"><p>Lists all attachment namespaces owned by your Google Developers Console
+project. Attachment data associated with a beacon must include a
+namespaced type, and the namespace must be owned by your project.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.NamespaceMethods.html" title="google_proximitybeacon1_beta1::api::NamespaceMethods struct">NamespaceMethods</a></td><td class="docblock-short"><p>A builder providing access to all methods supported on <em>namespace</em> resources.
+It is not used directly, but through the <code>Proximitybeacon</code> hub.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.NamespaceUpdateCall.html" title="google_proximitybeacon1_beta1::api::NamespaceUpdateCall struct">NamespaceUpdateCall</a></td><td class="docblock-short"><p>Updates the information about the specified namespace. Only the namespace
+visibility can be updated.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Observation.html" title="google_proximitybeacon1_beta1::api::Observation struct">Observation</a></td><td class="docblock-short"><p>Represents one beacon observed once.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Proximitybeacon.html" title="google_proximitybeacon1_beta1::api::Proximitybeacon struct">Proximitybeacon</a></td><td class="docblock-short"><p>Central instance to access all Proximitybeacon related resource activities</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Scope.html" title="google_proximitybeacon1_beta1::api::Scope enum">Scope</a></td><td class="docblock-short"><p>Identifies the an OAuth2 authorization scope.
+A scope is needed when requesting an
+<a href="https://developers.google.com/youtube/v3/guides/authentication">authorization token</a>.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="google_proximitybeacon1_beta1"></div>
+    <script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

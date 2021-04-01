@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["CFTimeZoneCopyDefault",""],["CFTimeZoneCopySystem",""],["CFTimeZoneCreateWithTimeIntervalFromGMT",""],["CFTimeZoneGetName",""],["CFTimeZoneGetSecondsFromGMT",""],["CFTimeZoneGetTypeID",""]],"struct":[["__CFTimeZone",""]],"type":[["CFTimeZoneRef",""]]});

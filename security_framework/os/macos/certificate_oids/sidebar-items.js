@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CertificateOid","An identifier of a property of a certificate."]]});

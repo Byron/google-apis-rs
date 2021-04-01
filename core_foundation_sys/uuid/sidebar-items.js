@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["CFUUIDCreate",""],["CFUUIDCreateFromUUIDBytes",""],["CFUUIDGetTypeID",""],["CFUUIDGetUUIDBytes",""]],"struct":[["CFUUIDBytes",""],["__CFUUID",""]],"type":[["CFUUIDRef",""]]});

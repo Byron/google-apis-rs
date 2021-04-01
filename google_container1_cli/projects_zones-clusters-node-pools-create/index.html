@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Zones Clusters Node Pools Create - Container v2.0.0+20210314</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Container v2.0.0+20210314</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_aggregated-usable-subnetworks-list">Aggregated Usable Subnetworks List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-complete-ip-rotation">Locations Clusters Complete Ip Rotation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-create">Locations Clusters Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-delete">Locations Clusters Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-get">Locations Clusters Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-get-jwks">Locations Clusters Get Jwks</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-list">Locations Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-create">Locations Clusters Node Pools Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-delete">Locations Clusters Node Pools Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-get">Locations Clusters Node Pools Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-list">Locations Clusters Node Pools List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-rollback">Locations Clusters Node Pools Rollback</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-set-autoscaling">Locations Clusters Node Pools Set Autoscaling</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-set-management">Locations Clusters Node Pools Set Management</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-set-size">Locations Clusters Node Pools Set Size</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-node-pools-update">Locations Clusters Node Pools Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-addons">Locations Clusters Set Addons</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-legacy-abac">Locations Clusters Set Legacy Abac</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-locations">Locations Clusters Set Locations</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-logging">Locations Clusters Set Logging</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-maintenance-policy">Locations Clusters Set Maintenance Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-master-auth">Locations Clusters Set Master Auth</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-monitoring">Locations Clusters Set Monitoring</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-network-policy">Locations Clusters Set Network Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-set-resource-labels">Locations Clusters Set Resource Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-start-ip-rotation">Locations Clusters Start Ip Rotation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-update">Locations Clusters Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-update-master">Locations Clusters Update Master</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-clusters-well-known-get-openid-configuration">Locations Clusters Well Known Get Openid Configuration</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get-server-config">Locations Get Server Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-addons">Zones Clusters Addons</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-complete-ip-rotation">Zones Clusters Complete Ip Rotation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-create">Zones Clusters Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-delete">Zones Clusters Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-get">Zones Clusters Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-legacy-abac">Zones Clusters Legacy Abac</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-list">Zones Clusters List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-locations">Zones Clusters Locations</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-logging">Zones Clusters Logging</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-master">Zones Clusters Master</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-monitoring">Zones Clusters Monitoring</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-autoscaling">Zones Clusters Node Pools Autoscaling</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Zones Clusters Node Pools Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-delete">Zones Clusters Node Pools Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-get">Zones Clusters Node Pools Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-list">Zones Clusters Node Pools List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-rollback">Zones Clusters Node Pools Rollback</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-set-management">Zones Clusters Node Pools Set Management</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-set-size">Zones Clusters Node Pools Set Size</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-node-pools-update">Zones Clusters Node Pools Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-resource-labels">Zones Clusters Resource Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-set-maintenance-policy">Zones Clusters Set Maintenance Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-set-master-auth">Zones Clusters Set Master Auth</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-set-network-policy">Zones Clusters Set Network Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-start-ip-rotation">Zones Clusters Start Ip Rotation</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-clusters-update">Zones Clusters Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-get-serverconfig">Zones Get Serverconfig</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-operations-cancel">Zones Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-operations-get">Zones Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_zones-operations-list">Zones Operations List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Zones Clusters Node Pools Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/container1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a node pool for a cluster.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>container1 --scope &lt;scope&gt; projects zones-clusters-node-pools-create ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;project-id&gt;</strong> <em>(string)</em><ul>
+<li>Deprecated. The Google Developers Console <a href="https://developers.google.com/console/help/new/#projectnumber">project ID or project number</a>. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+<li><strong>&lt;zone&gt;</strong> <em>(string)</em><ul>
+<li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+<li><strong>&lt;cluster-id&gt;</strong> <em>(string)</em><ul>
+<li>Deprecated. The name of the cluster. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>CreateNodePoolRequest:
+  cluster-id: string
+  node-pool:
+    autoscaling:
+      autoprovisioned: boolean
+      enabled: boolean
+      max-node-count: integer
+      min-node-count: integer
+    config:
+      boot-disk-kms-key: string
+      disk-size-gb: integer
+      disk-type: string
+      image-type: string
+      kubelet-config:
+        cpu-cfs-quota: boolean
+        cpu-cfs-quota-period: string
+        cpu-manager-policy: string
+      labels: { string: string }
+      linux-node-config:
+        sysctls: { string: string }
+      local-ssd-count: integer
+      machine-type: string
+      metadata: { string: string }
+      min-cpu-platform: string
+      node-group: string
+      oauth-scopes: [string]
+      preemptible: boolean
+      reservation-affinity:
+        consume-reservation-type: string
+        key: string
+        values: [string]
+      sandbox-config:
+        type: string
+      service-account: string
+      shielded-instance-config:
+        enable-integrity-monitoring: boolean
+        enable-secure-boot: boolean
+      tags: [string]
+      workload-metadata-config:
+        mode: string
+    initial-node-count: integer
+    instance-group-urls: [string]
+    locations: [string]
+    management:
+      auto-repair: boolean
+      auto-upgrade: boolean
+      upgrade-options:
+        auto-upgrade-start-time: string
+        description: string
+    max-pods-constraint:
+      max-pods-per-node: string
+    name: string
+    pod-ipv4-cidr-size: integer
+    self-link: string
+    status: string
+    status-message: string
+    upgrade-settings:
+      max-surge: integer
+      max-unavailable: integer
+    version: string
+  parent: string
+  project-id: string
+  zone: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    cluster-id=sit</code><ul>
+<li>Deprecated. The name of the cluster. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+<li><code>node-pool.autoscaling    autoprovisioned=true</code><ul>
+<li>Can this node pool be deleted automatically.</li>
+</ul>
+</li>
+<li><code>enabled=false</code><ul>
+<li>Is autoscaling enabled for this node pool.</li>
+</ul>
+</li>
+<li><code>max-node-count=78</code><ul>
+<li>Maximum number of nodes in the NodePool. Must be &gt;= min_node_count. There has to enough quota to scale up the cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>min-node-count=43</code></p>
+<ul>
+<li>Minimum number of nodes in the NodePool. Must be &gt;= 1 and &lt;= max_node_count.</li>
+</ul>
+</li>
+<li>
+<p><code>..config    boot-disk-kms-key=duo</code></p>
+<ul>
+<li>The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool. This should be of the form projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]. For more information about protecting resources with Cloud KMS Keys please see: https://cloud.google.com/compute/docs/disks/customer-managed-encryption</li>
+</ul>
+</li>
+<li><code>disk-size-gb=38</code><ul>
+<li>Size of the disk attached to each node, specified in GB. The smallest allowed disk size is 10GB. If unspecified, the default disk size is 100GB.</li>
+</ul>
+</li>
+<li><code>disk-type=eos</code><ul>
+<li>Type of the disk attached to each node (e.g. &#39;pd-standard&#39;, &#39;pd-ssd&#39; or &#39;pd-balanced&#39;) If unspecified, the default disk type is &#39;pd-standard&#39;</li>
+</ul>
+</li>
+<li><code>image-type=no</code><ul>
+<li>The image type to use for this node. Note that for a given image type, the latest version of it will be used.</li>
+</ul>
+</li>
+<li><code>kubelet-config    cpu-cfs-quota=true</code><ul>
+<li>Enable CPU CFS quota enforcement for containers that specify CPU limits. This option is enabled by default which makes kubelet use CFS quota (https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt) to enforce container CPU limits. Otherwise, CPU limits will not be enforced at all. Disable this option to mitigate CPU throttling problems while still having your pods to be in Guaranteed QoS class by specifying the CPU limits. The default value is &#39;true&#39; if unspecified.</li>
+</ul>
+</li>
+<li><code>cpu-cfs-quota-period=sanctus</code><ul>
+<li>Set the CPU CFS quota period value &#39;cpu.cfs_period_us&#39;. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as &#34;300ms&#34;. Valid time units are &#34;ns&#34;, &#34;us&#34; (or &#34;µs&#34;), &#34;ms&#34;, &#34;s&#34;, &#34;m&#34;, &#34;h&#34;. The value must be a positive duration.</li>
+</ul>
+</li>
+<li>
+<p><code>cpu-manager-policy=gubergren</code></p>
+<ul>
+<li>Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. - &#34;none&#34;: the default, which represents the existing scheduling behavior. - &#34;static&#34;: allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is &#39;none&#39; if unspecified.</li>
+</ul>
+</li>
+<li>
+<p><code>..    labels=key=accusam</code></p>
+<ul>
+<li>The map of Kubernetes labels (key/value pairs) to be applied to each node. These will added in addition to any default label(s) that Kubernetes may apply to the node. In case of conflict in label keys, the applied set may differ depending on the Kubernetes version -- it&#39;s best to assume the behavior is undefined and conflicts should be avoided. For more information, including usage and the valid values, see: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>linux-node-config    sysctls=key=lorem</code></p>
+<ul>
+<li>The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    local-ssd-count=97</code></p>
+<ul>
+<li>The number of local SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.</li>
+</ul>
+</li>
+<li><code>machine-type=sanctus</code><ul>
+<li>The name of a Google Compute Engine <a href="https://cloud.google.com/compute/docs/machine-types">machine type</a> If unspecified, the default machine type is <code>e2-medium</code>.</li>
+</ul>
+</li>
+<li><code>metadata=key=sea</code><ul>
+<li>The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp <code>[a-zA-Z0-9-_]+</code> and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the reserved keys: - &#34;cluster-location&#34; - &#34;cluster-name&#34; - &#34;cluster-uid&#34; - &#34;configure-sh&#34; - &#34;containerd-configure-sh&#34; - &#34;enable-os-login&#34; - &#34;gci-ensure-gke-docker&#34; - &#34;gci-metrics-enabled&#34; - &#34;gci-update-strategy&#34; - &#34;instance-template&#34; - &#34;kube-env&#34; - &#34;startup-script&#34; - &#34;user-data&#34; - &#34;disable-address-manager&#34; - &#34;windows-startup-script-ps1&#34; - &#34;common-psm1&#34; - &#34;k8s-node-setup-psm1&#34; - &#34;install-ssh-psm1&#34; - &#34;user-profile-psm1&#34; The following keys are reserved for Windows nodes: - &#34;serial-port-logging-enable&#34; Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value&#39;s size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>min-cpu-platform=diam</code><ul>
+<li>Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as <code>minCpuPlatform: &amp;#34;Intel Haswell&amp;#34;</code> or <code>minCpuPlatform: &amp;#34;Intel Sandy Bridge&amp;#34;</code>. For more information, read <a href="https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform">how to specify min CPU platform</a></li>
+</ul>
+</li>
+<li><code>node-group=amet</code><ul>
+<li>Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on <a href="https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes">sole tenant nodes</a>.</li>
+</ul>
+</li>
+<li><code>oauth-scopes=magna</code><ul>
+<li>The set of Google API scopes to be made available on all of the node VMs under the &#34;default&#34; service account. The following scopes are recommended, but not required, and by default are not included: * <code>https://www.googleapis.com/auth/compute</code> is required for mounting persistent storage on your nodes. * <code>https://www.googleapis.com/auth/devstorage.read_only</code> is required for communicating with <strong>gcr.io</strong> (the <a href="https://cloud.google.com/container-registry/">Google Container Registry</a>). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>preemptible=true</code><ul>
+<li>Whether the nodes are created as preemptible VM instances. See: https://cloud.google.com/compute/docs/instances/preemptible for more information about preemptible VM instances.</li>
+</ul>
+</li>
+<li><code>reservation-affinity    consume-reservation-type=tempor</code><ul>
+<li>Corresponds to the type of reservation consumption.</li>
+</ul>
+</li>
+<li><code>key=consetetur</code><ul>
+<li>Corresponds to the label key of a reservation resource. To target a SPECIFIC_RESERVATION by name, specify &#34;googleapis.com/reservation-name&#34; as the key and specify the name of your reservation as its value.</li>
+</ul>
+</li>
+<li>
+<p><code>values=amet</code></p>
+<ul>
+<li>Corresponds to the label value(s) of reservation resource(s).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..sandbox-config    type=ipsum</code></p>
+<ul>
+<li>Type of the sandbox to use for the node.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account=et</code></p>
+<ul>
+<li>The Google Cloud Platform Service Account to be used by the node VMs. Specify the email address of the Service Account; otherwise, if no Service Account is specified, the &#34;default&#34; service account is used.</li>
+</ul>
+</li>
+<li><code>shielded-instance-config    enable-integrity-monitoring=true</code><ul>
+<li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-secure-boot=false</code></p>
+<ul>
+<li>Defines whether the instance has Secure Boot enabled. Secure Boot helps ensure that the system only runs authentic software by verifying the digital signature of all boot components, and halting the boot process if signature verification fails.</li>
+</ul>
+</li>
+<li>
+<p><code>..    tags=et</code></p>
+<ul>
+<li>The list of instance tags applied to all nodes. Tags are used to identify valid sources or targets for network firewalls and are specified by the client during cluster or node pool creation. Each tag within the list must comply with RFC1035.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>workload-metadata-config    mode=lorem</code></p>
+<ul>
+<li>Mode is the configuration for how to expose metadata to workloads running on the node pool.</li>
+</ul>
+</li>
+<li>
+<p><code>...    initial-node-count=90</code></p>
+<ul>
+<li>The initial node count for the pool. You must ensure that your Compute Engine <a href="https://cloud.google.com/compute/quotas">resource quota</a> is sufficient for this number of instances. You must also have available firewall and routes quota.</li>
+</ul>
+</li>
+<li><code>instance-group-urls=sea</code><ul>
+<li>[Output only] The resource URLs of the <a href="https://cloud.google.com/compute/docs/instance-groups/creating-groups-of-managed-instances">managed instance groups</a> associated with this node pool.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>locations=et</code><ul>
+<li>The list of Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zones</a> in which the NodePool&#39;s nodes should be located. If this value is unspecified during node pool creation, the <a href="https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.FIELDS.locations">Cluster.Locations</a> value will be used, instead. Warning: changing node pool locations will result in nodes being added and/or removed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>management    auto-repair=false</code><ul>
+<li>A flag that specifies whether the node auto-repair is enabled for the node pool. If enabled, the nodes in this node pool will be monitored and, if they fail health checks too many times, an automatic repair action will be triggered.</li>
+</ul>
+</li>
+<li><code>auto-upgrade=true</code><ul>
+<li>A flag that specifies whether node auto-upgrade is enabled for the node pool. If enabled, node auto-upgrade helps keep the nodes in your node pool up to date with the latest release version of Kubernetes.</li>
+</ul>
+</li>
+<li><code>upgrade-options    auto-upgrade-start-time=ea</code><ul>
+<li>[Output only] This field is set when upgrades are about to commence with the approximate start time for the upgrades, in <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> text format.</li>
+</ul>
+</li>
+<li>
+<p><code>description=ipsum</code></p>
+<ul>
+<li>[Output only] This field is set when upgrades are about to commence with the description of the upgrade.</li>
+</ul>
+</li>
+<li>
+<p><code>...max-pods-constraint    max-pods-per-node=eos</code></p>
+<ul>
+<li>Constraint enforced on the max num of pods per node.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=vero</code></p>
+<ul>
+<li>The name of the node pool.</li>
+</ul>
+</li>
+<li><code>pod-ipv4-cidr-size=43</code><ul>
+<li>[Output only] The pod CIDR block size per node in this node pool.</li>
+</ul>
+</li>
+<li><code>self-link=dolores</code><ul>
+<li>[Output only] Server-defined URL for the resource.</li>
+</ul>
+</li>
+<li><code>status=elitr</code><ul>
+<li>[Output only] The status of the nodes in this pool instance.</li>
+</ul>
+</li>
+<li><code>status-message=diam</code><ul>
+<li>[Output only] Deprecated. Use conditions instead. Additional information about the current status of this node pool instance, if available.</li>
+</ul>
+</li>
+<li><code>upgrade-settings    max-surge=8</code><ul>
+<li>The maximum number of nodes that can be created beyond the current size of the node pool during the upgrade process.</li>
+</ul>
+</li>
+<li>
+<p><code>max-unavailable=0</code></p>
+<ul>
+<li>The maximum number of nodes that can be simultaneously unavailable during the upgrade process. A node is considered available if its status is Ready.</li>
+</ul>
+</li>
+<li>
+<p><code>..    version=magna</code></p>
+<ul>
+<li>The version of the Kubernetes of this node.</li>
+</ul>
+</li>
+<li>
+<p><code>..    parent=duo</code></p>
+<ul>
+<li>The parent (project, location, cluster id) where the node pool will be created. Specified in the format <code>projects/*/locations/*/clusters/*</code>.</li>
+</ul>
+</li>
+<li><code>project-id=et</code><ul>
+<li>Deprecated. The Google Developers Console <a href="https://developers.google.com/console/help/new/#projectnumber">project ID or project number</a>. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+<li><code>zone=no</code><ul>
+<li>Deprecated. The name of the Google Compute Engine <a href="https://cloud.google.com/compute/docs/zones#available">zone</a> in which the cluster resides. This field has been deprecated and replaced by the parent field.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_zones-clusters-node-pools-delete" class="btn btn-neutral float-right" title="Zones Clusters Node Pools Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_zones-clusters-node-pools-autoscaling" class="btn btn-neutral" title="Zones Clusters Node Pools Autoscaling"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_zones-clusters-node-pools-autoscaling" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_zones-clusters-node-pools-delete" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

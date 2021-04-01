@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SecTransform","A type representing a transform."]]});

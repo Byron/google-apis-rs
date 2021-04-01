@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Update - YouTube v2.0.0+20210330</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> YouTube v2.0.0+20210330</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Abuse Reports</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../abuse-reports_insert">Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Activities</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../activities_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Captions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../captions_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../captions_download">Download</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../captions_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../captions_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../captions_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Channel Banners</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channel-banners_insert">Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Channel Sections</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channel-sections_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channel-sections_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channel-sections_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channel-sections_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Channels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../channels_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Comment Threads</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comment-threads_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comment-threads_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comment-threads_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Comments</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_mark-as-spam">Mark As Spam</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_set-moderation-status">Set Moderation Status</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../comments_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>I18n Languages</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../i18n-languages_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>I18n Regions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../i18n-regions_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Live Broadcasts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_bind">Bind</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_transition">Transition</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-broadcasts_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Live Chat Bans</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-bans_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-bans_insert">Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Live Chat Messages</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-messages_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-messages_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-messages_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Live Chat Moderators</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-moderators_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-moderators_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-chat-moderators_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Live Streams</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-streams_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-streams_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-streams_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../live-streams_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Members</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../members_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Memberships Levels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../memberships-levels_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Playlist Items</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlist-items_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlist-items_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlist-items_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlist-items_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Playlists</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlists_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlists_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlists_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../playlists_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Search</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../search_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Subscriptions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subscriptions_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Super Chat Events</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../super-chat-events_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Tests</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tests_insert">Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Third Party Links</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../third-party-links_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../third-party-links_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../third-party-links_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../third-party-links_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Thumbnails</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../thumbnails_set">Set</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Video Abuse Report Reasons</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../video-abuse-report-reasons_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Video Categories</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../video-categories_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Videos</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_get-rating">Get Rating</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_rate">Rate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_report-abuse">Report Abuse</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../videos_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Watermarks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../watermarks_set">Set</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../watermarks_unset">Unset</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates an existing resource.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/youtube</em></li>
+<li><em>https://www.googleapis.com/auth/youtube.force-ssl</em></li>
+<li><em>https://www.googleapis.com/auth/youtubepartner</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/youtube</em>.
+You can set the scope for this method like this: <code>youtube3 --scope &lt;scope&gt; channels update ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Channel:
+  audit-details:
+    community-guidelines-good-standing: boolean
+    content-id-claims-good-standing: boolean
+    copyright-strikes-good-standing: boolean
+  branding-settings:
+    channel:
+      country: string
+      default-language: string
+      default-tab: string
+      description: string
+      featured-channels-title: string
+      featured-channels-urls: [string]
+      keywords: string
+      moderate-comments: boolean
+      profile-color: string
+      show-browse-view: boolean
+      show-related-channels: boolean
+      title: string
+      tracking-analytics-account-id: string
+      unsubscribed-trailer: string
+    image:
+      background-image-url:
+        default: string
+        default-language:
+          value: string
+      banner-external-url: string
+      banner-image-url: string
+      banner-mobile-extra-hd-image-url: string
+      banner-mobile-hd-image-url: string
+      banner-mobile-image-url: string
+      banner-mobile-low-image-url: string
+      banner-mobile-medium-hd-image-url: string
+      banner-tablet-extra-hd-image-url: string
+      banner-tablet-hd-image-url: string
+      banner-tablet-image-url: string
+      banner-tablet-low-image-url: string
+      banner-tv-high-image-url: string
+      banner-tv-image-url: string
+      banner-tv-low-image-url: string
+      banner-tv-medium-image-url: string
+      large-branded-banner-image-imap-script:
+        default: string
+        default-language:
+          value: string
+      large-branded-banner-image-url:
+        default: string
+        default-language:
+          value: string
+      small-branded-banner-image-imap-script:
+        default: string
+        default-language:
+          value: string
+      small-branded-banner-image-url:
+        default: string
+        default-language:
+          value: string
+      tracking-image-url: string
+      watch-icon-image-url: string
+    watch:
+      background-color: string
+      featured-playlist-id: string
+      text-color: string
+  content-details:
+    related-playlists:
+      favorites: string
+      likes: string
+      uploads: string
+      watch-history: string
+      watch-later: string
+  content-owner-details:
+    content-owner: string
+    time-linked: string
+  etag: string
+  id: string
+  kind: string
+  snippet:
+    country: string
+    custom-url: string
+    default-language: string
+    description: string
+    localized:
+      description: string
+      title: string
+    published-at: string
+    thumbnails:
+      default:
+        height: integer
+        url: string
+        width: integer
+      high:
+        height: integer
+        url: string
+        width: integer
+      maxres:
+        height: integer
+        url: string
+        width: integer
+      medium:
+        height: integer
+        url: string
+        width: integer
+      standard:
+        height: integer
+        url: string
+        width: integer
+    title: string
+  statistics:
+    comment-count: int64
+    hidden-subscriber-count: boolean
+    subscriber-count: int64
+    video-count: int64
+    view-count: int64
+  status:
+    is-linked: boolean
+    long-uploads-status: string
+    made-for-kids: boolean
+    privacy-status: string
+    self-declared-made-for-kids: boolean
+  topic-details:
+    topic-categories: [string]
+    topic-ids: [string]
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .audit-details    community-guidelines-good-standing=false</code><ul>
+<li>Whether or not the channel respects the community guidelines.</li>
+</ul>
+</li>
+<li><code>content-id-claims-good-standing=true</code><ul>
+<li>Whether or not the channel has any unresolved claims.</li>
+</ul>
+</li>
+<li>
+<p><code>copyright-strikes-good-standing=true</code></p>
+<ul>
+<li>Whether or not the channel has any copyright strikes.</li>
+</ul>
+</li>
+<li>
+<p><code>..branding-settings.channel    country=voluptua.</code></p>
+<ul>
+<li>The country of the channel.</li>
+</ul>
+</li>
+<li><code>default-language=et</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>default-tab=erat</code><ul>
+<li>Which content tab users should see when viewing the channel.</li>
+</ul>
+</li>
+<li><code>description=consetetur</code><ul>
+<li>Specifies the channel description.</li>
+</ul>
+</li>
+<li><code>featured-channels-title=amet.</code><ul>
+<li>Title for the featured channels tab.</li>
+</ul>
+</li>
+<li><code>featured-channels-urls=sed</code><ul>
+<li>The list of featured channels.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>keywords=takimata</code><ul>
+<li>Lists keywords associated with the channel, comma-separated.</li>
+</ul>
+</li>
+<li><code>moderate-comments=true</code><ul>
+<li>Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.</li>
+</ul>
+</li>
+<li><code>profile-color=et</code><ul>
+<li>A prominent color that can be rendered on this channel page.</li>
+</ul>
+</li>
+<li><code>show-browse-view=false</code><ul>
+<li>Whether the tab to browse the videos should be displayed.</li>
+</ul>
+</li>
+<li><code>show-related-channels=false</code><ul>
+<li>Whether related channels should be proposed.</li>
+</ul>
+</li>
+<li><code>title=amet.</code><ul>
+<li>Specifies the channel title.</li>
+</ul>
+</li>
+<li><code>tracking-analytics-account-id=ea</code><ul>
+<li>The ID for a Google Analytics account to track and measure traffic to the channels.</li>
+</ul>
+</li>
+<li>
+<p><code>unsubscribed-trailer=sadipscing</code></p>
+<ul>
+<li>The trailer of the channel, for users that are not subscribers.</li>
+</ul>
+</li>
+<li>
+<p><code>..image.background-image-url    default=lorem</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>default-language    value=invidunt</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...    banner-external-url=no</code></p>
+<ul>
+<li>This is generated when a ChannelBanner.Insert request has succeeded for the given channel.</li>
+</ul>
+</li>
+<li><code>banner-image-url=est</code><ul>
+<li>Banner image. Desktop size (1060x175).</li>
+</ul>
+</li>
+<li><code>banner-mobile-extra-hd-image-url=at</code><ul>
+<li>Banner image. Mobile size high resolution (1440x395).</li>
+</ul>
+</li>
+<li><code>banner-mobile-hd-image-url=sed</code><ul>
+<li>Banner image. Mobile size high resolution (1280x360).</li>
+</ul>
+</li>
+<li><code>banner-mobile-image-url=sit</code><ul>
+<li>Banner image. Mobile size (640x175).</li>
+</ul>
+</li>
+<li><code>banner-mobile-low-image-url=et</code><ul>
+<li>Banner image. Mobile size low resolution (320x88).</li>
+</ul>
+</li>
+<li><code>banner-mobile-medium-hd-image-url=tempor</code><ul>
+<li>Banner image. Mobile size medium/high resolution (960x263).</li>
+</ul>
+</li>
+<li><code>banner-tablet-extra-hd-image-url=aliquyam</code><ul>
+<li>Banner image. Tablet size extra high resolution (2560x424).</li>
+</ul>
+</li>
+<li><code>banner-tablet-hd-image-url=ipsum</code><ul>
+<li>Banner image. Tablet size high resolution (2276x377).</li>
+</ul>
+</li>
+<li><code>banner-tablet-image-url=et</code><ul>
+<li>Banner image. Tablet size (1707x283).</li>
+</ul>
+</li>
+<li><code>banner-tablet-low-image-url=sanctus</code><ul>
+<li>Banner image. Tablet size low resolution (1138x188).</li>
+</ul>
+</li>
+<li><code>banner-tv-high-image-url=lorem</code><ul>
+<li>Banner image. TV size high resolution (1920x1080).</li>
+</ul>
+</li>
+<li><code>banner-tv-image-url=est</code><ul>
+<li>Banner image. TV size extra high resolution (2120x1192).</li>
+</ul>
+</li>
+<li><code>banner-tv-low-image-url=sed</code><ul>
+<li>Banner image. TV size low resolution (854x480).</li>
+</ul>
+</li>
+<li><code>banner-tv-medium-image-url=diam</code><ul>
+<li>Banner image. TV size medium resolution (1280x720).</li>
+</ul>
+</li>
+<li><code>large-branded-banner-image-imap-script    default=dolores</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>default-language    value=dolores</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...large-branded-banner-image-url    default=et</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>default-language    value=sed</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...small-branded-banner-image-imap-script    default=no</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>default-language    value=et</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...small-branded-banner-image-url    default=elitr</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>default-language    value=sed</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...    tracking-image-url=no</code></p>
+<ul>
+<li>The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.</li>
+</ul>
+</li>
+<li>
+<p><code>watch-icon-image-url=nonumy</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..watch    background-color=at</code></p>
+<ul>
+<li>The text color for the video watch page&#39;s branded area.</li>
+</ul>
+</li>
+<li><code>featured-playlist-id=sadipscing</code><ul>
+<li>An ID that uniquely identifies a playlist that displays next to the video player.</li>
+</ul>
+</li>
+<li>
+<p><code>text-color=aliquyam</code></p>
+<ul>
+<li>The background color for the video watch page&#39;s branded area.</li>
+</ul>
+</li>
+<li>
+<p><code>...content-details.related-playlists    favorites=dolores</code></p>
+<ul>
+<li>The ID of the playlist that contains the channel&#34;s favorite videos. Use the playlistItems.insert and playlistItems.delete to add or remove items from that list.</li>
+</ul>
+</li>
+<li><code>likes=sadipscing</code><ul>
+<li>The ID of the playlist that contains the channel&#34;s liked videos. Use the playlistItems.insert and playlistItems.delete to add or remove items from that list.</li>
+</ul>
+</li>
+<li><code>uploads=erat</code><ul>
+<li>The ID of the playlist that contains the channel&#34;s uploaded videos. Use the videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.</li>
+</ul>
+</li>
+<li><code>watch-history=aliquyam</code><ul>
+<li>The ID of the playlist that contains the channel&#34;s watch history. Use the playlistItems.insert and playlistItems.delete to add or remove items from that list.</li>
+</ul>
+</li>
+<li>
+<p><code>watch-later=amet</code></p>
+<ul>
+<li>The ID of the playlist that contains the channel&#34;s watch later playlist. Use the playlistItems.insert and playlistItems.delete to add or remove items from that list.</li>
+</ul>
+</li>
+<li>
+<p><code>...content-owner-details    content-owner=est</code></p>
+<ul>
+<li>The ID of the content owner linked to the channel.</li>
+</ul>
+</li>
+<li>
+<p><code>time-linked=et</code></p>
+<ul>
+<li>The date and time when the channel was linked to the content owner.</li>
+</ul>
+</li>
+<li>
+<p><code>..    etag=sea</code></p>
+<ul>
+<li>Etag of this resource.</li>
+</ul>
+</li>
+<li><code>id=consetetur</code><ul>
+<li>The ID that YouTube uses to uniquely identify the channel.</li>
+</ul>
+</li>
+<li><code>kind=consetetur</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#channel&#34;.</li>
+</ul>
+</li>
+<li><code>snippet    country=stet</code><ul>
+<li>The country of the channel.</li>
+</ul>
+</li>
+<li><code>custom-url=est</code><ul>
+<li>The custom url of the channel.</li>
+</ul>
+</li>
+<li><code>default-language=aliquyam</code><ul>
+<li>The language of the channel&#39;s default title and description.</li>
+</ul>
+</li>
+<li><code>description=elitr</code><ul>
+<li>The description of the channel.</li>
+</ul>
+</li>
+<li><code>localized    description=duo</code><ul>
+<li>The localized strings for channel&#39;s description.</li>
+</ul>
+</li>
+<li>
+<p><code>title=diam</code></p>
+<ul>
+<li>The localized strings for channel&#39;s title.</li>
+</ul>
+</li>
+<li>
+<p><code>..    published-at=est</code></p>
+<ul>
+<li>The date and time that the channel was created.</li>
+</ul>
+</li>
+<li><code>thumbnails.default    height=48</code><ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=sed</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=26</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..high    height=45</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=ea</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=86</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..maxres    height=82</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=eos</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=33</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..medium    height=91</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=et</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=24</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..standard    height=17</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=eirmod</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=50</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>...    title=accusam</code></p>
+<ul>
+<li>The channel&#39;s title.</li>
+</ul>
+</li>
+<li>
+<p><code>..statistics    comment-count=-47</code></p>
+<ul>
+<li>The number of comments for the channel.</li>
+</ul>
+</li>
+<li><code>hidden-subscriber-count=true</code><ul>
+<li>Whether or not the number of subscribers is shown for this user.</li>
+</ul>
+</li>
+<li><code>subscriber-count=-81</code><ul>
+<li>The number of subscribers that the channel has.</li>
+</ul>
+</li>
+<li><code>video-count=-73</code><ul>
+<li>The number of videos uploaded to the channel.</li>
+</ul>
+</li>
+<li>
+<p><code>view-count=-10</code></p>
+<ul>
+<li>The number of times the channel has been viewed.</li>
+</ul>
+</li>
+<li>
+<p><code>..status    is-linked=true</code></p>
+<ul>
+<li>If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn&#39;t have a public YouTube identity.</li>
+</ul>
+</li>
+<li><code>long-uploads-status=lorem</code><ul>
+<li>The long uploads status of this channel. See https://support.google.com/youtube/answer/71673 for more information.</li>
+</ul>
+</li>
+<li><code>made-for-kids=false</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>privacy-status=dolor</code><ul>
+<li>Privacy status of the channel.</li>
+</ul>
+</li>
+<li>
+<p><code>self-declared-made-for-kids=true</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..topic-details    topic-categories=erat</code></p>
+<ul>
+<li>A list of Wikipedia URLs that describe the channel&#39;s content.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>topic-ids=sea</code><ul>
+<li>A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p on-behalf-of-content-owner=string</strong><ul>
+<li>The <em>onBehalfOfContentOwner</em> parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../comment-threads_insert" class="btn btn-neutral float-right" title="Insert"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../channels_list" class="btn btn-neutral" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../channels_list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../comment-threads_insert" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Register - proximitybeacon v2.0.0+20200127</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> proximitybeacon v2.0.0+20200127</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Beaconinfo</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beaconinfo_getforobserved">Getforobserved</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Beacons</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_activate">Activate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_attachments-batch-delete">Attachments Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_attachments-create">Attachments Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_attachments-delete">Attachments Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_attachments-list">Attachments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_deactivate">Deactivate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_decommission">Decommission</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_diagnostics-list">Diagnostics List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Register</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../beacons_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Methods</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../methods_get-eidparams">Get Eidparams</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Namespaces</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../namespaces_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../namespaces_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Register</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/proximitybeacon1_beta1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Registers a previously unregistered beacon given its <code>advertisedId</code>.
+These IDs are unique within the system. An ID can be registered only once.</p>
+<p>Authenticate using an <a href="https://developers.google.com/identity/protocols/OAuth2">OAuth access
+token</a> from a
+signed-in user with <strong>Is owner</strong> or <strong>Can edit</strong> permissions in the Google
+Developers Console project.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/userlocation.beacon.registry</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/userlocation.beacon.registry</em>.
+You can set the scope for this method like this: <code>proximitybeacon1-beta1 --scope &lt;scope&gt; beacons register ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Beacon:
+  advertised-id:
+    id: string
+    type: string
+  beacon-name: string
+  description: string
+  ephemeral-id-registration:
+    beacon-ecdh-public-key: string
+    beacon-identity-key: string
+    initial-clock-value: string
+    initial-eid: string
+    rotation-period-exponent: integer
+    service-ecdh-public-key: string
+  expected-stability: string
+  indoor-level:
+    name: string
+  lat-lng:
+    latitude: number
+    longitude: number
+  place-id: string
+  properties: { string: string }
+  provisioning-key: string
+  status: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .advertised-id    id=sed</code><ul>
+<li>The actual beacon identifier, as broadcast by the beacon hardware. Must be
+    <a href="http://tools.ietf.org/html/rfc4648#section-4">base64</a> encoded in HTTP
+    requests, and will be so encoded (with padding) in responses. The base64
+    encoding should be of the binary byte-stream and not any textual (such as
+    hex) representation thereof.
+    Required.</li>
+</ul>
+</li>
+<li>
+<p><code>type=amet.</code></p>
+<ul>
+<li>Specifies the identifier type.
+    Required.</li>
+</ul>
+</li>
+<li>
+<p><code>..    beacon-name=takimata</code></p>
+<ul>
+<li>
+<p>Resource name of this beacon. A beacon name has the format
+    &#34;beacons/N!beaconId&#34; where the beaconId is the base16 ID broadcast by
+    the beacon and N is a code for the beacon&#39;s type. Possible values are
+    <code>3</code> for Eddystone, <code>1</code> for iBeacon, or <code>5</code> for AltBeacon.</p>
+<p>This field must be left empty when registering. After reading a beacon,
+clients can use the name for future operations.
+<em> <code>description=amet.</code>
+    - Free text used to identify and describe the beacon. Maximum length 140
+characters.
+Optional.
+</em> <code>ephemeral-id-registration    beacon-ecdh-public-key=duo</code>
+    - The beacon&#39;s public key used for the Elliptic curve Diffie-Hellman
+key exchange. When this field is populated, <code>service_ecdh_public_key</code>
+must also be populated, and <code>beacon_identity_key</code> must not be.
+<em> <code>beacon-identity-key=ipsum</code>
+    - The private key of the beacon. If this field is populated,
+<code>beacon_ecdh_public_key</code> and <code>service_ecdh_public_key</code> must not be
+populated.
+</em> <code>initial-clock-value=gubergren</code>
+    - The initial clock value of the beacon. The beacon&#39;s clock must have
+begun counting at this value immediately prior to transmitting this
+value to the resolving service. Significant delay in transmitting this
+value to the service risks registration or resolution failures. If a
+value is not provided, the default is zero.
+<em> <code>initial-eid=lorem</code>
+    - An initial ephemeral ID calculated using the clock value submitted as
+<code>initial_clock_value</code>, and the secret key generated by the
+Diffie-Hellman key exchange using <code>service_ecdh_public_key</code> and
+<code>service_ecdh_public_key</code>. This initial EID value will be used by the
+service to confirm that the key exchange process was successful.
+</em> <code>rotation-period-exponent=89</code>
+    - Indicates the nominal period between each rotation of the beacon&#39;s
+ephemeral ID. &#34;Nominal&#34; because the beacon should randomize the
+actual interval. See <a href="https://github.com/google/eddystone/tree/master/eddystone-eid">the spec at
+github</a>
+for details. This value corresponds to a power-of-two scaler on the
+beacon&#39;s clock: when the scaler value is K, the beacon will begin
+broadcasting a new ephemeral ID on average every 2^K seconds.
+* <code>service-ecdh-public-key=eos</code>
+    - The service&#39;s public key used for the Elliptic curve Diffie-Hellman
+key exchange. When this field is populated, <code>beacon_ecdh_public_key</code>
+must also be populated, and <code>beacon_identity_key</code> must not be.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>..    expected-stability=dolor</code></p>
+<ul>
+<li>Expected location stability. This is set when the beacon is registered or
+    updated, not automatically detected in any way.
+    Optional.</li>
+</ul>
+</li>
+<li>
+<p><code>indoor-level    name=ea</code></p>
+<ul>
+<li>The name of this level.</li>
+</ul>
+</li>
+<li>
+<p><code>..lat-lng    latitude=0.8638300740145545</code></p>
+<ul>
+<li>The latitude in degrees. It must be in the range [-90.0, +90.0].</li>
+</ul>
+</li>
+<li>
+<p><code>longitude=0.36487300775415</code></p>
+<ul>
+<li>The longitude in degrees. It must be in the range [-180.0, +180.0].</li>
+</ul>
+</li>
+<li>
+<p><code>..    place-id=amet</code></p>
+<ul>
+<li>The <a href="..//places/place-id">Google Places API</a> Place ID of the place where
+    the beacon is deployed. This is given when the beacon is registered or
+    updated, not automatically detected in any way.
+    Optional.</li>
+</ul>
+</li>
+<li><code>properties=key=duo</code><ul>
+<li>Properties of the beacon device, for example battery type or firmware
+    version.
+    Optional.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>provisioning-key=ipsum</code><ul>
+<li>Some beacons may require a user to provide an authorization key before
+    changing any of its configuration (e.g. broadcast frames, transmit power).
+    This field provides a place to store and control access to that key.
+    This field is populated in responses to <code>GET /v1beta1/beacons/3!beaconId</code>
+    from users with write access to the given beacon. That is to say: If the
+    user is authorized to write the beacon&#39;s confidential data in the service,
+    the service considers them authorized to configure the beacon. Note
+    that this key grants nothing on the service, only on the beacon itself.</li>
+</ul>
+</li>
+<li><code>status=sed</code><ul>
+<li>Current status of the beacon.
+    Required.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p project-id=string</strong><ul>
+<li>The project id of the project the beacon will be registered to. If
+    the project id is not specified then the project making the request
+    is used.
+    Optional.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../beacons_update" class="btn btn-neutral float-right" title="Update"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../beacons_list" class="btn btn-neutral" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../beacons_list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../beacons_update" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

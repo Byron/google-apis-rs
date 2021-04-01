@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Create - storagetransfer v2.0.0+20210316</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> storagetransfer v2.0.0+20210316</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Google Service Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../google-service-accounts_get">Get</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Transfer Jobs</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-jobs_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-jobs_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-jobs_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-jobs_run">Run</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Transfer Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-operations_cancel">Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-operations_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-operations_pause">Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../transfer-operations_resume">Resume</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a transfer job that runs periodically.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>storagetransfer1 --scope &lt;scope&gt; transfer-jobs create ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>TransferJob:
+  creation-time: string
+  deletion-time: string
+  description: string
+  last-modification-time: string
+  latest-operation-name: string
+  name: string
+  notification-config:
+    event-types: [string]
+    payload-format: string
+    pubsub-topic: string
+  project-id: string
+  schedule:
+    end-time-of-day:
+      hours: integer
+      minutes: integer
+      nanos: integer
+      seconds: integer
+    repeat-interval: string
+    schedule-end-date:
+      day: integer
+      month: integer
+      year: integer
+    schedule-start-date:
+      day: integer
+      month: integer
+      year: integer
+    start-time-of-day:
+      hours: integer
+      minutes: integer
+      nanos: integer
+      seconds: integer
+  status: string
+  transfer-spec:
+    aws-s3-data-source:
+      aws-access-key:
+        access-key-id: string
+        secret-access-key: string
+      bucket-name: string
+      path: string
+    azure-blob-storage-data-source:
+      azure-credentials:
+        sas-token: string
+      container: string
+      path: string
+      storage-account: string
+    gcs-data-sink:
+      bucket-name: string
+      path: string
+    gcs-data-source:
+      bucket-name: string
+      path: string
+    http-data-source:
+      list-url: string
+    object-conditions:
+      exclude-prefixes: [string]
+      include-prefixes: [string]
+      last-modified-before: string
+      last-modified-since: string
+      max-time-elapsed-since-last-modification: string
+      min-time-elapsed-since-last-modification: string
+    transfer-options:
+      delete-objects-from-source-after-transfer: boolean
+      delete-objects-unique-in-sink: boolean
+      overwrite-objects-already-existing-in-sink: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    creation-time=et</code><ul>
+<li>Output only. The time that the transfer job was created.</li>
+</ul>
+</li>
+<li><code>deletion-time=magna</code><ul>
+<li>Output only. The time that the transfer job was deleted.</li>
+</ul>
+</li>
+<li><code>description=no</code><ul>
+<li>A description provided by the user for the job. Its max length is 1024 bytes when Unicode-encoded.</li>
+</ul>
+</li>
+<li><code>last-modification-time=ipsum</code><ul>
+<li>Output only. The time that the transfer job was last modified.</li>
+</ul>
+</li>
+<li><code>latest-operation-name=voluptua.</code><ul>
+<li>The name of the most recently started TransferOperation of this JobConfig. Present if and only if at least one TransferOperation has been created for this JobConfig.</li>
+</ul>
+</li>
+<li><code>name=at</code><ul>
+<li>A unique name (within the transfer project) assigned when the job is created. If this field is empty in a CreateTransferJobRequest, Storage Transfer Service will assign a unique name. Otherwise, the specified name is used as the unique name for this job. If the specified name is in use by a job, the creation request fails with an ALREADY_EXISTS error. This name must start with <code>&amp;#34;transferJobs/&amp;#34;</code> prefix and end with a letter or a number, and should be no more than 128 characters. Example: <code>&amp;#34;transferJobs/[A-Za-z0-9-._~]*[A-Za-z0-9]$&amp;#34;</code> Invalid job names will fail with an INVALID_ARGUMENT error.</li>
+</ul>
+</li>
+<li><code>notification-config    event-types=sanctus</code><ul>
+<li>Event types for which a notification is desired. If empty, send notifications for all event types.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>payload-format=sed</code><ul>
+<li>Required. The desired format of the notification message payloads.</li>
+</ul>
+</li>
+<li>
+<p><code>pubsub-topic=amet.</code></p>
+<ul>
+<li>Required. The <code>Topic.name</code> of the Cloud Pub/Sub topic to which to publish notifications. Must be of the format: <code>projects/{project}/topics/{topic}</code>. Not matching this format will result in an INVALID_ARGUMENT error.</li>
+</ul>
+</li>
+<li>
+<p><code>..    project-id=takimata</code></p>
+<ul>
+<li>The ID of the Google Cloud Platform Project that owns the job.</li>
+</ul>
+</li>
+<li><code>schedule.end-time-of-day    hours=49</code><ul>
+<li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
+</ul>
+</li>
+<li><code>minutes=81</code><ul>
+<li>Minutes of hour of day. Must be from 0 to 59.</li>
+</ul>
+</li>
+<li><code>nanos=46</code><ul>
+<li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
+</ul>
+</li>
+<li>
+<p><code>seconds=39</code></p>
+<ul>
+<li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>..    repeat-interval=lorem</code></p>
+<ul>
+<li>Interval between the start of each scheduled TransferOperation. If unspecified, the default value is 24 hours. This value may not be less than 1 hour.</li>
+</ul>
+</li>
+<li><code>schedule-end-date    day=89</code><ul>
+<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
+</ul>
+</li>
+<li><code>month=26</code><ul>
+<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
+</ul>
+</li>
+<li>
+<p><code>year=97</code></p>
+<ul>
+<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
+</ul>
+</li>
+<li>
+<p><code>..schedule-start-date    day=84</code></p>
+<ul>
+<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
+</ul>
+</li>
+<li><code>month=46</code><ul>
+<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
+</ul>
+</li>
+<li>
+<p><code>year=13</code></p>
+<ul>
+<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
+</ul>
+</li>
+<li>
+<p><code>..start-time-of-day    hours=54</code></p>
+<ul>
+<li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
+</ul>
+</li>
+<li><code>minutes=81</code><ul>
+<li>Minutes of hour of day. Must be from 0 to 59.</li>
+</ul>
+</li>
+<li><code>nanos=51</code><ul>
+<li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
+</ul>
+</li>
+<li>
+<p><code>seconds=8</code></p>
+<ul>
+<li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>...    status=ut</code></p>
+<ul>
+<li>Status of the job. This value MUST be specified for <code>CreateTransferJobRequests</code>. <strong>Note:</strong> The effect of the new job status takes place during a subsequent job run. For example, if you change the job status from ENABLED to DISABLED, and an operation spawned by the transfer is running, the status change would not affect the current operation.</li>
+</ul>
+</li>
+<li><code>transfer-spec.aws-s3-data-source.aws-access-key    access-key-id=gubergren</code><ul>
+<li>Required. AWS access key ID.</li>
+</ul>
+</li>
+<li>
+<p><code>secret-access-key=rebum.</code></p>
+<ul>
+<li>Required. AWS secret access key. This field is not returned in RPC responses.</li>
+</ul>
+</li>
+<li>
+<p><code>..    bucket-name=est</code></p>
+<ul>
+<li>Required. S3 Bucket name (see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html">Creating a bucket</a>).</li>
+</ul>
+</li>
+<li>
+<p><code>path=ipsum</code></p>
+<ul>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>..azure-blob-storage-data-source.azure-credentials    sas-token=ipsum</code></p>
+<ul>
+<li>Required. Azure shared access signature. (see <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview">Grant limited access to Azure Storage resources using shared access signatures (SAS)</a>).</li>
+</ul>
+</li>
+<li>
+<p><code>..    container=est</code></p>
+<ul>
+<li>Required. The container to transfer from the Azure Storage account.</li>
+</ul>
+</li>
+<li><code>path=gubergren</code><ul>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>storage-account=ea</code></p>
+<ul>
+<li>Required. The name of the Azure Storage account.</li>
+</ul>
+</li>
+<li>
+<p><code>..gcs-data-sink    bucket-name=dolor</code></p>
+<ul>
+<li>Required. Cloud Storage bucket name (see <a href="https://cloud.google.com/storage/docs/naming#requirements">Bucket Name Requirements</a>).</li>
+</ul>
+</li>
+<li>
+<p><code>path=lorem</code></p>
+<ul>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. (must meet Object Name Requirements](https://cloud.google.com/storage/docs/naming#objectnames)).</li>
+</ul>
+</li>
+<li>
+<p><code>..gcs-data-source    bucket-name=eos</code></p>
+<ul>
+<li>Required. Cloud Storage bucket name (see <a href="https://cloud.google.com/storage/docs/naming#requirements">Bucket Name Requirements</a>).</li>
+</ul>
+</li>
+<li>
+<p><code>path=labore</code></p>
+<ul>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. (must meet Object Name Requirements](https://cloud.google.com/storage/docs/naming#objectnames)).</li>
+</ul>
+</li>
+<li>
+<p><code>..http-data-source    list-url=sed</code></p>
+<ul>
+<li>Required. The URL that points to the file that stores the object list entries. This file must allow public access. Currently, only URLs with HTTP and HTTPS schemes are supported.</li>
+</ul>
+</li>
+<li>
+<p><code>..object-conditions    exclude-prefixes=duo</code></p>
+<ul>
+<li>If you specify <code>exclude_prefixes</code>, Storage Transfer Service uses the items in the <code>exclude_prefixes</code> array to determine which objects to exclude from a transfer. Objects must not start with one of the matching <code>exclude_prefixes</code> for inclusion in a transfer. The following are requirements of <code>exclude_prefixes</code>: * Each exclude-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each exclude-prefix must omit the leading slash. For example, to exclude the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the exclude-prefix as <code>logs/y=2015/requests.gz</code>. * None of the exclude-prefix values can be empty, if specified. * Each exclude-prefix must exclude a distinct portion of the object namespace. No exclude-prefix may be a prefix of another exclude-prefix. * If include_prefixes is specified, then each exclude-prefix must start with the value of a path explicitly included by <code>include_prefixes</code>. The max size of <code>exclude_prefixes</code> is 1000. For more information, see <a href="..//storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>include-prefixes=sed</code><ul>
+<li>If you specify <code>include_prefixes</code>, Storage Transfer Service uses the items in the <code>include_prefixes</code> array to determine which objects to include in a transfer. Objects must start with one of the matching <code>include_prefixes</code> for inclusion in the transfer. If exclude_prefixes is specified, objects must not start with any of the <code>exclude_prefixes</code> specified for inclusion in the transfer. The following are requirements of <code>include_prefixes</code>: * Each include-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each include-prefix must omit the leading slash. For example, to include the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the include-prefix as <code>logs/y=2015/requests.gz</code>. * None of the include-prefix values can be empty, if specified. * Each include-prefix must include a distinct portion of the object namespace. No include-prefix may be a prefix of another include-prefix. The max size of <code>include_prefixes</code> is 1000. For more information, see <a href="..//storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>last-modified-before=no</code><ul>
+<li>If specified, only objects with a &#34;last modification time&#34; before this timestamp and objects that don&#39;t have a &#34;last modification time&#34; will be transferred.</li>
+</ul>
+</li>
+<li><code>last-modified-since=stet</code><ul>
+<li>If specified, only objects with a &#34;last modification time&#34; on or after this timestamp and objects that don&#39;t have a &#34;last modification time&#34; are transferred. The <code>last_modified_since</code> and <code>last_modified_before</code> fields can be used together for chunked data processing. For example, consider a script that processes each day&#39;s worth of data at a time. For that you&#39;d set each of the fields as follows: * <code>last_modified_since</code> to the start of the day * <code>last_modified_before</code> to the end of the day</li>
+</ul>
+</li>
+<li><code>max-time-elapsed-since-last-modification=kasd</code><ul>
+<li>If specified, only objects with a &#34;last modification time&#34; on or after <code>NOW</code> - <code>max_time_elapsed_since_last_modification</code> and objects that don&#39;t have a &#34;last modification time&#34; are transferred. For each TransferOperation started by this TransferJob, <code>NOW</code> refers to the start_time of the <code>TransferOperation</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>min-time-elapsed-since-last-modification=et</code></p>
+<ul>
+<li>If specified, only objects with a &#34;last modification time&#34; before <code>NOW</code> - <code>min_time_elapsed_since_last_modification</code> and objects that don&#39;t have a &#34;last modification time&#34; are transferred. For each TransferOperation started by this TransferJob, <code>NOW</code> refers to the start_time of the <code>TransferOperation</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..transfer-options    delete-objects-from-source-after-transfer=true</code></p>
+<ul>
+<li>Whether objects should be deleted from the source after they are transferred to the sink. <strong>Note:</strong> This option and delete_objects_unique_in_sink are mutually exclusive.</li>
+</ul>
+</li>
+<li><code>delete-objects-unique-in-sink=true</code><ul>
+<li>Whether objects that exist only in the sink should be deleted. <strong>Note:</strong> This option and delete_objects_from_source_after_transfer are mutually exclusive.</li>
+</ul>
+</li>
+<li><code>overwrite-objects-already-existing-in-sink=false</code><ul>
+<li>When to overwrite objects that already exist in the sink. The default is that only objects that are different from the source are ovewritten. If true, all objects in the sink whose name matches an object in the source will be overwritten with the source object.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../transfer-jobs_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../google-service-accounts_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../google-service-accounts_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../transfer-jobs_get" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

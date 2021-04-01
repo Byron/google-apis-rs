@@ -1,0 +1,3673 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Resize - compute v2.0.0+20210316</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> compute v2.0.0+20210316</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accelerator Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accelerator-types_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accelerator-types_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accelerator-types_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Addresses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../addresses_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../addresses_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../addresses_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../addresses_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../addresses_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Autoscalers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../autoscalers_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Backend Buckets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_add-signed-url-key">Add Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_delete-signed-url-key">Delete Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-buckets_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Backend Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_add-signed-url-key">Add Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_delete-signed-url-key">Delete Signed Url Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_get-health">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_set-security-policy">Set Security Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../backend-services_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Disk Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disk-types_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disk-types_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disk-types_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Disks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_add-resource-policies">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_create-snapshot">Create Snapshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_remove-resource-policies">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Resize</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../disks_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>External Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../external-vpn-gateways_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Firewall Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_add-association">Add Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_add-rule">Add Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_clone-rules">Clone Rules</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_get-association">Get Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_get-rule">Get Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_list-associations">List Associations</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_move">Move</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_patch-rule">Patch Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_remove-association">Remove Association</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_remove-rule">Remove Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewall-policies_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Firewalls</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../firewalls_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Forwarding Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../forwarding-rules_set-target">Set Target</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Addresses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-addresses_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-addresses_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-addresses_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-addresses_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Forwarding Rules</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-forwarding-rules_set-target">Set Target</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_attach-network-endpoints">Attach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_detach-network-endpoints">Detach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-network-endpoint-groups_list-network-endpoints">List Network Endpoints</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-operations_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-operations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-operations_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-operations_wait">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Organization Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-organization-operations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-organization-operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-organization-operations_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Global Public Delegated Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-public-delegated-prefixes_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-public-delegated-prefixes_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-public-delegated-prefixes_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-public-delegated-prefixes_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../global-public-delegated-prefixes_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../health-checks_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Http Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../http-health-checks_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Https Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../https-health-checks_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Images</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_deprecate">Deprecate</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_get-from-family">Get From Family</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../images_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Group Managers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_abandon-instances">Abandon Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_apply-updates-to-instances">Apply Updates To Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_create-instances">Create Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_delete-instances">Delete Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_delete-per-instance-configs">Delete Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_list-errors">List Errors</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_list-managed-instances">List Managed Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_list-per-instance-configs">List Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_patch-per-instance-configs">Patch Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_recreate-instances">Recreate Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_resize">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_set-instance-template">Set Instance Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_set-target-pools">Set Target Pools</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-group-managers_update-per-instance-configs">Update Per Instance Configs</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_add-instances">Add Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_list-instances">List Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_remove-instances">Remove Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-groups_set-named-ports">Set Named Ports</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instance Templates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instance-templates_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_add-access-config">Add Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_add-resource-policies">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_attach-disk">Attach Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_bulk-insert">Bulk Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_delete-access-config">Delete Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_detach-disk">Detach Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-effective-firewalls">Get Effective Firewalls</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-guest-attributes">Get Guest Attributes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-screenshot">Get Screenshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-serial-port-output">Get Serial Port Output</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_get-shielded-instance-identity">Get Shielded Instance Identity</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_list-referrers">List Referrers</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_remove-resource-policies">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_reset">Reset</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-deletion-protection">Set Deletion Protection</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-disk-auto-delete">Set Disk Auto Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-machine-resources">Set Machine Resources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-machine-type">Set Machine Type</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-metadata">Set Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-min-cpu-platform">Set Min Cpu Platform</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-scheduling">Set Scheduling</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-service-account">Set Service Account</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-shielded-instance-integrity-policy">Set Shielded Instance Integrity Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_set-tags">Set Tags</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_simulate-maintenance-event">Simulate Maintenance Event</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_start">Start</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_start-with-encryption-key">Start With Encryption Key</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_stop">Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update-access-config">Update Access Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update-display-device">Update Display Device</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update-network-interface">Update Network Interface</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../instances_update-shielded-instance-config">Update Shielded Instance Config</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnect Attachments</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-attachments_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnect Locations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-locations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnect-locations_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Interconnects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_get-diagnostics">Get Diagnostics</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../interconnects_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>License Codes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../license-codes_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../license-codes_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Licenses</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../licenses_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Machine Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../machine-types_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../machine-types_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../machine-types_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_attach-network-endpoints">Attach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_detach-network-endpoints">Detach Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_list-network-endpoints">List Network Endpoints</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../network-endpoint-groups_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Networks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_add-peering">Add Peering</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_get-effective-firewalls">Get Effective Firewalls</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_list-peering-routes">List Peering Routes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_remove-peering">Remove Peering</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_switch-to-custom-mode">Switch To Custom Mode</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../networks_update-peering">Update Peering</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_add-nodes">Add Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_delete-nodes">Delete Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_list-nodes">List Nodes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_set-node-template">Set Node Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-groups_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Templates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-templates_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Node Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-types_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-types_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../node-types_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Packet Mirrorings</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../packet-mirrorings_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_disable-xpn-host">Disable Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_disable-xpn-resource">Disable Xpn Resource</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_enable-xpn-host">Enable Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_enable-xpn-resource">Enable Xpn Resource</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get-xpn-host">Get Xpn Host</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get-xpn-resources">Get Xpn Resources</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_list-xpn-hosts">List Xpn Hosts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_move-disk">Move Disk</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_move-instance">Move Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_set-common-instance-metadata">Set Common Instance Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_set-default-network-tier">Set Default Network Tier</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_set-usage-export-bucket">Set Usage Export Bucket</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Public Advertised Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-advertised-prefixes_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-advertised-prefixes_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-advertised-prefixes_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-advertised-prefixes_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-advertised-prefixes_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Public Delegated Prefixes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../public-delegated-prefixes_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Autoscalers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-autoscalers_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Backend Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_get-health">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-backend-services_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Commitments</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-commitments_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-commitments_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-commitments_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-commitments_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Disk Types</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disk-types_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disk-types_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Disks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_add-resource-policies">Add Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_create-snapshot">Create Snapshot</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_remove-resource-policies">Remove Resource Policies</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_resize">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-disks_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Health Check Services</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-check-services_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-check-services_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-check-services_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-check-services_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-check-services_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Health Checks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-health-checks_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instance Group Managers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_abandon-instances">Abandon Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_apply-updates-to-instances">Apply Updates To Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_create-instances">Create Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_delete-instances">Delete Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_delete-per-instance-configs">Delete Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_list-errors">List Errors</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_list-managed-instances">List Managed Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_list-per-instance-configs">List Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_patch-per-instance-configs">Patch Per Instance Configs</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_recreate-instances">Recreate Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_resize">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_set-instance-template">Set Instance Template</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_set-target-pools">Set Target Pools</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-group-managers_update-per-instance-configs">Update Per Instance Configs</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instance Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-groups_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-groups_list-instances">List Instances</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instance-groups_set-named-ports">Set Named Ports</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-instances_bulk-insert">Bulk Insert</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Network Endpoint Groups</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-network-endpoint-groups_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-network-endpoint-groups_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-network-endpoint-groups_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-network-endpoint-groups_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Notification Endpoints</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-notification-endpoints_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-notification-endpoints_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-notification-endpoints_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-notification-endpoints_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-operations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-operations_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-operations_wait">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Ssl Certificates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-ssl-certificates_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-ssl-certificates_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-ssl-certificates_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-ssl-certificates_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Target Http Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-http-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-http-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-http-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-http-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-http-proxies_set-url-map">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Target Https Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_set-ssl-certificates">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-target-https-proxies_set-url-map">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Region Url Maps</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../region-url-maps_validate">Validate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Regions</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../regions_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../regions_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Reservations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_resize">Resize</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../reservations_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Resource Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../resource-policies_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Routers</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_get-nat-mapping-info">Get Nat Mapping Info</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_get-router-status">Get Router Status</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_preview">Preview</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routers_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Routes</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routes_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routes_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routes_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routes_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Security Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_add-rule">Add Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_get-rule">Get Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_list-preconfigured-expression-sets">List Preconfigured Expression Sets</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_patch-rule">Patch Rule</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../security-policies_remove-rule">Remove Rule</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Snapshots</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../snapshots_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Ssl Certificates</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certificates_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certificates_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certificates_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certificates_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-certificates_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Ssl Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_list-available-features">List Available Features</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../ssl-policies_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Subnetworks</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_expand-ip-cidr-range">Expand Ip Cidr Range</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_list-usable">List Usable</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_set-private-ip-google-access">Set Private Ip Google Access</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../subnetworks_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Grpc Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-grpc-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-grpc-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-grpc-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-grpc-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-grpc-proxies_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Http Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-http-proxies_set-url-map">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Https Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_set-quic-override">Set Quic Override</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_set-ssl-certificates">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_set-ssl-policy">Set Ssl Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-https-proxies_set-url-map">Set Url Map</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Instances</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-instances_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-instances_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-instances_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-instances_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-instances_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Pools</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_add-health-check">Add Health Check</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_add-instance">Add Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_get-health">Get Health</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_remove-health-check">Remove Health Check</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_remove-instance">Remove Instance</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-pools_set-backup">Set Backup</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Ssl Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_set-backend-service">Set Backend Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_set-proxy-header">Set Proxy Header</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_set-ssl-certificates">Set Ssl Certificates</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-ssl-proxies_set-ssl-policy">Set Ssl Policy</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Tcp Proxies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_set-backend-service">Set Backend Service</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-tcp-proxies_set-proxy-header">Set Proxy Header</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Target Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-vpn-gateways_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-vpn-gateways_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-vpn-gateways_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-vpn-gateways_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../target-vpn-gateways_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Url Maps</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_invalidate-cache">Invalidate Cache</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_update">Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../url-maps_validate">Validate</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Vpn Gateways</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_get-status">Get Status</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_set-labels">Set Labels</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-gateways_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Vpn Tunnels</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-tunnels_aggregated-list">Aggregated List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-tunnels_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-tunnels_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-tunnels_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../vpn-tunnels_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Zone Operations</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zone-operations_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zone-operations_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zone-operations_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zone-operations_wait">Wait</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Zones</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zones_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../zones_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Resize</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/compute1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Resizes the specified persistent disk. You can only increase the size of the disk.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/compute</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>compute1 --scope &lt;scope&gt; disks resize ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;project&gt;</strong> <em>(string)</em><ul>
+<li>Project ID for this request.</li>
+</ul>
+</li>
+<li><strong>&lt;zone&gt;</strong> <em>(string)</em><ul>
+<li>The name of the zone for this request.</li>
+</ul>
+</li>
+<li><strong>&lt;disk&gt;</strong> <em>(string)</em><ul>
+<li>The name of the persistent disk.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>DisksResizeRequest:
+  size-gb: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    size-gb=sanctus</code><ul>
+<li>The new size of the persistent disk, which is specified in GB.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p request-id=string</strong><ul>
+<li>
+<p>An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed.</p>
+<p>For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments.</p>
+<p>The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../disks_set-iam-policy" class="btn btn-neutral float-right" title="Set Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../disks_remove-resource-policies" class="btn btn-neutral" title="Remove Resource Policies"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../disks_remove-resource-policies" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../disks_set-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

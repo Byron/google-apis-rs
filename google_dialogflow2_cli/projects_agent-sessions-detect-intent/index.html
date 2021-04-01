@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Agent Sessions Detect Intent - Dialogflow v2.0.0+20210329</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dialogflow v2.0.0+20210329</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-batch-delete">Agent Entity Types Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-batch-update">Agent Entity Types Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-create">Agent Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-delete">Agent Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-entities-batch-create">Agent Entity Types Entities Batch Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-entities-batch-delete">Agent Entity Types Entities Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-entities-batch-update">Agent Entity Types Entities Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-get">Agent Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-list">Agent Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-entity-types-patch">Agent Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-intents-list">Agent Environments Intents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-list">Agent Environments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-contexts-create">Agent Environments Users Sessions Contexts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-contexts-delete">Agent Environments Users Sessions Contexts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-contexts-get">Agent Environments Users Sessions Contexts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-contexts-list">Agent Environments Users Sessions Contexts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-contexts-patch">Agent Environments Users Sessions Contexts Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-delete-contexts">Agent Environments Users Sessions Delete Contexts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-detect-intent">Agent Environments Users Sessions Detect Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-entity-types-create">Agent Environments Users Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-entity-types-delete">Agent Environments Users Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-entity-types-get">Agent Environments Users Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-entity-types-list">Agent Environments Users Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-environments-users-sessions-entity-types-patch">Agent Environments Users Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-export">Agent Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-get-fulfillment">Agent Get Fulfillment</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-get-validation-result">Agent Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-import">Agent Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-batch-delete">Agent Intents Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-batch-update">Agent Intents Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-create">Agent Intents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-delete">Agent Intents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-get">Agent Intents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-list">Agent Intents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-intents-patch">Agent Intents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-create">Agent Knowledge Bases Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-delete">Agent Knowledge Bases Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-create">Agent Knowledge Bases Documents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-delete">Agent Knowledge Bases Documents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-get">Agent Knowledge Bases Documents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-list">Agent Knowledge Bases Documents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-patch">Agent Knowledge Bases Documents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-documents-reload">Agent Knowledge Bases Documents Reload</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-get">Agent Knowledge Bases Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-list">Agent Knowledge Bases List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-knowledge-bases-patch">Agent Knowledge Bases Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-restore">Agent Restore</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-search">Agent Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-contexts-create">Agent Sessions Contexts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-contexts-delete">Agent Sessions Contexts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-contexts-get">Agent Sessions Contexts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-contexts-list">Agent Sessions Contexts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-contexts-patch">Agent Sessions Contexts Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-delete-contexts">Agent Sessions Delete Contexts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Agent Sessions Detect Intent</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-entity-types-create">Agent Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-entity-types-delete">Agent Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-entity-types-get">Agent Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-entity-types-list">Agent Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-sessions-entity-types-patch">Agent Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-train">Agent Train</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_agent-update-fulfillment">Agent Update Fulfillment</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_answer-records-list">Answer Records List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_answer-records-patch">Answer Records Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversation-profiles-create">Conversation Profiles Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversation-profiles-delete">Conversation Profiles Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversation-profiles-get">Conversation Profiles Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversation-profiles-list">Conversation Profiles List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversation-profiles-patch">Conversation Profiles Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-complete">Conversations Complete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-create">Conversations Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-get">Conversations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-list">Conversations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-messages-list">Conversations Messages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-analyze-content">Conversations Participants Analyze Content</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-create">Conversations Participants Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-get">Conversations Participants Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-list">Conversations Participants List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-patch">Conversations Participants Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-suggestions-suggest-articles">Conversations Participants Suggestions Suggest Articles</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_conversations-participants-suggestions-suggest-faq-answers">Conversations Participants Suggestions Suggest Faq Answers</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_delete-agent">Delete Agent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get-agent">Get Agent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-create">Knowledge Bases Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-delete">Knowledge Bases Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-create">Knowledge Bases Documents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-delete">Knowledge Bases Documents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-get">Knowledge Bases Documents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-list">Knowledge Bases Documents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-patch">Knowledge Bases Documents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-documents-reload">Knowledge Bases Documents Reload</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-get">Knowledge Bases Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-list">Knowledge Bases List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_knowledge-bases-patch">Knowledge Bases Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-batch-delete">Locations Agent Entity Types Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-batch-update">Locations Agent Entity Types Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-create">Locations Agent Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-delete">Locations Agent Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-entities-batch-create">Locations Agent Entity Types Entities Batch Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-entities-batch-delete">Locations Agent Entity Types Entities Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-entities-batch-update">Locations Agent Entity Types Entities Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-get">Locations Agent Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-list">Locations Agent Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-entity-types-patch">Locations Agent Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-list">Locations Agent Environments List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-contexts-create">Locations Agent Environments Users Sessions Contexts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-contexts-delete">Locations Agent Environments Users Sessions Contexts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-contexts-get">Locations Agent Environments Users Sessions Contexts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-contexts-list">Locations Agent Environments Users Sessions Contexts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-contexts-patch">Locations Agent Environments Users Sessions Contexts Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-delete-contexts">Locations Agent Environments Users Sessions Delete Contexts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-detect-intent">Locations Agent Environments Users Sessions Detect Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-entity-types-create">Locations Agent Environments Users Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-entity-types-delete">Locations Agent Environments Users Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-entity-types-get">Locations Agent Environments Users Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-entity-types-list">Locations Agent Environments Users Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-environments-users-sessions-entity-types-patch">Locations Agent Environments Users Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-export">Locations Agent Export</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-get-fulfillment">Locations Agent Get Fulfillment</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-get-validation-result">Locations Agent Get Validation Result</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-import">Locations Agent Import</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-batch-delete">Locations Agent Intents Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-batch-update">Locations Agent Intents Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-create">Locations Agent Intents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-delete">Locations Agent Intents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-get">Locations Agent Intents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-list">Locations Agent Intents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-intents-patch">Locations Agent Intents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-restore">Locations Agent Restore</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-search">Locations Agent Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-contexts-create">Locations Agent Sessions Contexts Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-contexts-delete">Locations Agent Sessions Contexts Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-contexts-get">Locations Agent Sessions Contexts Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-contexts-list">Locations Agent Sessions Contexts List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-contexts-patch">Locations Agent Sessions Contexts Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-delete-contexts">Locations Agent Sessions Delete Contexts</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-detect-intent">Locations Agent Sessions Detect Intent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-entity-types-create">Locations Agent Sessions Entity Types Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-entity-types-delete">Locations Agent Sessions Entity Types Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-entity-types-get">Locations Agent Sessions Entity Types Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-entity-types-list">Locations Agent Sessions Entity Types List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-sessions-entity-types-patch">Locations Agent Sessions Entity Types Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-train">Locations Agent Train</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-agent-update-fulfillment">Locations Agent Update Fulfillment</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-answer-records-list">Locations Answer Records List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-answer-records-patch">Locations Answer Records Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversation-profiles-create">Locations Conversation Profiles Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversation-profiles-delete">Locations Conversation Profiles Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversation-profiles-get">Locations Conversation Profiles Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversation-profiles-list">Locations Conversation Profiles List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversation-profiles-patch">Locations Conversation Profiles Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-complete">Locations Conversations Complete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-create">Locations Conversations Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-get">Locations Conversations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-list">Locations Conversations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-messages-list">Locations Conversations Messages List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-analyze-content">Locations Conversations Participants Analyze Content</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-create">Locations Conversations Participants Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-get">Locations Conversations Participants Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-list">Locations Conversations Participants List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-patch">Locations Conversations Participants Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-suggestions-suggest-articles">Locations Conversations Participants Suggestions Suggest Articles</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-conversations-participants-suggestions-suggest-faq-answers">Locations Conversations Participants Suggestions Suggest Faq Answers</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-delete-agent">Locations Delete Agent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get-agent">Locations Get Agent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-create">Locations Knowledge Bases Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-delete">Locations Knowledge Bases Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-create">Locations Knowledge Bases Documents Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-delete">Locations Knowledge Bases Documents Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-get">Locations Knowledge Bases Documents Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-list">Locations Knowledge Bases Documents List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-patch">Locations Knowledge Bases Documents Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-documents-reload">Locations Knowledge Bases Documents Reload</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-get">Locations Knowledge Bases Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-list">Locations Knowledge Bases List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-knowledge-bases-patch">Locations Knowledge Bases Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-set-agent">Locations Set Agent</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-cancel">Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_set-agent">Set Agent</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Agent Sessions Detect Intent</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Processes a natural language query and returns structured, actionable data as a result. This method is not idempotent, because it may cause contexts and session entity types to be updated, which in turn might affect results of future queries. Note: Always use agent versions for production traffic. See <a href="https://cloud.google.com/dialogflow/es/docs/agents-versions">Versions and environments</a>.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/dialogflow</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>dialogflow2 --scope &lt;scope&gt; projects agent-sessions-detect-intent ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;session&gt;</strong> <em>(string)</em><ul>
+<li>Required. The name of the session this query is sent to. Format: <code>projects//agent/sessions/</code>, or <code>projects//agent/environments//users//sessions/</code>. If <code>Environment ID</code> is not specified, we assume default &#39;draft&#39; environment (<code>Environment ID</code> might be referred to as environment name at some places). If <code>User ID</code> is not specified, we are using &#34;-&#34;. It&#39;s up to the API caller to choose an appropriate <code>Session ID</code> and <code>User Id</code>. They can be a random number or some type of user and session identifiers (preferably hashed). The length of the <code>Session ID</code> and <code>User ID</code> must not exceed 36 characters. For more information, see the <a href="https://cloud.google.com/dialogflow/docs/api-overview">API interactions guide</a>. Note: Always use agent versions for production traffic. See <a href="https://cloud.google.com/dialogflow/es/docs/agents-versions">Versions and environments</a>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudDialogflowV2DetectIntentRequest:
+  input-audio: string
+  output-audio-config:
+    audio-encoding: string
+    sample-rate-hertz: integer
+    synthesize-speech-config:
+      effects-profile-id: [string]
+      pitch: number
+      speaking-rate: number
+      voice:
+        name: string
+        ssml-gender: string
+      volume-gain-db: number
+  output-audio-config-mask: string
+  query-input:
+    audio-config:
+      audio-encoding: string
+      disable-no-speech-recognized-event: boolean
+      enable-word-info: boolean
+      language-code: string
+      model: string
+      model-variant: string
+      phrase-hints: [string]
+      sample-rate-hertz: integer
+      single-utterance: boolean
+    event:
+      language-code: string
+      name: string
+    text:
+      language-code: string
+      text: string
+  query-params:
+    geo-location:
+      latitude: number
+      longitude: number
+    reset-contexts: boolean
+    sentiment-analysis-request-config:
+      analyze-query-text-sentiment: boolean
+    time-zone: string
+    webhook-headers: { string: string }
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    input-audio=stet</code><ul>
+<li>The natural language speech audio to be processed. This field should be populated iff <code>query_input</code> is set to an input audio config. A single request can contain up to 1 minute of speech audio data.</li>
+</ul>
+</li>
+<li><code>output-audio-config    audio-encoding=dolores</code><ul>
+<li>Required. Audio encoding of the synthesized audio content.</li>
+</ul>
+</li>
+<li><code>sample-rate-hertz=76</code><ul>
+<li>The synthesis sample rate (in hertz) for this audio. If not provided, then the synthesizer will use the default sample rate based on the audio encoding. If this is different from the voice&#39;s natural sample rate, then the synthesizer will honor this request by converting to the desired sample rate (which might result in worse audio quality).</li>
+</ul>
+</li>
+<li><code>synthesize-speech-config    effects-profile-id=et</code><ul>
+<li>Optional. An identifier which selects &#39;audio effects&#39; profiles that are applied on (post synthesized) text to speech. Effects are applied on top of each other in the order they are given.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>pitch=0.7173775897454667</code><ul>
+<li>Optional. Speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20 semitones from the original pitch. -20 means decrease 20 semitones from the original pitch.</li>
+</ul>
+</li>
+<li><code>speaking-rate=0.19152174246409814</code><ul>
+<li>Optional. Speaking rate/speed, in the range [0.25, 4.0]. 1.0 is the normal native speed supported by the specific voice. 2.0 is twice as fast, and 0.5 is half as fast. If unset(0.0), defaults to the native 1.0 speed. Any other values &lt; 0.25 or &gt; 4.0 will return an error.</li>
+</ul>
+</li>
+<li><code>voice    name=eirmod</code><ul>
+<li>Optional. The name of the voice. If not set, the service will choose a voice based on the other parameters such as language_code and ssml_gender.</li>
+</ul>
+</li>
+<li>
+<p><code>ssml-gender=lorem</code></p>
+<ul>
+<li>Optional. The preferred gender of the voice. If not set, the service will choose a voice based on the other parameters such as language_code and name. Note that this is only a preference, not requirement. If a voice of the appropriate gender is not available, the synthesizer should substitute a voice with a different gender rather than failing the request.</li>
+</ul>
+</li>
+<li>
+<p><code>..    volume-gain-db=0.6131721394478933</code></p>
+<ul>
+<li>Optional. Volume gain (in dB) of the normal native volume supported by the specific voice, in the range [-96.0, 16.0]. If unset, or set to a value of 0.0 (dB), will play at normal native signal amplitude. A value of -6.0 (dB) will play at approximately half the amplitude of the normal native signal amplitude. A value of +6.0 (dB) will play at approximately twice the amplitude of the normal native signal amplitude. We strongly recommend not to exceed +10 (dB) as there&#39;s usually no effective increase in loudness for any value greater than that.</li>
+</ul>
+</li>
+<li>
+<p><code>...    output-audio-config-mask=erat</code></p>
+<ul>
+<li>Mask for output_audio_config indicating which settings in this request-level config should override speech synthesizer settings defined at agent-level. If unspecified or empty, output_audio_config replaces the agent-level config in its entirety.</li>
+</ul>
+</li>
+<li><code>query-input.audio-config    audio-encoding=dolores</code><ul>
+<li>Required. Audio encoding of the audio content to process.</li>
+</ul>
+</li>
+<li><code>disable-no-speech-recognized-event=false</code><ul>
+<li>Only used in Participants.AnalyzeContent and Participants.StreamingAnalyzeContent. If <code>false</code> and recognition doesn&#39;t return any result, trigger <code>NO_SPEECH_RECOGNIZED</code> event to Dialogflow agent.</li>
+</ul>
+</li>
+<li><code>enable-word-info=false</code><ul>
+<li>If <code>true</code>, Dialogflow returns SpeechWordInfo in StreamingRecognitionResult with information about the recognized speech words, e.g. start and end time offsets. If false or unspecified, Speech doesn&#39;t return any word-level information.</li>
+</ul>
+</li>
+<li><code>language-code=sea</code><ul>
+<li>Required. The language of the supplied audio. Dialogflow does not do translations. See <a href="https://cloud.google.com/dialogflow/docs/reference/language">Language Support</a> for a list of the currently supported language codes. Note that queries in the same session do not necessarily need to specify the same language.</li>
+</ul>
+</li>
+<li><code>model=takimata</code><ul>
+<li>Which Speech model to select for the given request. Select the model best suited to your domain to get best results. If a model is not explicitly specified, then we auto-select a model based on the parameters in the InputAudioConfig. If enhanced speech model is enabled for the agent and an enhanced version of the specified model for the language does not exist, then the speech is recognized using the standard version of the specified model. Refer to <a href="https://cloud.google.com/speech-to-text/docs/basics#select-model">Cloud Speech API documentation</a> for more details.</li>
+</ul>
+</li>
+<li><code>model-variant=lorem</code><ul>
+<li>Which variant of the Speech model to use.</li>
+</ul>
+</li>
+<li><code>phrase-hints=et</code><ul>
+<li>A list of strings containing words and phrases that the speech recognizer should recognize with higher likelihood. See <a href="https://cloud.google.com/speech-to-text/docs/basics#phrase-hints">the Cloud Speech documentation</a> for more details. This field is deprecated. Please use <a href="">speech_contexts</a> instead. If you specify both <a href="">phrase_hints</a> and <a href="">speech_contexts</a>, Dialogflow will treat the <a href="">phrase_hints</a> as a single additional <a href="">SpeechContext</a>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>sample-rate-hertz=24</code><ul>
+<li>Required. Sample rate (in Hertz) of the audio content sent in the query. Refer to <a href="https://cloud.google.com/speech-to-text/docs/basics">Cloud Speech API documentation</a> for more details.</li>
+</ul>
+</li>
+<li>
+<p><code>single-utterance=true</code></p>
+<ul>
+<li>If <code>false</code> (default), recognition does not cease until the client closes the stream. If <code>true</code>, the recognizer will detect a single spoken utterance in input audio. Recognition ceases when it detects the audio&#39;s voice has stopped or paused. In this case, once a detected intent is received, the client should close the stream and start a new request with a new stream as needed. Note: This setting is relevant only for streaming methods. Note: When specified, InputAudioConfig.single_utterance takes precedence over StreamingDetectIntentRequest.single_utterance.</li>
+</ul>
+</li>
+<li>
+<p><code>..event    language-code=erat</code></p>
+<ul>
+<li>Required. The language of this query. See <a href="https://cloud.google.com/dialogflow/docs/reference/language">Language Support</a> for a list of the currently supported language codes. Note that queries in the same session do not necessarily need to specify the same language.</li>
+</ul>
+</li>
+<li>
+<p><code>name=sea</code></p>
+<ul>
+<li>Required. The unique identifier of the event.</li>
+</ul>
+</li>
+<li>
+<p><code>..text    language-code=nonumy</code></p>
+<ul>
+<li>Required. The language of this conversational query. See <a href="https://cloud.google.com/dialogflow/docs/reference/language">Language Support</a> for a list of the currently supported language codes. Note that queries in the same session do not necessarily need to specify the same language.</li>
+</ul>
+</li>
+<li>
+<p><code>text=et</code></p>
+<ul>
+<li>Required. The UTF-8 encoded natural language text to be processed. Text length must not exceed 256 characters.</li>
+</ul>
+</li>
+<li>
+<p><code>...query-params.geo-location    latitude=0.6976549448756626</code></p>
+<ul>
+<li>The latitude in degrees. It must be in the range [-90.0, +90.0].</li>
+</ul>
+</li>
+<li>
+<p><code>longitude=0.3216722759557804</code></p>
+<ul>
+<li>The longitude in degrees. It must be in the range [-180.0, +180.0].</li>
+</ul>
+</li>
+<li>
+<p><code>..    reset-contexts=false</code></p>
+<ul>
+<li>Specifies whether to delete all contexts in the current session before the new ones are activated.</li>
+</ul>
+</li>
+<li>
+<p><code>sentiment-analysis-request-config    analyze-query-text-sentiment=false</code></p>
+<ul>
+<li>Instructs the service to perform sentiment analysis on <code>query_text</code>. If not provided, sentiment analysis is not performed on <code>query_text</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    time-zone=dolores</code></p>
+<ul>
+<li>The time zone of this conversational query from the <a href="https://www.iana.org/time-zones">time zone database</a>, e.g., America/New_York, Europe/Paris. If not provided, the time zone specified in agent settings is used.</li>
+</ul>
+</li>
+<li><code>webhook-headers=key=consetetur</code><ul>
+<li>This field can be used to pass HTTP headers for a webhook call. These headers will be sent to webhook along with the headers that have been configured through the Dialogflow web console. The headers defined within this field will overwrite the headers configured through the Dialogflow console if there is a conflict. Header names are case-insensitive. Google&#39;s specified headers are not allowed. Including: &#34;Host&#34;, &#34;Content-Length&#34;, &#34;Connection&#34;, &#34;From&#34;, &#34;User-Agent&#34;, &#34;Accept-Encoding&#34;, &#34;If-Modified-Since&#34;, &#34;If-None-Match&#34;, &#34;X-Forwarded-For&#34;, etc.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_agent-sessions-entity-types-create" class="btn btn-neutral float-right" title="Agent Sessions Entity Types Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_agent-sessions-delete-contexts" class="btn btn-neutral" title="Agent Sessions Delete Contexts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_agent-sessions-delete-contexts" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_agent-sessions-entity-types-create" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

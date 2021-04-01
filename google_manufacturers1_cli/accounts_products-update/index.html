@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Products Update - Manufacturer Center v2.0.0+20210325</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Manufacturer Center v2.0.0+20210325</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_products-delete">Products Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_products-get">Products Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_products-list">Products List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Products Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Products Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Inserts or updates the attributes of the product in a Manufacturer Center account. Creates a product with the provided attributes. If the product already exists, then all attributes are replaced with the new ones. The checks at upload time are minimal. All required attributes need to be present for a product to be valid. Issues may show up later after the API has accepted a new upload for a product and it is possible to overwrite an existing valid product with an invalid product. To detect this, you should retrieve the product and check it for issues once the new version is available. Uploaded attributes first need to be processed before they can be retrieved. Until then, new products will be unavailable, and retrieval of previously uploaded products will return the original state of the product.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/manufacturercenter</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/manufacturercenter</em>.
+You can set the scope for this method like this: <code>manufacturers1 --scope &lt;scope&gt; accounts products-update ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Parent ID in the format <code>accounts/{account_id}</code>. <code>account_id</code> - The ID of the Manufacturer Center account.</li>
+</ul>
+</li>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Name in the format <code>{target_country}:{content_language}:{product_id}</code>. <code>target_country</code> - The target country of the product as a CLDR territory code (for example, US). <code>content_language</code> - The content language of the product as a two-letter ISO 639-1 language code (for example, en). <code>product_id</code> - The ID of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#id.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Attributes:
+  age-group: string
+  brand: string
+  capacity:
+    unit: string
+    value: string
+  color: string
+  count:
+    unit: string
+    value: string
+  description: string
+  disclosure-date: string
+  excluded-destination: [string]
+  flavor: string
+  format: string
+  gender: string
+  gtin: [string]
+  image-link:
+    image-url: string
+    status: string
+    type: string
+  included-destination: [string]
+  item-group-id: string
+  material: string
+  mpn: string
+  pattern: string
+  product-highlight: [string]
+  product-line: string
+  product-name: string
+  product-page-url: string
+  product-type: [string]
+  release-date: string
+  rich-product-content: [string]
+  scent: string
+  size: string
+  size-system: string
+  size-type: string
+  suggested-retail-price:
+    amount: string
+    currency: string
+  target-client-id: string
+  theme: string
+  title: string
+  video-link: [string]
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    age-group=et</code><ul>
+<li>The target age group of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#agegroup.</li>
+</ul>
+</li>
+<li><code>brand=magna</code><ul>
+<li>The brand name of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#brand.</li>
+</ul>
+</li>
+<li><code>capacity    unit=no</code><ul>
+<li>The unit of the capacity, i.e., MB, GB, or TB.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ipsum</code></p>
+<ul>
+<li>The numeric value of the capacity.</li>
+</ul>
+</li>
+<li>
+<p><code>..    color=voluptua.</code></p>
+<ul>
+<li>The color of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#color.</li>
+</ul>
+</li>
+<li><code>count    unit=at</code><ul>
+<li>The unit in which these products are counted.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sanctus</code></p>
+<ul>
+<li>The numeric value of the number of products in a package.</li>
+</ul>
+</li>
+<li>
+<p><code>..    description=sed</code></p>
+<ul>
+<li>The description of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#description.</li>
+</ul>
+</li>
+<li><code>disclosure-date=amet.</code><ul>
+<li>The disclosure date of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#disclosure.</li>
+</ul>
+</li>
+<li><code>excluded-destination=takimata</code><ul>
+<li>A list of excluded destinations.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>flavor=amet.</code><ul>
+<li>The flavor of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#flavor.</li>
+</ul>
+</li>
+<li><code>format=duo</code><ul>
+<li>The format of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#format.</li>
+</ul>
+</li>
+<li><code>gender=ipsum</code><ul>
+<li>The target gender of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#gender.</li>
+</ul>
+</li>
+<li><code>gtin=gubergren</code><ul>
+<li>The Global Trade Item Number (GTIN) of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#gtin.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>image-link    image-url=lorem</code><ul>
+<li>The URL of the image. For crawled images, this is the provided URL. For uploaded images, this is a serving URL from Google if the image has been processed successfully.</li>
+</ul>
+</li>
+<li><code>status=gubergren</code><ul>
+<li>The status of the image. @OutputOnly</li>
+</ul>
+</li>
+<li>
+<p><code>type=eos</code></p>
+<ul>
+<li>The type of the image, i.e., crawled or uploaded. @OutputOnly</li>
+</ul>
+</li>
+<li>
+<p><code>..    included-destination=dolor</code></p>
+<ul>
+<li>A list of included destinations.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>item-group-id=ea</code><ul>
+<li>The item group id of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#itemgroupid.</li>
+</ul>
+</li>
+<li><code>material=ipsum</code><ul>
+<li>The material of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#material.</li>
+</ul>
+</li>
+<li><code>mpn=invidunt</code><ul>
+<li>The Manufacturer Part Number (MPN) of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#mpn.</li>
+</ul>
+</li>
+<li><code>pattern=amet</code><ul>
+<li>The pattern of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#pattern.</li>
+</ul>
+</li>
+<li><code>product-highlight=duo</code><ul>
+<li>The product highlights. For more information, see https://support.google.com/manufacturers/answer/10066942</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>product-line=ipsum</code><ul>
+<li>The name of the group of products related to the product. For more information, see https://support.google.com/manufacturers/answer/6124116#productline.</li>
+</ul>
+</li>
+<li><code>product-name=sed</code><ul>
+<li>The canonical name of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#productname.</li>
+</ul>
+</li>
+<li><code>product-page-url=ut</code><ul>
+<li>The URL of the detail page of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#productpage.</li>
+</ul>
+</li>
+<li><code>product-type=gubergren</code><ul>
+<li>The type or category of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#producttype.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>release-date=rebum.</code><ul>
+<li>The release date of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#release.</li>
+</ul>
+</li>
+<li><code>rich-product-content=est</code><ul>
+<li>Rich product content. For more information, see https://support.google.com/manufacturers/answer/9389865</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>scent=ipsum</code><ul>
+<li>The scent of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#scent.</li>
+</ul>
+</li>
+<li><code>size=ipsum</code><ul>
+<li>The size of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#size.</li>
+</ul>
+</li>
+<li><code>size-system=est</code><ul>
+<li>The size system of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#sizesystem.</li>
+</ul>
+</li>
+<li><code>size-type=gubergren</code><ul>
+<li>The size type of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#sizetype.</li>
+</ul>
+</li>
+<li><code>suggested-retail-price    amount=ea</code><ul>
+<li>The numeric value of the price.</li>
+</ul>
+</li>
+<li>
+<p><code>currency=dolor</code></p>
+<ul>
+<li>The currency in which the price is denoted.</li>
+</ul>
+</li>
+<li>
+<p><code>..    target-client-id=lorem</code></p>
+<ul>
+<li>The target client id. Should only be used in the accounts of the data partners.</li>
+</ul>
+</li>
+<li><code>theme=eos</code><ul>
+<li>The theme of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#theme.</li>
+</ul>
+</li>
+<li><code>title=labore</code><ul>
+<li>The title of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#title.</li>
+</ul>
+</li>
+<li><code>video-link=sed</code><ul>
+<li>The videos of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#video.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../accounts_products-list" class="btn btn-neutral" title="Products List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../accounts_products-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

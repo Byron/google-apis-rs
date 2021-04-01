@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/Users/byron/.cargo/registry/src/github.com-1ecc6299db9ec823/security-framework-sys-2.2.0/src/trust.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trust.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../security_framework_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">SecCertificateRef</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">SecKeyRef</span>;
+<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">array</span>::<span class="ident">CFArrayRef</span>;
+<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">base</span>::{<span class="ident">Boolean</span>, <span class="ident">CFIndex</span>, <span class="ident">CFTypeID</span>, <span class="ident">CFTypeRef</span>, <span class="ident">OSStatus</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;OSX_10_13&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">core_foundation_sys</span>::<span class="ident">error</span>::<span class="ident">CFErrorRef</span>;
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="ident">u32</span>;
+
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultInvalid</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultProceed</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultDeny</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">3</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultUnspecified</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultRecoverableTrustFailure</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">5</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultFatalTrustFailure</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">6</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">kSecTrustResultOtherError</span>: <span class="ident">SecTrustResultType</span> <span class="op">=</span> <span class="number">7</span>;
+
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">__SecTrust</span> {}
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SecTrustRef</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">__SecTrust</span>;
+
+<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustGetTypeID</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFTypeID</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustGetCertificateCount</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CFIndex</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustGetCertificateAtIndex</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>, <span class="ident">ix</span>: <span class="ident">CFIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SecCertificateRef</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustSetAnchorCertificates</span>(
+        <span class="ident">trust</span>: <span class="ident">SecTrustRef</span>,
+        <span class="ident">anchorCertificates</span>: <span class="ident">CFArrayRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustSetAnchorCertificatesOnly</span>(
+        <span class="ident">trust</span>: <span class="ident">SecTrustRef</span>,
+        <span class="ident">anchorCertificatesOnly</span>: <span class="ident">Boolean</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustEvaluate</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SecTrustResultType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
+    <span class="comment">// it should have been OSX_10_14, but due to back-compat it can&#39;t rely on the newer feature flag</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;OSX_10_13&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustEvaluateWithError</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>, <span class="ident">error</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CFErrorRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustCreateWithCertificates</span>(
+        <span class="ident">certificates</span>: <span class="ident">CFTypeRef</span>,
+        <span class="ident">policies</span>: <span class="ident">CFTypeRef</span>,
+        <span class="ident">trust</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">SecTrustRef</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustSetPolicies</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>, <span class="ident">policies</span>: <span class="ident">CFTypeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OSStatus</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SecTrustCopyPublicKey</span>(<span class="ident">trust</span>: <span class="ident">SecTrustRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SecKeyRef</span>;
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="security_framework_sys"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

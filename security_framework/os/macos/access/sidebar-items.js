@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SecAccess","A type representing access control settings."]]});

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>List - CustomSearch API v2.0.0+20210330</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> CustomSearch API v2.0.0+20210330</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Cse</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">List</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../cse_siterestrict-list">Siterestrict List</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>List</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/customsearch1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Returns metadata about the search performed, metadata about the engine used for the search, and the search results.</p>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p c2coff=string</strong></p>
+<ul>
+<li>Enables or disables <a href="https://developers.google.com/custom-search/docs/xml_results#chineseSearch">Simplified and Traditional Chinese Search</a>. The default value for this parameter is 0 (zero), meaning that the feature is enabled. Supported values are: * <code>1</code>: Disabled * <code>0</code>: Enabled (default)</li>
+</ul>
+</li>
+<li>
+<p><strong>-p cr=string</strong></p>
+<ul>
+<li>Restricts search results to documents originating in a particular country. You may use <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#booleanOperators">Boolean operators</a> in the cr parameter&#39;s value. Google Search determines the country of a document by analyzing: * the top-level domain (TLD) of the document&#39;s URL * the geographic location of the Web server&#39;s IP address See the <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#countryCollections">Country Parameter Values</a> page for a list of valid values for this parameter.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p cx=string</strong></p>
+<ul>
+<li>The Programmable Search Engine ID to use for this request.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p date-restrict=string</strong></p>
+<ul>
+<li>Restricts results to URLs based on date. Supported values include: * <code>d[number]</code>: requests results from the specified number of past days. * <code>w[number]</code>: requests results from the specified number of past weeks. * <code>m[number]</code>: requests results from the specified number of past months. * <code>y[number]</code>: requests results from the specified number of past years.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p exact-terms=string</strong></p>
+<ul>
+<li>Identifies a phrase that all documents in the search results must contain.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p exclude-terms=string</strong></p>
+<ul>
+<li>Identifies a word or phrase that should not appear in any documents in the search results.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p file-type=string</strong></p>
+<ul>
+<li>Restricts results to files of a specified extension. A list of file types indexable by Google can be found in Search Console <a href="https://support.google.com/webmasters/answer/35287">Help Center</a>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>Controls turning on or off the duplicate content filter. * See <a href="https://developers.google.com/custom-search/docs/xml_results#automaticFiltering">Automatic Filtering</a> for more information about Google&#39;s search results filters. Note that host crowding filtering applies only to multi-site searches. * By default, Google applies filtering to all search results to improve the quality of those results. Acceptable values are: * <code>0</code>: Turns off duplicate content filter. * <code>1</code>: Turns on duplicate content filter.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p gl=string</strong></p>
+<ul>
+<li>Geolocation of end user. * The <code>gl</code> parameter value is a two-letter country code. The <code>gl</code> parameter boosts search results whose country of origin matches the parameter value. See the <a href="https://developers.google.com/custom-search/docs/xml_results_appendices#countryCodes">Country Codes</a> page for a list of valid values. * Specifying a <code>gl</code> parameter value should lead to more relevant results. This is particularly true for international customers and, even more specifically, for customers in English- speaking countries other than the United States.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p googlehost=string</strong></p>
+<ul>
+<li><strong>Deprecated</strong>. Use the <code>gl</code> parameter for a similar effect. The local Google domain (for example, google.com, google.de, or google.fr) to use to perform the search.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p high-range=string</strong></p>
+<ul>
+<li>Specifies the ending value for a search range. * Use <code>lowRange</code> and <code>highRange</code> to append an inclusive search range of <code>lowRange...highRange</code> to the query.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p hl=string</strong></p>
+<ul>
+<li>Sets the user interface language. * Explicitly setting this parameter improves the performance and the quality of your search results. * See the <a href="https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages">Interface Languages</a> section of <a href="https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing">Internationalizing Queries and Results Presentation</a> for more information, and (Supported Interface Languages)[https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages] for a list of supported languages.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p hq=string</strong></p>
+<ul>
+<li>Appends the specified query terms to the query, as if they were combined with a logical AND operator.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p img-color-type=string</strong></p>
+<ul>
+<li>Returns black and white, grayscale, transparent, or color images. Acceptable values are: * <code>&amp;#34;color&amp;#34;</code> * <code>&amp;#34;gray&amp;#34;</code> * <code>&amp;#34;mono&amp;#34;</code>: black and white * <code>&amp;#34;trans&amp;#34;</code>: transparent background</li>
+</ul>
+</li>
+<li>
+<p><strong>-p img-dominant-color=string</strong></p>
+<ul>
+<li>Returns images of a specific dominant color. Acceptable values are: * <code>&amp;#34;black&amp;#34;</code> * <code>&amp;#34;blue&amp;#34;</code> * <code>&amp;#34;brown&amp;#34;</code> * <code>&amp;#34;gray&amp;#34;</code> * <code>&amp;#34;green&amp;#34;</code> * <code>&amp;#34;orange&amp;#34;</code> * <code>&amp;#34;pink&amp;#34;</code> * <code>&amp;#34;purple&amp;#34;</code> * <code>&amp;#34;red&amp;#34;</code> * <code>&amp;#34;teal&amp;#34;</code> * <code>&amp;#34;white&amp;#34;</code> * <code>&amp;#34;yellow&amp;#34;</code></li>
+</ul>
+</li>
+<li>
+<p><strong>-p img-size=string</strong></p>
+<ul>
+<li>Returns images of a specified size. Acceptable values are: * <code>&amp;#34;huge&amp;#34;</code> * <code>&amp;#34;icon&amp;#34;</code> * <code>&amp;#34;large&amp;#34;</code> * <code>&amp;#34;medium&amp;#34;</code> * <code>&amp;#34;small&amp;#34;</code> * <code>&amp;#34;xlarge&amp;#34;</code> * <code>&amp;#34;xxlarge&amp;#34;</code></li>
+</ul>
+</li>
+<li>
+<p><strong>-p img-type=string</strong></p>
+<ul>
+<li>Returns images of a type. Acceptable values are: * <code>&amp;#34;clipart&amp;#34;</code> * <code>&amp;#34;face&amp;#34;</code> * <code>&amp;#34;lineart&amp;#34;</code> * <code>&amp;#34;stock&amp;#34;</code> * <code>&amp;#34;photo&amp;#34;</code> * <code>&amp;#34;animated&amp;#34;</code></li>
+</ul>
+</li>
+<li>
+<p><strong>-p link-site=string</strong></p>
+<ul>
+<li>Specifies that all search results should contain a link to a particular URL.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p low-range=string</strong></p>
+<ul>
+<li>Specifies the starting value for a search range. Use <code>lowRange</code> and <code>highRange</code> to append an inclusive search range of <code>lowRange...highRange</code> to the query.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p lr=string</strong></p>
+<ul>
+<li>Restricts the search to documents written in a particular language (e.g., <code>lr=lang_ja</code>). Acceptable values are: * <code>&amp;#34;lang_ar&amp;#34;</code>: Arabic * <code>&amp;#34;lang_bg&amp;#34;</code>: Bulgarian * <code>&amp;#34;lang_ca&amp;#34;</code>: Catalan * <code>&amp;#34;lang_cs&amp;#34;</code>: Czech * <code>&amp;#34;lang_da&amp;#34;</code>: Danish * <code>&amp;#34;lang_de&amp;#34;</code>: German * <code>&amp;#34;lang_el&amp;#34;</code>: Greek * <code>&amp;#34;lang_en&amp;#34;</code>: English * <code>&amp;#34;lang_es&amp;#34;</code>: Spanish * <code>&amp;#34;lang_et&amp;#34;</code>: Estonian * <code>&amp;#34;lang_fi&amp;#34;</code>: Finnish * <code>&amp;#34;lang_fr&amp;#34;</code>: French * <code>&amp;#34;lang_hr&amp;#34;</code>: Croatian * <code>&amp;#34;lang_hu&amp;#34;</code>: Hungarian * <code>&amp;#34;lang_id&amp;#34;</code>: Indonesian * <code>&amp;#34;lang_is&amp;#34;</code>: Icelandic * <code>&amp;#34;lang_it&amp;#34;</code>: Italian * <code>&amp;#34;lang_iw&amp;#34;</code>: Hebrew * <code>&amp;#34;lang_ja&amp;#34;</code>: Japanese * <code>&amp;#34;lang_ko&amp;#34;</code>: Korean * <code>&amp;#34;lang_lt&amp;#34;</code>: Lithuanian * <code>&amp;#34;lang_lv&amp;#34;</code>: Latvian * <code>&amp;#34;lang_nl&amp;#34;</code>: Dutch * <code>&amp;#34;lang_no&amp;#34;</code>: Norwegian * <code>&amp;#34;lang_pl&amp;#34;</code>: Polish * <code>&amp;#34;lang_pt&amp;#34;</code>: Portuguese * <code>&amp;#34;lang_ro&amp;#34;</code>: Romanian * <code>&amp;#34;lang_ru&amp;#34;</code>: Russian * <code>&amp;#34;lang_sk&amp;#34;</code>: Slovak * <code>&amp;#34;lang_sl&amp;#34;</code>: Slovenian * <code>&amp;#34;lang_sr&amp;#34;</code>: Serbian * <code>&amp;#34;lang_sv&amp;#34;</code>: Swedish * <code>&amp;#34;lang_tr&amp;#34;</code>: Turkish * <code>&amp;#34;lang_zh-CN&amp;#34;</code>: Chinese (Simplified) * <code>&amp;#34;lang_zh-TW&amp;#34;</code>: Chinese (Traditional)</li>
+</ul>
+</li>
+<li>
+<p><strong>-p num=integer</strong></p>
+<ul>
+<li>Number of search results to return. * Valid values are integers between 1 and 10, inclusive.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p or-terms=string</strong></p>
+<ul>
+<li>Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p q=string</strong></p>
+<ul>
+<li>Query</li>
+</ul>
+</li>
+<li>
+<p><strong>-p related-site=string</strong></p>
+<ul>
+<li>Specifies that all search results should be pages that are related to the specified URL.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p rights=string</strong></p>
+<ul>
+<li>Filters based on licensing. Supported values include: <code>cc_publicdomain</code>, <code>cc_attribute</code>, <code>cc_sharealike</code>, <code>cc_noncommercial</code>, <code>cc_nonderived</code> and combinations of these. See <a href="https://wiki.creativecommons.org/wiki/CC_Search_integration">typical combinations</a>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p safe=string</strong></p>
+<ul>
+<li>Search safety level. Acceptable values are: * <code>&amp;#34;active&amp;#34;</code>: Enables SafeSearch filtering. * <code>&amp;#34;off&amp;#34;</code>: Disables SafeSearch filtering. (default)</li>
+</ul>
+</li>
+<li>
+<p><strong>-p search-type=string</strong></p>
+<ul>
+<li>Specifies the search type: <code>image</code>. If unspecified, results are limited to webpages. Acceptable values are: * <code>&amp;#34;image&amp;#34;</code>: custom image search.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p site-search=string</strong></p>
+<ul>
+<li>Specifies a given site which should always be included or excluded from results (see <code>siteSearchFilter</code> parameter, below).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p site-search-filter=string</strong></p>
+<ul>
+<li>Controls whether to include or exclude results from the site named in the <code>siteSearch</code> parameter. Acceptable values are: * <code>&amp;#34;e&amp;#34;</code>: exclude * <code>&amp;#34;i&amp;#34;</code>: include</li>
+</ul>
+</li>
+<li>
+<p><strong>-p sort=string</strong></p>
+<ul>
+<li>The sort expression to apply to the results. The sort parameter specifies that the results be sorted according to the specified expression i.e. sort by date. <a href="https://developers.google.com/custom-search/docs/structured_search#sort-by-attribute">Example: sort=date</a>.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p start=integer</strong></p>
+<ul>
+<li>The index of the first result to return. The default number of results per page is 10, so <code>&amp;amp;start=11</code> would start at the top of the second page of results. <strong>Note</strong>: The JSON API will never return more than 100 results, even if more than 100 documents match the query, so setting the sum of <code>start + num</code> to a number greater than 100 will produce an error. Also note that the maximum value for <code>num</code> is 10.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../cse_siterestrict-list" class="btn btn-neutral float-right" title="Siterestrict List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../cse_siterestrict-list" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

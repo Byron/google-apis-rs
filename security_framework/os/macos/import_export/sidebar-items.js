@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ImportOptions","A builder type to import Security Framework types from serialized formats."],["SecItems","A type which holds items imported from serialized data."]],"trait":[["Pkcs12ImportOptionsExt","An extension trait adding OSX specific functionality to `Pkcs12ImportOptions`."]]});

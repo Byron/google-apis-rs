@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Modules Versions Create - appengine v2.0.0+20181005</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> appengine v2.0.0+20181005</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Apps</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_create">Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-delete">Modules Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-get">Modules Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-list">Modules List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-patch">Modules Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Modules Versions Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-delete">Modules Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-get">Modules Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-instances-debug">Modules Versions Instances Debug</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-instances-delete">Modules Versions Instances Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-instances-get">Modules Versions Instances Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-instances-list">Modules Versions Instances List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-list">Modules Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_modules-versions-patch">Modules Versions Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_operations-list">Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../apps_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Modules Versions Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta4-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Deploys code and resource files to a new version.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>appengine1-beta4 --scope &lt;scope&gt; apps modules-versions-create ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;apps-id&gt;</strong> <em>(string)</em><ul>
+<li>Part of <code>name</code>. Name of the resource to update. Example: apps/myapp/modules/default.</li>
+</ul>
+</li>
+<li><strong>&lt;modules-id&gt;</strong> <em>(string)</em><ul>
+<li>Part of <code>name</code>. See documentation of <code>appsId</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Version:
+  api-config:
+    auth-fail-action: string
+    login: string
+    script: string
+    security-level: string
+    url: string
+  automatic-scaling:
+    cool-down-period: string
+    cpu-utilization:
+      aggregation-window-length: string
+      target-utilization: number
+    disk-utilization:
+      target-read-bytes-per-sec: integer
+      target-read-ops-per-sec: integer
+      target-write-bytes-per-sec: integer
+      target-write-ops-per-sec: integer
+    max-concurrent-requests: integer
+    max-idle-instances: integer
+    max-pending-latency: string
+    max-total-instances: integer
+    min-idle-instances: integer
+    min-pending-latency: string
+    min-total-instances: integer
+    network-utilization:
+      target-received-bytes-per-sec: integer
+      target-received-packets-per-sec: integer
+      target-sent-bytes-per-sec: integer
+      target-sent-packets-per-sec: integer
+    request-utilization:
+      target-concurrent-requests: integer
+      target-request-count-per-sec: integer
+  basic-scaling:
+    idle-timeout: string
+    max-instances: integer
+  beta-settings: { string: string }
+  creation-time: string
+  default-expiration: string
+  deployer: string
+  deployment:
+    container:
+      image: string
+  endpoints-api-service:
+    config-id: string
+    disable-trace-sampling: boolean
+    name: string
+    rollout-strategy: string
+  env: string
+  env-variables: { string: string }
+  health-check:
+    check-interval: string
+    disable-health-check: boolean
+    healthy-threshold: integer
+    host: string
+    restart-threshold: integer
+    timeout: string
+    unhealthy-threshold: integer
+  id: string
+  inbound-services: [string]
+  instance-class: string
+  manual-scaling:
+    instances: integer
+  name: string
+  network:
+    forwarded-ports: [string]
+    instance-tag: string
+    name: string
+  nobuild-files-regex: string
+  resources:
+    cpu: number
+    disk-gb: number
+    memory-gb: number
+  runtime: string
+  runtime-api-version: string
+  serving-status: string
+  threadsafe: boolean
+  vm: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .api-config    auth-fail-action=ipsum</code><ul>
+<li>Action to take when users access resources that require authentication. Defaults to redirect.</li>
+</ul>
+</li>
+<li><code>login=invidunt</code><ul>
+<li>Level of login required to access this resource. Defaults to optional.</li>
+</ul>
+</li>
+<li><code>script=amet</code><ul>
+<li>Path to the script from the application root directory.</li>
+</ul>
+</li>
+<li><code>security-level=duo</code><ul>
+<li>Security (HTTPS) enforcement for this URL.</li>
+</ul>
+</li>
+<li>
+<p><code>url=ipsum</code></p>
+<ul>
+<li>URL to serve the endpoint at.</li>
+</ul>
+</li>
+<li>
+<p><code>..automatic-scaling    cool-down-period=sed</code></p>
+<ul>
+<li>The time period that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable. Only applicable in the App Engine flexible environment.</li>
+</ul>
+</li>
+<li><code>cpu-utilization    aggregation-window-length=ut</code><ul>
+<li>Period of time over which CPU utilization is calculated.</li>
+</ul>
+</li>
+<li>
+<p><code>target-utilization=0.6992083316156428</code></p>
+<ul>
+<li>Target CPU utilization ratio to maintain when scaling. Must be between 0 and 1.</li>
+</ul>
+</li>
+<li>
+<p><code>..disk-utilization    target-read-bytes-per-sec=44</code></p>
+<ul>
+<li>Target bytes read per second.</li>
+</ul>
+</li>
+<li><code>target-read-ops-per-sec=51</code><ul>
+<li>Target ops read per second.</li>
+</ul>
+</li>
+<li><code>target-write-bytes-per-sec=51</code><ul>
+<li>Target bytes written per second.</li>
+</ul>
+</li>
+<li>
+<p><code>target-write-ops-per-sec=94</code></p>
+<ul>
+<li>Target ops written per second.</li>
+</ul>
+</li>
+<li>
+<p><code>..    max-concurrent-requests=39</code></p>
+<ul>
+<li>Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.Defaults to a runtime-specific value.</li>
+</ul>
+</li>
+<li><code>max-idle-instances=84</code><ul>
+<li>Maximum number of idle instances that should be maintained for this version.</li>
+</ul>
+</li>
+<li><code>max-pending-latency=dolor</code><ul>
+<li>Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.</li>
+</ul>
+</li>
+<li><code>max-total-instances=45</code><ul>
+<li>Maximum number of instances that should be started to handle requests.</li>
+</ul>
+</li>
+<li><code>min-idle-instances=76</code><ul>
+<li>Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a module.</li>
+</ul>
+</li>
+<li><code>min-pending-latency=labore</code><ul>
+<li>Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.</li>
+</ul>
+</li>
+<li><code>min-total-instances=58</code><ul>
+<li>Minimum number of instances that should be maintained for this version.</li>
+</ul>
+</li>
+<li><code>network-utilization    target-received-bytes-per-sec=31</code><ul>
+<li>Target bytes received per second.</li>
+</ul>
+</li>
+<li><code>target-received-packets-per-sec=21</code><ul>
+<li>Target packets received per second.</li>
+</ul>
+</li>
+<li><code>target-sent-bytes-per-sec=40</code><ul>
+<li>Target bytes sent per second.</li>
+</ul>
+</li>
+<li>
+<p><code>target-sent-packets-per-sec=86</code></p>
+<ul>
+<li>Target packets sent per second.</li>
+</ul>
+</li>
+<li>
+<p><code>..request-utilization    target-concurrent-requests=88</code></p>
+<ul>
+<li>Target number of concurrent requests.</li>
+</ul>
+</li>
+<li>
+<p><code>target-request-count-per-sec=77</code></p>
+<ul>
+<li>Target requests per second.</li>
+</ul>
+</li>
+<li>
+<p><code>...basic-scaling    idle-timeout=sed</code></p>
+<ul>
+<li>Duration of time after the last request that an instance must wait before the instance is shut down.</li>
+</ul>
+</li>
+<li>
+<p><code>max-instances=77</code></p>
+<ul>
+<li>Maximum number of instances to create for this version.</li>
+</ul>
+</li>
+<li>
+<p><code>..    beta-settings=key=et</code></p>
+<ul>
+<li>Metadata settings that are supplied to this version to enable beta runtime features.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>creation-time=vero</code><ul>
+<li>Time that this version was created.@OutputOnly</li>
+</ul>
+</li>
+<li><code>default-expiration=erat</code><ul>
+<li>Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.</li>
+</ul>
+</li>
+<li><code>deployer=sed</code><ul>
+<li>Email address of the user who created this version.@OutputOnly</li>
+</ul>
+</li>
+<li>
+<p><code>deployment.container    image=duo</code></p>
+<ul>
+<li>URI to the hosted container image in Google Container Registry. The URI must be fully qualified and include a tag or digest. Examples: &#34;gcr.io/my-project/image:tag&#34; or &#34;gcr.io/my-project/image@digest&#34;</li>
+</ul>
+</li>
+<li>
+<p><code>...endpoints-api-service    config-id=dolore</code></p>
+<ul>
+<li>Endpoints service configuration id as specified by the Service Management API. For example &#34;2016-09-19r1&#34;By default, the Endpoints service configuration id is fixed and config_id must be specified. To keep the Endpoints service configuration id updated with each rollout, specify RolloutStrategy.MANAGED and omit config_id.</li>
+</ul>
+</li>
+<li><code>disable-trace-sampling=false</code><ul>
+<li>Enable or disable trace sampling. By default, this is set to false for enabled.</li>
+</ul>
+</li>
+<li><code>name=diam</code><ul>
+<li>Endpoints service name which is the name of the &#34;service&#34; resource in the Service Management API. For example &#34;myapi.endpoints.myproject.cloud.goog&#34;</li>
+</ul>
+</li>
+<li>
+<p><code>rollout-strategy=dolor</code></p>
+<ul>
+<li>Endpoints rollout strategy. If FIXED, config_id must be specified. If MANAGED, config_id must be omitted.</li>
+</ul>
+</li>
+<li>
+<p><code>..    env=et</code></p>
+<ul>
+<li>App Engine execution environment to use for this version.Defaults to 1.</li>
+</ul>
+</li>
+<li><code>env-variables=key=et</code><ul>
+<li>Environment variables made available to the application.Only returned in GET requests if view=FULL is set.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>health-check    check-interval=sadipscing</code><ul>
+<li>Interval between health checks.</li>
+</ul>
+</li>
+<li><code>disable-health-check=false</code><ul>
+<li>Whether to explicitly disable health checks for this instance.</li>
+</ul>
+</li>
+<li><code>healthy-threshold=81</code><ul>
+<li>Number of consecutive successful health checks required before receiving traffic.</li>
+</ul>
+</li>
+<li><code>host=vero</code><ul>
+<li>Host header to send when performing an HTTP health check. Example: &#34;myapp.appspot.com&#34;</li>
+</ul>
+</li>
+<li><code>restart-threshold=25</code><ul>
+<li>Number of consecutive failed health checks required before an instance is restarted.</li>
+</ul>
+</li>
+<li><code>timeout=invidunt</code><ul>
+<li>Time before the health check is considered failed.</li>
+</ul>
+</li>
+<li>
+<p><code>unhealthy-threshold=36</code></p>
+<ul>
+<li>Number of consecutive failed health checks required before removing traffic.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=vero</code></p>
+<ul>
+<li>Relative name of the version within the module. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: &#34;default&#34;, &#34;latest&#34;, and any name with the prefix &#34;ah-&#34;.</li>
+</ul>
+</li>
+<li><code>inbound-services=elitr</code><ul>
+<li>Before an application can receive email or XMPP messages, the application must be configured to enable the service.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>instance-class=lorem</code><ul>
+<li>Instance class that is used to run this version. Valid values are:
+    AutomaticScaling: F1, F2, F4, F4_1G
+    ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.</li>
+</ul>
+</li>
+<li>
+<p><code>manual-scaling    instances=72</code></p>
+<ul>
+<li>Number of instances to assign to the module at the start. This number can later be altered by using the Modules API (https://cloud.google.com/appengine/docs/python/modules/functions) set_num_instances() function.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=no</code></p>
+<ul>
+<li>Full path to the Version resource in the API. Example: apps/myapp/modules/default/versions/v1.@OutputOnly</li>
+</ul>
+</li>
+<li><code>network    forwarded-ports=ipsum</code><ul>
+<li>List of ports, or port pairs, to forward from the virtual machine to the application container.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>instance-tag=accusam</code><ul>
+<li>Tag to apply to the VM instance during creation.</li>
+</ul>
+</li>
+<li>
+<p><code>name=takimata</code></p>
+<ul>
+<li>Google Cloud Platform network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.</li>
+</ul>
+</li>
+<li>
+<p><code>..    nobuild-files-regex=consetetur</code></p>
+<ul>
+<li>Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.</li>
+</ul>
+</li>
+<li><code>resources    cpu=0.5721089079262882</code><ul>
+<li>Number of CPU cores needed.</li>
+</ul>
+</li>
+<li><code>disk-gb=0.22880530766851637</code><ul>
+<li>Disk size (GB) needed.</li>
+</ul>
+</li>
+<li>
+<p><code>memory-gb=0.04583256524798884</code></p>
+<ul>
+<li>Memory (GB) needed.</li>
+</ul>
+</li>
+<li>
+<p><code>..    runtime=sed</code></p>
+<ul>
+<li>Desired runtime. Example: python27.</li>
+</ul>
+</li>
+<li><code>runtime-api-version=takimata</code><ul>
+<li>The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/&lt;language&gt;/config/appref</li>
+</ul>
+</li>
+<li><code>serving-status=dolores</code><ul>
+<li>Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.</li>
+</ul>
+</li>
+<li><code>threadsafe=true</code><ul>
+<li>Whether multiple requests can be dispatched to this version at once.</li>
+</ul>
+</li>
+<li><code>vm=false</code><ul>
+<li>Whether to deploy this version in a container on a virtual machine.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../apps_modules-versions-delete" class="btn btn-neutral float-right" title="Modules Versions Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../apps_modules-patch" class="btn btn-neutral" title="Modules Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../apps_modules-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../apps_modules-versions-delete" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tenants Jobs Search For Alert - Cloud Talent Solution v2.0.0+20210309</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Talent Solution v2.0.0+20210309</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-client-events-create">Tenants Client Events Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-companies-create">Tenants Companies Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-companies-delete">Tenants Companies Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-companies-get">Tenants Companies Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-companies-list">Tenants Companies List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-companies-patch">Tenants Companies Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-complete-query">Tenants Complete Query</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-create">Tenants Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-delete">Tenants Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-get">Tenants Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-batch-create">Tenants Jobs Batch Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-batch-delete">Tenants Jobs Batch Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-batch-update">Tenants Jobs Batch Update</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-create">Tenants Jobs Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-delete">Tenants Jobs Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-get">Tenants Jobs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-list">Tenants Jobs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-patch">Tenants Jobs Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-jobs-search">Tenants Jobs Search</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Tenants Jobs Search For Alert</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-list">Tenants List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_tenants-patch">Tenants Patch</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Tenants Jobs Search For Alert</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/jobs4-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Searches for jobs using the provided SearchJobsRequest. This API call is intended for the use case of targeting passive job seekers (for example, job seekers who have signed up to receive email alerts about potential job opportunities), it has different algorithmic adjustments that are designed to specifically target passive job seekers. This call constrains the visibility of jobs present in the database, and only returns jobs the caller has permission to search against.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/jobs</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>jobs4 --scope &lt;scope&gt; projects tenants-jobs-search-for-alert ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The resource name of the tenant to search within. The format is &#34;projects/{project_id}/tenants/{tenant_id}&#34;. For example, &#34;projects/foo/tenants/bar&#34;.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>SearchJobsRequest:
+  custom-ranking-info:
+    importance-level: string
+    ranking-expression: string
+  disable-keyword-match: boolean
+  diversification-level: string
+  enable-broadening: boolean
+  job-query:
+    commute-filter:
+      allow-imprecise-addresses: boolean
+      commute-method: string
+      departure-time:
+        hours: integer
+        minutes: integer
+        nanos: integer
+        seconds: integer
+      road-traffic: string
+      start-coordinates:
+        latitude: number
+        longitude: number
+      travel-duration: string
+    companies: [string]
+    company-display-names: [string]
+    compensation-filter:
+      include-jobs-with-unspecified-compensation-range: boolean
+      range:
+        max-compensation:
+          currency-code: string
+          nanos: integer
+          units: string
+        min-compensation:
+          currency-code: string
+          nanos: integer
+          units: string
+      type: string
+      units: [string]
+    custom-attribute-filter: string
+    disable-spell-check: boolean
+    employment-types: [string]
+    excluded-jobs: [string]
+    job-categories: [string]
+    language-codes: [string]
+    publish-time-range:
+      end-time: string
+      start-time: string
+    query: string
+    query-language-code: string
+  job-view: string
+  max-page-size: integer
+  offset: integer
+  order-by: string
+  page-token: string
+  request-metadata:
+    allow-missing-ids: boolean
+    device-info:
+      device-type: string
+      id: string
+    domain: string
+    session-id: string
+    user-id: string
+  search-mode: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .custom-ranking-info    importance-level=sanctus</code><ul>
+<li>Required. Controls over how important the score of CustomRankingInfo.ranking_expression gets applied to job&#39;s final ranking position. An error is thrown if not specified.</li>
+</ul>
+</li>
+<li>
+<p><code>ranking-expression=nonumy</code></p>
+<ul>
+<li>Required. Controls over how job documents get ranked on top of existing relevance score (determined by API algorithm). A combination of the ranking expression and relevance score is used to determine job&#39;s final ranking position. The syntax for this expression is a subset of Google SQL syntax. Supported operators are: +, -, *, /, where the left and right side of the operator is either a numeric Job.custom_attributes key, integer/double value or an expression that can be evaluated to a number. Parenthesis are supported to adjust calculation precedence. The expression must be &lt; 100 characters in length. The expression is considered invalid for a job if the expression references custom attributes that are not populated on the job or if the expression results in a divide by zero. If an expression is invalid for a job, that job is demoted to the end of the results. Sample ranking expression (year + 25) * 0.25 - (freshness / 0.5)</li>
+</ul>
+</li>
+<li>
+<p><code>..    disable-keyword-match=true</code></p>
+<ul>
+<li>Controls whether to disable exact keyword match on Job.title, Job.description, Job.company_display_name, Job.addresses, Job.qualifications. When disable keyword match is turned off, a keyword match returns jobs that do not match given category filters when there are matching keywords. For example, for the query &#34;program manager,&#34; a result is returned even if the job posting has the title &#34;software developer,&#34; which doesn&#39;t fall into &#34;program manager&#34; ontology, but does have &#34;program manager&#34; appearing in its description. For queries like &#34;cloud&#34; that don&#39;t contain title or location specific ontology, jobs with &#34;cloud&#34; keyword matches are returned regardless of this flag&#39;s value. Use Company.keyword_searchable_job_custom_attributes if company-specific globally matched custom field/attribute string values are needed. Enabling keyword match improves recall of subsequent search requests. Defaults to false.</li>
+</ul>
+</li>
+<li><code>diversification-level=tempor</code><ul>
+<li>Controls whether highly similar jobs are returned next to each other in the search results. Jobs are identified as highly similar based on their titles, job categories, and locations. Highly similar results are clustered so that only one representative job of the cluster is displayed to the job seeker higher up in the results, with the other jobs being displayed lower down in the results. Defaults to DiversificationLevel.SIMPLE if no value is specified.</li>
+</ul>
+</li>
+<li><code>enable-broadening=true</code><ul>
+<li>Controls whether to broaden the search when it produces sparse results. Broadened queries append results to the end of the matching results list. Defaults to false.</li>
+</ul>
+</li>
+<li><code>job-query.commute-filter    allow-imprecise-addresses=false</code><ul>
+<li>If <code>true</code>, jobs without street level addresses may also be returned. For city level addresses, the city center is used. For state and coarser level addresses, text matching is used. If this field is set to <code>false</code> or isn&#39;t specified, only jobs that include street level addresses will be returned by commute search.</li>
+</ul>
+</li>
+<li><code>commute-method=amet</code><ul>
+<li>Required. The method of transportation to calculate the commute time for.</li>
+</ul>
+</li>
+<li><code>departure-time    hours=64</code><ul>
+<li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
+</ul>
+</li>
+<li><code>minutes=74</code><ul>
+<li>Minutes of hour of day. Must be from 0 to 59.</li>
+</ul>
+</li>
+<li><code>nanos=48</code><ul>
+<li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
+</ul>
+</li>
+<li>
+<p><code>seconds=25</code></p>
+<ul>
+<li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>..    road-traffic=duo</code></p>
+<ul>
+<li>Specifies the traffic density to use when calculating commute time.</li>
+</ul>
+</li>
+<li><code>start-coordinates    latitude=0.44431237216058306</code><ul>
+<li>The latitude in degrees. It must be in the range [-90.0, +90.0].</li>
+</ul>
+</li>
+<li>
+<p><code>longitude=0.6669967714177497</code></p>
+<ul>
+<li>The longitude in degrees. It must be in the range [-180.0, +180.0].</li>
+</ul>
+</li>
+<li>
+<p><code>..    travel-duration=kasd</code></p>
+<ul>
+<li>Required. The maximum travel time in seconds. The maximum allowed value is <code>3600s</code> (one hour). Format is <code>123s</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    companies=sadipscing</code></p>
+<ul>
+<li>This filter specifies the company entities to search against. If a value isn&#39;t specified, jobs are searched for against all companies. If multiple values are specified, jobs are searched against the companies specified. The format is &#34;projects/{project_id}/tenants/{tenant_id}/companies/{company_id}&#34;. For example, &#34;projects/foo/tenants/bar/companies/baz&#34;. At most 20 company filters are allowed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>company-display-names=tempor</code><ul>
+<li>This filter specifies the exact company Company.display_name of the jobs to search against. If a value isn&#39;t specified, jobs within the search results are associated with any company. If multiple values are specified, jobs within the search results may be associated with any of the specified companies. At most 20 company display name filters are allowed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>compensation-filter    include-jobs-with-unspecified-compensation-range=false</code><ul>
+<li>If set to true, jobs with unspecified compensation range fields are included.</li>
+</ul>
+</li>
+<li><code>range.max-compensation    currency-code=lorem</code><ul>
+<li>The three-letter currency code defined in ISO 4217.</li>
+</ul>
+</li>
+<li><code>nanos=68</code><ul>
+<li>Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If <code>units</code> is positive, <code>nanos</code> must be positive or zero. If <code>units</code> is zero, <code>nanos</code> can be positive, zero, or negative. If <code>units</code> is negative, <code>nanos</code> must be negative or zero. For example $-1.75 is represented as <code>units</code>=-1 and <code>nanos</code>=-750,000,000.</li>
+</ul>
+</li>
+<li>
+<p><code>units=takimata</code></p>
+<ul>
+<li>The whole units of the amount. For example if <code>currencyCode</code> is <code>&amp;#34;USD&amp;#34;</code>, then 1 unit is one US dollar.</li>
+</ul>
+</li>
+<li>
+<p><code>..min-compensation    currency-code=rebum.</code></p>
+<ul>
+<li>The three-letter currency code defined in ISO 4217.</li>
+</ul>
+</li>
+<li><code>nanos=74</code><ul>
+<li>Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If <code>units</code> is positive, <code>nanos</code> must be positive or zero. If <code>units</code> is zero, <code>nanos</code> can be positive, zero, or negative. If <code>units</code> is negative, <code>nanos</code> must be negative or zero. For example $-1.75 is represented as <code>units</code>=-1 and <code>nanos</code>=-750,000,000.</li>
+</ul>
+</li>
+<li>
+<p><code>units=invidunt</code></p>
+<ul>
+<li>The whole units of the amount. For example if <code>currencyCode</code> is <code>&amp;#34;USD&amp;#34;</code>, then 1 unit is one US dollar.</li>
+</ul>
+</li>
+<li>
+<p><code>...    type=clita</code></p>
+<ul>
+<li>Required. Type of filter.</li>
+</ul>
+</li>
+<li>
+<p><code>units=stet</code></p>
+<ul>
+<li>Required. Specify desired <code>base compensation entry&amp;#39;s</code> CompensationInfo.CompensationUnit.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    custom-attribute-filter=aliquyam</code></p>
+<ul>
+<li>This filter specifies a structured syntax to match against the Job.custom_attributes marked as <code>filterable</code>. The syntax for this expression is a subset of SQL syntax. Supported operators are: <code>=</code>, <code>!=</code>, <code>&amp;lt;</code>, <code>&amp;lt;=</code>, <code>&amp;gt;</code>, and <code>&amp;gt;=</code> where the left of the operator is a custom field key and the right of the operator is a number or a quoted string. You must escape backslash (\) and quote (\&#34;) characters. Supported functions are <code>LOWER([field_name])</code> to perform a case insensitive match and <code>EMPTY([field_name])</code> to filter on the existence of a key. Boolean expressions (AND/OR/NOT) are supported up to 3 levels of nesting (for example, &#34;((A AND B AND C) OR NOT D) AND E&#34;), a maximum of 100 comparisons or functions are allowed in the expression. The expression must be &lt; 6000 bytes in length. Sample Query: <code>(LOWER(driving_license)=&amp;#34;class \&amp;#34;a\&amp;#34;&amp;#34; OR EMPTY(driving_license)) AND driving_years &amp;gt; 10</code></li>
+</ul>
+</li>
+<li><code>disable-spell-check=false</code><ul>
+<li>This flag controls the spell-check feature. If false, the service attempts to correct a misspelled query, for example, &#34;enginee&#34; is corrected to &#34;engineer&#34;. Defaults to false: a spell check is performed.</li>
+</ul>
+</li>
+<li><code>employment-types=dolores</code><ul>
+<li>The employment type filter specifies the employment type of jobs to search against, such as EmploymentType.FULL_TIME. If a value isn&#39;t specified, jobs in the search results includes any employment type. If multiple values are specified, jobs in the search results include any of the specified employment types.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>excluded-jobs=sed</code><ul>
+<li>This filter specifies a list of job names to be excluded during search. At most 400 excluded job names are allowed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>job-categories=invidunt</code><ul>
+<li>The category filter specifies the categories of jobs to search against. See JobCategory for more information. If a value isn&#39;t specified, jobs from any category are searched against. If multiple values are specified, jobs from any of the specified categories are searched against.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>language-codes=clita</code><ul>
+<li>This filter specifies the locale of jobs to search against, for example, &#34;en-US&#34;. If a value isn&#39;t specified, the search results can contain jobs in any locale. Language codes should be in BCP-47 format, such as &#34;en-US&#34; or &#34;sr-Latn&#34;. For more information, see <a href="https://tools.ietf.org/html/bcp47">Tags for Identifying Languages</a>. At most 10 language code filters are allowed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>publish-time-range    end-time=dolor</code><ul>
+<li>End of the period (exclusive).</li>
+</ul>
+</li>
+<li>
+<p><code>start-time=aliquyam</code></p>
+<ul>
+<li>Begin of the period (inclusive).</li>
+</ul>
+</li>
+<li>
+<p><code>..    query=magna</code></p>
+<ul>
+<li>The query string that matches against the job title, description, and location fields. The maximum number of allowed characters is 255.</li>
+</ul>
+</li>
+<li>
+<p><code>query-language-code=diam</code></p>
+<ul>
+<li>The language code of query. For example, &#34;en-US&#34;. This field helps to better interpret the query. If a value isn&#39;t specified, the query language code is automatically detected, which may not be accurate. Language code should be in BCP-47 format, such as &#34;en-US&#34; or &#34;sr-Latn&#34;. For more information, see <a href="https://tools.ietf.org/html/bcp47">Tags for Identifying Languages</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    job-view=nonumy</code></p>
+<ul>
+<li>The desired job attributes returned for jobs in the search response. Defaults to JobView.JOB_VIEW_SMALL if no value is specified.</li>
+</ul>
+</li>
+<li><code>max-page-size=83</code><ul>
+<li>A limit on the number of jobs returned in the search results. Increasing this value above the default value of 10 can increase search response time. The value can be between 1 and 100.</li>
+</ul>
+</li>
+<li><code>offset=93</code><ul>
+<li>An integer that specifies the current offset (that is, starting result location, amongst the jobs deemed by the API as relevant) in search results. This field is only considered if page_token is unset. The maximum allowed value is 5000. Otherwise an error is thrown. For example, 0 means to return results starting from the first matching job, and 10 means to return from the 11th job. This can be used for pagination, (for example, pageSize = 10 and offset = 10 means to return from the second page).</li>
+</ul>
+</li>
+<li><code>order-by=accusam</code><ul>
+<li>The criteria determining how search results are sorted. Default is <code>&amp;#34;relevance desc&amp;#34;</code>. Supported options are: * <code>&amp;#34;relevance desc&amp;#34;</code>: By relevance descending, as determined by the API algorithms. Relevance thresholding of query results is only available with this ordering. * <code>&amp;#34;posting_publish_time desc&amp;#34;</code>: By Job.posting_publish_time descending. * <code>&amp;#34;posting_update_time desc&amp;#34;</code>: By Job.posting_update_time descending. * <code>&amp;#34;title&amp;#34;</code>: By Job.title ascending. * <code>&amp;#34;title desc&amp;#34;</code>: By Job.title descending. * <code>&amp;#34;annualized_base_compensation&amp;#34;</code>: By job&#39;s CompensationInfo.annualized_base_compensation_range ascending. Jobs whose annualized base compensation is unspecified are put at the end of search results. * <code>&amp;#34;annualized_base_compensation desc&amp;#34;</code>: By job&#39;s CompensationInfo.annualized_base_compensation_range descending. Jobs whose annualized base compensation is unspecified are put at the end of search results. * <code>&amp;#34;annualized_total_compensation&amp;#34;</code>: By job&#39;s CompensationInfo.annualized_total_compensation_range ascending. Jobs whose annualized base compensation is unspecified are put at the end of search results. * <code>&amp;#34;annualized_total_compensation desc&amp;#34;</code>: By job&#39;s CompensationInfo.annualized_total_compensation_range descending. Jobs whose annualized base compensation is unspecified are put at the end of search results. * <code>&amp;#34;custom_ranking desc&amp;#34;</code>: By the relevance score adjusted to the SearchJobsRequest.CustomRankingInfo.ranking_expression with weight factor assigned by SearchJobsRequest.CustomRankingInfo.importance_level in descending order. * Location sorting: Use the special syntax to order jobs by distance: <code>&amp;#34;distance_from(&amp;#39;Hawaii&amp;#39;)&amp;#34;</code>: Order by distance from Hawaii. <code>&amp;#34;distance_from(19.89, 155.5)&amp;#34;</code>: Order by distance from a coordinate. <code>&amp;#34;distance_from(&amp;#39;Hawaii&amp;#39;), distance_from(&amp;#39;Puerto Rico&amp;#39;)&amp;#34;</code>: Order by multiple locations. See details below. <code>&amp;#34;distance_from(&amp;#39;Hawaii&amp;#39;), distance_from(19.89, 155.5)&amp;#34;</code>: Order by multiple locations. See details below. The string can have a maximum of 256 characters. When multiple distance centers are provided, a job that is close to any of the distance centers would have a high rank. When a job has multiple locations, the job location closest to one of the distance centers will be used. Jobs that don&#39;t have locations will be ranked at the bottom. Distance is calculated with a precision of 11.3 meters (37.4 feet). Diversification strategy is still applied unless explicitly disabled in diversification_level.</li>
+</ul>
+</li>
+<li><code>page-token=tempor</code><ul>
+<li>The token specifying the current offset within search results. See SearchJobsResponse.next_page_token for an explanation of how to obtain the next set of query results.</li>
+</ul>
+</li>
+<li><code>request-metadata    allow-missing-ids=true</code><ul>
+<li>Only set when any of domain, session_id and user_id isn&#39;t available for some reason. It is highly recommended not to set this field and provide accurate domain, session_id and user_id for the best service experience.</li>
+</ul>
+</li>
+<li><code>device-info    device-type=est</code><ul>
+<li>Type of the device.</li>
+</ul>
+</li>
+<li>
+<p><code>id=takimata</code></p>
+<ul>
+<li>A device-specific ID. The ID must be a unique identifier that distinguishes the device from other devices.</li>
+</ul>
+</li>
+<li>
+<p><code>..    domain=dolor</code></p>
+<ul>
+<li>Required if allow_missing_ids is unset or <code>false</code>. The client-defined scope or source of the service call, which typically is the domain on which the service has been implemented and is currently being run. For example, if the service is being run by client <em>Foo, Inc.</em>, on job board www.foo.com and career site www.bar.com, then this field is set to &#34;foo.com&#34; for use on the job board, and &#34;bar.com&#34; for use on the career site. Note that any improvements to the model for a particular tenant site rely on this field being set correctly to a unique domain. The maximum number of allowed characters is 255.</li>
+</ul>
+</li>
+<li><code>session-id=diam</code><ul>
+<li>Required if allow_missing_ids is unset or <code>false</code>. A unique session identification string. A session is defined as the duration of an end user&#39;s interaction with the service over a certain period. Obfuscate this field for privacy concerns before providing it to the service. Note that any improvements to the model for a particular tenant site rely on this field being set correctly to a unique session ID. The maximum number of allowed characters is 255.</li>
+</ul>
+</li>
+<li>
+<p><code>user-id=at</code></p>
+<ul>
+<li>Required if allow_missing_ids is unset or <code>false</code>. A unique user identification string, as determined by the client. To have the strongest positive impact on search quality make sure the client-level is unique. Obfuscate this field for privacy concerns before providing it to the service. Note that any improvements to the model for a particular tenant site rely on this field being set correctly to a unique user ID. The maximum number of allowed characters is 255.</li>
+</ul>
+</li>
+<li>
+<p><code>..    search-mode=erat</code></p>
+<ul>
+<li>Mode of a search. Defaults to SearchMode.JOB_SEARCH.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_tenants-list" class="btn btn-neutral float-right" title="Tenants List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_tenants-jobs-search" class="btn btn-neutral" title="Tenants Jobs Search"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_tenants-jobs-search" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_tenants-list" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

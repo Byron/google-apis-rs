@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Jobs Patch - Cloud Machine Learning Engine v2.0.0+20210317</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Machine Learning Engine v2.0.0+20210317</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_explain">Explain</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get-config">Get Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-cancel">Jobs Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-create">Jobs Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-get">Jobs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-get-iam-policy">Jobs Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-list">Jobs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Jobs Patch</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-set-iam-policy">Jobs Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_jobs-test-iam-permissions">Jobs Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-create">Locations Studies Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-delete">Locations Studies Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-get">Locations Studies Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-list">Locations Studies List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-add-measurement">Locations Studies Trials Add Measurement</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-check-early-stopping-state">Locations Studies Trials Check Early Stopping State</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-complete">Locations Studies Trials Complete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-create">Locations Studies Trials Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-delete">Locations Studies Trials Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-get">Locations Studies Trials Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-list">Locations Studies Trials List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-list-optimal-trials">Locations Studies Trials List Optimal Trials</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-stop">Locations Studies Trials Stop</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-studies-trials-suggest">Locations Studies Trials Suggest</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-create">Models Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-delete">Models Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-get">Models Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-get-iam-policy">Models Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-list">Models List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-patch">Models Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-set-iam-policy">Models Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-test-iam-permissions">Models Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-create">Models Versions Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-delete">Models Versions Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-get">Models Versions Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-list">Models Versions List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-patch">Models Versions Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_models-versions-set-default">Models Versions Set Default</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-cancel">Operations Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-get">Operations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_operations-list">Operations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_predict">Predict</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Jobs Patch</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/ml1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates a specific job resource. Currently the only supported fields to update are <code>labels</code>.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>ml1 --scope &lt;scope&gt; projects jobs-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. The job name.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudMlV1__Job:
+  create-time: string
+  end-time: string
+  error-message: string
+  etag: string
+  job-id: string
+  labels: { string: string }
+  prediction-input:
+    batch-size: string
+    data-format: string
+    input-paths: [string]
+    max-worker-count: int64
+    model-name: string
+    output-data-format: string
+    output-path: string
+    region: string
+    runtime-version: string
+    signature-name: string
+    uri: string
+    version-name: string
+  prediction-output:
+    error-count: int64
+    node-hours: number
+    output-path: string
+    prediction-count: int64
+  start-time: string
+  state: string
+  training-input:
+    args: [string]
+    encryption-config:
+      kms-key-name: string
+    evaluator-config:
+      accelerator-config:
+        count: string
+        type: string
+      container-args: [string]
+      container-command: [string]
+      disk-config:
+        boot-disk-size-gb: integer
+        boot-disk-type: string
+      image-uri: string
+      tpu-tf-version: string
+    evaluator-count: int64
+    evaluator-type: string
+    hyperparameters:
+      algorithm: string
+      enable-trial-early-stopping: boolean
+      goal: string
+      hyperparameter-metric-tag: string
+      max-failed-trials: integer
+      max-parallel-trials: integer
+      max-trials: integer
+      resume-previous-job-id: string
+    job-dir: string
+    master-config:
+      accelerator-config:
+        count: string
+        type: string
+      container-args: [string]
+      container-command: [string]
+      disk-config:
+        boot-disk-size-gb: integer
+        boot-disk-type: string
+      image-uri: string
+      tpu-tf-version: string
+    master-type: string
+    network: string
+    package-uris: [string]
+    parameter-server-config:
+      accelerator-config:
+        count: string
+        type: string
+      container-args: [string]
+      container-command: [string]
+      disk-config:
+        boot-disk-size-gb: integer
+        boot-disk-type: string
+      image-uri: string
+      tpu-tf-version: string
+    parameter-server-count: int64
+    parameter-server-type: string
+    python-module: string
+    python-version: string
+    region: string
+    runtime-version: string
+    scale-tier: string
+    scheduling:
+      max-running-time: string
+      max-wait-time: string
+    service-account: string
+    use-chief-in-tf-config: boolean
+    worker-config:
+      accelerator-config:
+        count: string
+        type: string
+      container-args: [string]
+      container-command: [string]
+      disk-config:
+        boot-disk-size-gb: integer
+        boot-disk-type: string
+      image-uri: string
+      tpu-tf-version: string
+    worker-count: int64
+    worker-type: string
+  training-output:
+    built-in-algorithm-output:
+      framework: string
+      model-path: string
+      python-version: string
+      runtime-version: string
+    completed-trial-count: int64
+    consumed-ml-units: number
+    hyperparameter-metric-tag: string
+    is-built-in-algorithm-job: boolean
+    is-hyperparameter-tuning-job: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    create-time=no</code><ul>
+<li>Output only. When the job was created.</li>
+</ul>
+</li>
+<li><code>end-time=est</code><ul>
+<li>Output only. When the job processing was completed.</li>
+</ul>
+</li>
+<li><code>error-message=at</code><ul>
+<li>Output only. The details of a failure or a cancellation.</li>
+</ul>
+</li>
+<li><code>etag=sed</code><ul>
+<li><code>etag</code> is used for optimistic concurrency control as a way to help prevent simultaneous updates of a job from overwriting each other. It is strongly suggested that systems make use of the <code>etag</code> in the read-modify-write cycle to perform job updates in order to avoid race conditions: An <code>etag</code> is returned in the response to <code>GetJob</code>, and systems are expected to put that etag in the request to <code>UpdateJob</code> to ensure that their change will be applied to the same version of the job.</li>
+</ul>
+</li>
+<li><code>job-id=sit</code><ul>
+<li>Required. The user-specified id of the job.</li>
+</ul>
+</li>
+<li><code>labels=key=et</code><ul>
+<li>Optional. One or more labels that you can add, to organize your jobs. Each label is a key-value pair, where both the key and the value are arbitrary strings that you supply. For more information, see the documentation on using labels.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>prediction-input    batch-size=tempor</code><ul>
+<li>Optional. Number of records per batch, defaults to 64. The service will buffer batch_size number of records in memory before invoking one Tensorflow prediction call internally. So take the record size and memory available into consideration when setting this parameter.</li>
+</ul>
+</li>
+<li><code>data-format=aliquyam</code><ul>
+<li>Required. The format of the input data files.</li>
+</ul>
+</li>
+<li><code>input-paths=ipsum</code><ul>
+<li>Required. The Cloud Storage location of the input data files. May contain wildcards.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>max-worker-count=-18</code><ul>
+<li>Optional. The maximum number of workers to be used for parallel processing. Defaults to 10 if not specified.</li>
+</ul>
+</li>
+<li><code>model-name=sanctus</code><ul>
+<li>Use this field if you want to use the default version for the specified model. The string must use the following format: <code>&amp;#34;projects/YOUR_PROJECT/models/YOUR_MODEL&amp;#34;</code></li>
+</ul>
+</li>
+<li><code>output-data-format=lorem</code><ul>
+<li>Optional. Format of the output data files, defaults to JSON.</li>
+</ul>
+</li>
+<li><code>output-path=est</code><ul>
+<li>Required. The output Google Cloud Storage location.</li>
+</ul>
+</li>
+<li><code>region=sed</code><ul>
+<li>Required. The Google Compute Engine region to run the prediction job in. See the available regions for AI Platform services.</li>
+</ul>
+</li>
+<li><code>runtime-version=diam</code><ul>
+<li>Optional. The AI Platform runtime version to use for this batch prediction. If not set, AI Platform will pick the runtime version used during the CreateVersion request for this model version, or choose the latest stable version when model version information is not available such as when the model is specified by uri.</li>
+</ul>
+</li>
+<li><code>signature-name=dolores</code><ul>
+<li>Optional. The name of the signature defined in the SavedModel to use for this job. Please refer to <a href="https://tensorflow.github.io/serving/serving_basic.html">SavedModel</a> for information about how to use signatures. Defaults to <a href="https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants">DEFAULT_SERVING_SIGNATURE_DEF_KEY</a> , which is &#34;serving_default&#34;.</li>
+</ul>
+</li>
+<li><code>uri=dolores</code><ul>
+<li>Use this field if you want to specify a Google Cloud Storage path for the model to use.</li>
+</ul>
+</li>
+<li>
+<p><code>version-name=et</code></p>
+<ul>
+<li>Use this field if you want to specify a version of the model to use. The string is formatted the same way as <code>model_version</code>, with the addition of the version information: <code>&amp;#34;projects/YOUR_PROJECT/models/YOUR_MODEL/versions/YOUR_VERSION&amp;#34;</code></li>
+</ul>
+</li>
+<li>
+<p><code>..prediction-output    error-count=-93</code></p>
+<ul>
+<li>The number of data instances which resulted in errors.</li>
+</ul>
+</li>
+<li><code>node-hours=0.7087562540955133</code><ul>
+<li>Node hours used by the batch prediction job.</li>
+</ul>
+</li>
+<li><code>output-path=elitr</code><ul>
+<li>The output Google Cloud Storage location provided at the job creation time.</li>
+</ul>
+</li>
+<li>
+<p><code>prediction-count=-80</code></p>
+<ul>
+<li>The number of generated predictions.</li>
+</ul>
+</li>
+<li>
+<p><code>..    start-time=no</code></p>
+<ul>
+<li>Output only. When the job processing was started.</li>
+</ul>
+</li>
+<li><code>state=nonumy</code><ul>
+<li>Output only. The detailed state of a job.</li>
+</ul>
+</li>
+<li><code>training-input    args=at</code><ul>
+<li>Optional. Command-line arguments passed to the training application when it starts. If your job uses a custom container, then the arguments are passed to the container&#39;s <code>ENTRYPOINT</code> command.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>encryption-config    kms-key-name=sadipscing</code></p>
+<ul>
+<li>The Cloud KMS resource identifier of the customer-managed encryption key used to protect a resource, such as a training job. It has the following format: <code>projects/{PROJECT_ID}/locations/{REGION}/keyRings/{KEY_RING_NAME}/cryptoKeys/{KEY_NAME}</code></li>
+</ul>
+</li>
+<li>
+<p><code>..evaluator-config.accelerator-config    count=aliquyam</code></p>
+<ul>
+<li>The number of accelerators to attach to each machine running the job.</li>
+</ul>
+</li>
+<li>
+<p><code>type=dolores</code></p>
+<ul>
+<li>The type of accelerator to use.</li>
+</ul>
+</li>
+<li>
+<p><code>..    container-args=sadipscing</code></p>
+<ul>
+<li>Arguments to the entrypoint command. The following rules apply for container_command and container_args: - If you do not supply command or args: The defaults defined in the Docker image are used. - If you supply a command but no args: The default EntryPoint and the default Cmd defined in the Docker image are ignored. Your command is run without any arguments. - If you supply only args: The default Entrypoint defined in the Docker image is run with the args that you supplied. - If you supply a command and args: The default Entrypoint and the default Cmd defined in the Docker image are ignored. Your command is run with your args. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>container-command=erat</code><ul>
+<li>The command with which the replica&#39;s custom container is run. If provided, it will override default ENTRYPOINT of the docker image. If not provided, the docker image&#39;s ENTRYPOINT is used. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>disk-config    boot-disk-size-gb=19</code><ul>
+<li>Size in GB of the boot disk (default is 100GB).</li>
+</ul>
+</li>
+<li>
+<p><code>boot-disk-type=amet</code></p>
+<ul>
+<li>Type of the boot disk (default is &#34;pd-ssd&#34;). Valid values: &#34;pd-ssd&#34; (Persistent Disk Solid State Drive) or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive).</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=est</code></p>
+<ul>
+<li>The Docker image to run on the replica. This image must be in Container Registry. Learn more about <a href="..//ai-platform/training/docs/distributed-training-containers">configuring custom containers</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>tpu-tf-version=et</code></p>
+<ul>
+<li>The AI Platform runtime version that includes a TensorFlow version matching the one used in the custom container. This field is required if the replica is a TPU worker that uses a custom container. Otherwise, do not specify this field. This must be a <a href="..//ml-engine/docs/tensorflow/runtime-version-list#tpu-support">runtime version that currently supports training with TPUs</a>. Note that the version of TensorFlow included in a runtime version may differ from the numbering of the runtime version itself, because it may have a different <a href="https://www.tensorflow.org/guide/version_compat#semantic_versioning_20">patch version</a>. In this field, you must specify the runtime version (TensorFlow minor version). For example, if your custom container runs TensorFlow <code>1.x.y</code>, specify <code>1.x</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    evaluator-count=-10</code></p>
+<ul>
+<li>Optional. The number of evaluator replicas to use for the training job. Each replica in the cluster will be of the type specified in <code>evaluator_type</code>. This value can only be used when <code>scale_tier</code> is set to <code>CUSTOM</code>. If you set this value, you must also set <code>evaluator_type</code>. The default value is zero.</li>
+</ul>
+</li>
+<li><code>evaluator-type=consetetur</code><ul>
+<li>Optional. Specifies the type of virtual machine to use for your training job&#39;s evaluator nodes. The supported values are the same as those described in the entry for <code>masterType</code>. This value must be consistent with the category of machine type that <code>masterType</code> uses. In other words, both must be Compute Engine machine types or both must be legacy machine types. This value must be present when <code>scaleTier</code> is set to <code>CUSTOM</code> and <code>evaluatorCount</code> is greater than zero.</li>
+</ul>
+</li>
+<li><code>hyperparameters    algorithm=consetetur</code><ul>
+<li>Optional. The search algorithm specified for the hyperparameter tuning job. Uses the default AI Platform hyperparameter tuning algorithm if unspecified.</li>
+</ul>
+</li>
+<li><code>enable-trial-early-stopping=true</code><ul>
+<li>Optional. Indicates if the hyperparameter tuning job enables auto trial early stopping.</li>
+</ul>
+</li>
+<li><code>goal=est</code><ul>
+<li>Required. The type of goal to use for tuning. Available types are <code>MAXIMIZE</code> and <code>MINIMIZE</code>. Defaults to <code>MAXIMIZE</code>.</li>
+</ul>
+</li>
+<li><code>hyperparameter-metric-tag=aliquyam</code><ul>
+<li>Optional. The TensorFlow summary tag name to use for optimizing trials. For current versions of TensorFlow, this tag name should exactly match what is shown in TensorBoard, including all scopes. For versions of TensorFlow prior to 0.12, this should be only the tag passed to tf.Summary. By default, &#34;training/hptuning/metric&#34; will be used.</li>
+</ul>
+</li>
+<li><code>max-failed-trials=7</code><ul>
+<li>Optional. The number of failed trials that need to be seen before failing the hyperparameter tuning job. You can specify this field to override the default failing criteria for AI Platform hyperparameter tuning jobs. Defaults to zero, which means the service decides when a hyperparameter job should fail.</li>
+</ul>
+</li>
+<li><code>max-parallel-trials=81</code><ul>
+<li>Optional. The number of training trials to run concurrently. You can reduce the time it takes to perform hyperparameter tuning by adding trials in parallel. However, each trail only benefits from the information gained in completed trials. That means that a trial does not get access to the results of trials running at the same time, which could reduce the quality of the overall optimization. Each trial will use the same scale tier and machine types. Defaults to one.</li>
+</ul>
+</li>
+<li><code>max-trials=59</code><ul>
+<li>Optional. How many training trials should be attempted to optimize the specified hyperparameters. Defaults to one.</li>
+</ul>
+</li>
+<li>
+<p><code>resume-previous-job-id=est</code></p>
+<ul>
+<li>Optional. The prior hyperparameter tuning job id that users hope to continue with. The job id will be used to find the corresponding vizier study guid and resume the study.</li>
+</ul>
+</li>
+<li>
+<p><code>..    job-dir=sit</code></p>
+<ul>
+<li>Optional. A Google Cloud Storage path in which to store training outputs and other data needed for training. This path is passed to your TensorFlow program as the &#39;--job-dir&#39; command-line argument. The benefit of specifying this field is that Cloud ML validates the path for use in training.</li>
+</ul>
+</li>
+<li><code>master-config.accelerator-config    count=sed</code><ul>
+<li>The number of accelerators to attach to each machine running the job.</li>
+</ul>
+</li>
+<li>
+<p><code>type=eos</code></p>
+<ul>
+<li>The type of accelerator to use.</li>
+</ul>
+</li>
+<li>
+<p><code>..    container-args=lorem</code></p>
+<ul>
+<li>Arguments to the entrypoint command. The following rules apply for container_command and container_args: - If you do not supply command or args: The defaults defined in the Docker image are used. - If you supply a command but no args: The default EntryPoint and the default Cmd defined in the Docker image are ignored. Your command is run without any arguments. - If you supply only args: The default Entrypoint defined in the Docker image is run with the args that you supplied. - If you supply a command and args: The default Entrypoint and the default Cmd defined in the Docker image are ignored. Your command is run with your args. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>container-command=ea</code><ul>
+<li>The command with which the replica&#39;s custom container is run. If provided, it will override default ENTRYPOINT of the docker image. If not provided, the docker image&#39;s ENTRYPOINT is used. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>disk-config    boot-disk-size-gb=86</code><ul>
+<li>Size in GB of the boot disk (default is 100GB).</li>
+</ul>
+</li>
+<li>
+<p><code>boot-disk-type=dolores</code></p>
+<ul>
+<li>Type of the boot disk (default is &#34;pd-ssd&#34;). Valid values: &#34;pd-ssd&#34; (Persistent Disk Solid State Drive) or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive).</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=eos</code></p>
+<ul>
+<li>The Docker image to run on the replica. This image must be in Container Registry. Learn more about <a href="..//ai-platform/training/docs/distributed-training-containers">configuring custom containers</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>tpu-tf-version=et</code></p>
+<ul>
+<li>The AI Platform runtime version that includes a TensorFlow version matching the one used in the custom container. This field is required if the replica is a TPU worker that uses a custom container. Otherwise, do not specify this field. This must be a <a href="..//ml-engine/docs/tensorflow/runtime-version-list#tpu-support">runtime version that currently supports training with TPUs</a>. Note that the version of TensorFlow included in a runtime version may differ from the numbering of the runtime version itself, because it may have a different <a href="https://www.tensorflow.org/guide/version_compat#semantic_versioning_20">patch version</a>. In this field, you must specify the runtime version (TensorFlow minor version). For example, if your custom container runs TensorFlow <code>1.x.y</code>, specify <code>1.x</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    master-type=sea</code></p>
+<ul>
+<li>Optional. Specifies the type of virtual machine to use for your training job&#39;s master worker. You must specify this field when <code>scaleTier</code> is set to <code>CUSTOM</code>. You can use certain Compute Engine machine types directly in this field. See the <a href="..//ai-platform/training/docs/machine-types#compute-engine-machine-types">list of compatible Compute Engine machine types</a>. Alternatively, you can use the certain legacy machine types in this field. See the <a href="..//ai-platform/training/docs/machine-types#legacy-machine-types">list of legacy machine types</a>. Finally, if you want to use a TPU for training, specify <code>cloud_tpu</code> in this field. Learn more about the <a href="..//ai-platform/training/docs/using-tpus#configuring_a_custom_tpu_machine">special configuration options for training with TPUs</a>.</li>
+</ul>
+</li>
+<li><code>network=et</code><ul>
+<li>Optional. The full name of the <a href="..//vpc/docs/vpc">Compute Engine network</a> to which the Job is peered. For example, <code>projects/12345/global/networks/myVPC</code>. The format of this field is <code>projects/{project}/global/networks/{network}</code>, where {project} is a project number (like <code>12345</code>) and {network} is network name. Private services access must already be configured for the network. If left unspecified, the Job is not peered with any network. <a href="..//ai-platform/training/docs/vpc-peering">Learn about using VPC Network Peering.</a>.</li>
+</ul>
+</li>
+<li><code>package-uris=at</code><ul>
+<li>Required. The Google Cloud Storage location of the packages with the training program and any additional dependencies. The maximum number of package URIs is 100.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>parameter-server-config.accelerator-config    count=dolore</code><ul>
+<li>The number of accelerators to attach to each machine running the job.</li>
+</ul>
+</li>
+<li>
+<p><code>type=eirmod</code></p>
+<ul>
+<li>The type of accelerator to use.</li>
+</ul>
+</li>
+<li>
+<p><code>..    container-args=lorem</code></p>
+<ul>
+<li>Arguments to the entrypoint command. The following rules apply for container_command and container_args: - If you do not supply command or args: The defaults defined in the Docker image are used. - If you supply a command but no args: The default EntryPoint and the default Cmd defined in the Docker image are ignored. Your command is run without any arguments. - If you supply only args: The default Entrypoint defined in the Docker image is run with the args that you supplied. - If you supply a command and args: The default Entrypoint and the default Cmd defined in the Docker image are ignored. Your command is run with your args. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>container-command=accusam</code><ul>
+<li>The command with which the replica&#39;s custom container is run. If provided, it will override default ENTRYPOINT of the docker image. If not provided, the docker image&#39;s ENTRYPOINT is used. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>disk-config    boot-disk-size-gb=54</code><ul>
+<li>Size in GB of the boot disk (default is 100GB).</li>
+</ul>
+</li>
+<li>
+<p><code>boot-disk-type=erat</code></p>
+<ul>
+<li>Type of the boot disk (default is &#34;pd-ssd&#34;). Valid values: &#34;pd-ssd&#34; (Persistent Disk Solid State Drive) or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive).</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=dolores</code></p>
+<ul>
+<li>The Docker image to run on the replica. This image must be in Container Registry. Learn more about <a href="..//ai-platform/training/docs/distributed-training-containers">configuring custom containers</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>tpu-tf-version=erat</code></p>
+<ul>
+<li>The AI Platform runtime version that includes a TensorFlow version matching the one used in the custom container. This field is required if the replica is a TPU worker that uses a custom container. Otherwise, do not specify this field. This must be a <a href="..//ml-engine/docs/tensorflow/runtime-version-list#tpu-support">runtime version that currently supports training with TPUs</a>. Note that the version of TensorFlow included in a runtime version may differ from the numbering of the runtime version itself, because it may have a different <a href="https://www.tensorflow.org/guide/version_compat#semantic_versioning_20">patch version</a>. In this field, you must specify the runtime version (TensorFlow minor version). For example, if your custom container runs TensorFlow <code>1.x.y</code>, specify <code>1.x</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    parameter-server-count=-73</code></p>
+<ul>
+<li>Optional. The number of parameter server replicas to use for the training job. Each replica in the cluster will be of the type specified in <code>parameter_server_type</code>. This value can only be used when <code>scale_tier</code> is set to <code>CUSTOM</code>. If you set this value, you must also set <code>parameter_server_type</code>. The default value is zero.</li>
+</ul>
+</li>
+<li><code>parameter-server-type=sea</code><ul>
+<li>Optional. Specifies the type of virtual machine to use for your training job&#39;s parameter server. The supported values are the same as those described in the entry for <code>master_type</code>. This value must be consistent with the category of machine type that <code>masterType</code> uses. In other words, both must be Compute Engine machine types or both must be legacy machine types. This value must be present when <code>scaleTier</code> is set to <code>CUSTOM</code> and <code>parameter_server_count</code> is greater than zero.</li>
+</ul>
+</li>
+<li><code>python-module=takimata</code><ul>
+<li>Required. The Python module name to run after installing the packages.</li>
+</ul>
+</li>
+<li><code>python-version=lorem</code><ul>
+<li>Optional. The version of Python used in training. You must either specify this field or specify <code>masterConfig.imageUri</code>. The following Python versions are available: * Python &#39;3.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or later. * Python &#39;3.5&#39; is available when <code>runtime_version</code> is set to a version from &#39;1.4&#39; to &#39;1.14&#39;. * Python &#39;2.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or earlier. Read more about the Python versions available for <a href="..//ml-engine/docs/runtime-version-list">each runtime version</a>.</li>
+</ul>
+</li>
+<li><code>region=et</code><ul>
+<li>Required. The region to run the training job in. See the <a href="..//ai-platform/training/docs/regions">available regions</a> for AI Platform Training.</li>
+</ul>
+</li>
+<li><code>runtime-version=at</code><ul>
+<li>Optional. The AI Platform runtime version to use for training. You must either specify this field or specify <code>masterConfig.imageUri</code>. For more information, see the <a href="..//ai-platform/training/docs/runtime-version-list">runtime version list</a> and learn <a href="..//ai-platform/training/docs/versioning">how to manage runtime versions</a>.</li>
+</ul>
+</li>
+<li><code>scale-tier=dolor</code><ul>
+<li>Required. Specifies the machine types, the number of replicas for workers and parameter servers.</li>
+</ul>
+</li>
+<li><code>scheduling    max-running-time=et</code><ul>
+<li>Optional. The maximum job running time, expressed in seconds. The field can contain up to nine fractional digits, terminated by <code>s</code>. If not specified, this field defaults to <code>604800s</code> (seven days). If the training job is still running after this duration, AI Platform Training cancels it. The duration is measured from when the job enters the <code>RUNNING</code> state; therefore it does not overlap with the duration limited by Scheduling.max_wait_time. For example, if you want to ensure your job runs for no more than 2 hours, set this field to <code>7200s</code> (2 hours * 60 minutes / hour * 60 seconds / minute). If you submit your training job using the <code>gcloud</code> tool, you can <a href="..//ai-platform/training/docs/training-jobs#formatting_your_configuration_parameters">specify this field in a <code>config.yaml</code> file</a>. For example: <code>yaml trainingInput: scheduling: maxRunningTime: 7200s</code></li>
+</ul>
+</li>
+<li>
+<p><code>max-wait-time=sit</code></p>
+<ul>
+<li>Optional. The maximum job wait time, expressed in seconds. The field can contain up to nine fractional digits, terminated by <code>s</code>. If not specified, there is no limit to the wait time. The minimum for this field is <code>1800s</code> (30 minutes). If the training job has not entered the <code>RUNNING</code> state after this duration, AI Platform Training cancels it. After the job begins running, it can no longer be cancelled due to the maximum wait time. Therefore the duration limited by this field does not overlap with the duration limited by Scheduling.max_running_time. For example, if the job temporarily stops running and retries due to a <a href="..//ai-platform/training/docs/overview#restarts">VM restart</a>, this cannot lead to a maximum wait time cancellation. However, independently of this constraint, AI Platform Training might stop a job if there are too many retries due to exhausted resources in a region. The following example describes how you might use this field: To cancel your job if it doesn&#39;t start running within 1 hour, set this field to <code>3600s</code> (1 hour * 60 minutes / hour * 60 seconds / minute). If the job is still in the <code>QUEUED</code> or <code>PREPARING</code> state after an hour of waiting, AI Platform Training cancels the job. If you submit your training job using the <code>gcloud</code> tool, you can <a href="..//ai-platform/training/docs/training-jobs#formatting_your_configuration_parameters">specify this field in a <code>config.yaml</code> file</a>. For example: <code>yaml trainingInput: scheduling: maxWaitTime: 3600s</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account=erat</code></p>
+<ul>
+<li>Optional. The email address of a service account to use when running the training appplication. You must have the <code>iam.serviceAccounts.actAs</code> permission for the specified service account. In addition, the AI Platform Training Google-managed service account must have the <code>roles/iam.serviceAccountAdmin</code> role for the specified service account. <a href="..//ai-platform/training/docs/custom-service-account">Learn more about configuring a service account.</a> If not specified, the AI Platform Training Google-managed service account is used by default.</li>
+</ul>
+</li>
+<li><code>use-chief-in-tf-config=true</code><ul>
+<li>Optional. Use <code>chief</code> instead of <code>master</code> in the <code>TF_CONFIG</code> environment variable when training with a custom container. Defaults to <code>false</code>. <a href="..//ai-platform/training/docs/distributed-training-details#chief-versus-master">Learn more about this field.</a> This field has no effect for training jobs that don&#39;t use a custom container.</li>
+</ul>
+</li>
+<li><code>worker-config.accelerator-config    count=et</code><ul>
+<li>The number of accelerators to attach to each machine running the job.</li>
+</ul>
+</li>
+<li>
+<p><code>type=gubergren</code></p>
+<ul>
+<li>The type of accelerator to use.</li>
+</ul>
+</li>
+<li>
+<p><code>..    container-args=justo</code></p>
+<ul>
+<li>Arguments to the entrypoint command. The following rules apply for container_command and container_args: - If you do not supply command or args: The defaults defined in the Docker image are used. - If you supply a command but no args: The default EntryPoint and the default Cmd defined in the Docker image are ignored. Your command is run without any arguments. - If you supply only args: The default Entrypoint defined in the Docker image is run with the args that you supplied. - If you supply a command and args: The default Entrypoint and the default Cmd defined in the Docker image are ignored. Your command is run with your args. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>container-command=sea</code><ul>
+<li>The command with which the replica&#39;s custom container is run. If provided, it will override default ENTRYPOINT of the docker image. If not provided, the docker image&#39;s ENTRYPOINT is used. It cannot be set if custom container image is not provided. Note that this field and [TrainingInput.args] are mutually exclusive, i.e., both cannot be set at the same time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>disk-config    boot-disk-size-gb=5</code><ul>
+<li>Size in GB of the boot disk (default is 100GB).</li>
+</ul>
+</li>
+<li>
+<p><code>boot-disk-type=sit</code></p>
+<ul>
+<li>Type of the boot disk (default is &#34;pd-ssd&#34;). Valid values: &#34;pd-ssd&#34; (Persistent Disk Solid State Drive) or &#34;pd-standard&#34; (Persistent Disk Hard Disk Drive).</li>
+</ul>
+</li>
+<li>
+<p><code>..    image-uri=aliquyam</code></p>
+<ul>
+<li>The Docker image to run on the replica. This image must be in Container Registry. Learn more about <a href="..//ai-platform/training/docs/distributed-training-containers">configuring custom containers</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>tpu-tf-version=eos</code></p>
+<ul>
+<li>The AI Platform runtime version that includes a TensorFlow version matching the one used in the custom container. This field is required if the replica is a TPU worker that uses a custom container. Otherwise, do not specify this field. This must be a <a href="..//ml-engine/docs/tensorflow/runtime-version-list#tpu-support">runtime version that currently supports training with TPUs</a>. Note that the version of TensorFlow included in a runtime version may differ from the numbering of the runtime version itself, because it may have a different <a href="https://www.tensorflow.org/guide/version_compat#semantic_versioning_20">patch version</a>. In this field, you must specify the runtime version (TensorFlow minor version). For example, if your custom container runs TensorFlow <code>1.x.y</code>, specify <code>1.x</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    worker-count=-77</code></p>
+<ul>
+<li>Optional. The number of worker replicas to use for the training job. Each replica in the cluster will be of the type specified in <code>worker_type</code>. This value can only be used when <code>scale_tier</code> is set to <code>CUSTOM</code>. If you set this value, you must also set <code>worker_type</code>. The default value is zero.</li>
+</ul>
+</li>
+<li>
+<p><code>worker-type=dolores</code></p>
+<ul>
+<li>Optional. Specifies the type of virtual machine to use for your training job&#39;s worker nodes. The supported values are the same as those described in the entry for <code>masterType</code>. This value must be consistent with the category of machine type that <code>masterType</code> uses. In other words, both must be Compute Engine machine types or both must be legacy machine types. If you use <code>cloud_tpu</code> for this value, see special instructions for <a href="..//ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine">configuring a custom TPU machine</a>. This value must be present when <code>scaleTier</code> is set to <code>CUSTOM</code> and <code>workerCount</code> is greater than zero.</li>
+</ul>
+</li>
+<li>
+<p><code>..training-output.built-in-algorithm-output    framework=consetetur</code></p>
+<ul>
+<li>Framework on which the built-in algorithm was trained.</li>
+</ul>
+</li>
+<li><code>model-path=gubergren</code><ul>
+<li>The Cloud Storage path to the <code>model/</code> directory where the training job saves the trained model. Only set for successful jobs that don&#39;t use hyperparameter tuning.</li>
+</ul>
+</li>
+<li><code>python-version=dolor</code><ul>
+<li>Python version on which the built-in algorithm was trained.</li>
+</ul>
+</li>
+<li>
+<p><code>runtime-version=aliquyam</code></p>
+<ul>
+<li>AI Platform runtime version on which the built-in algorithm was trained.</li>
+</ul>
+</li>
+<li>
+<p><code>..    completed-trial-count=-61</code></p>
+<ul>
+<li>The number of hyperparameter tuning trials that completed successfully. Only set for hyperparameter tuning jobs.</li>
+</ul>
+</li>
+<li><code>consumed-ml-units=0.7808014184415061</code><ul>
+<li>The amount of ML units consumed by the job.</li>
+</ul>
+</li>
+<li><code>hyperparameter-metric-tag=lorem</code><ul>
+<li>The TensorFlow summary tag name used for optimizing hyperparameter tuning trials. See <a href="#HyperparameterSpec.FIELDS.hyperparameter_metric_tag"><code>HyperparameterSpec.hyperparameterMetricTag</code></a> for more information. Only set for hyperparameter tuning jobs.</li>
+</ul>
+</li>
+<li><code>is-built-in-algorithm-job=false</code><ul>
+<li>Whether this job is a built-in Algorithm job.</li>
+</ul>
+</li>
+<li><code>is-hyperparameter-tuning-job=true</code><ul>
+<li>Whether this job is a hyperparameter tuning job.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p update-mask=string</strong><ul>
+<li>Required. Specifies the path, relative to <code>Job</code>, of the field to update. To adopt etag mechanism, include <code>etag</code> field in the mask, and include the <code>etag</code> value in your job resource. For example, to change the labels of a job, the <code>update_mask</code> parameter would be specified as <code>labels</code>, <code>etag</code>, and the <code>PATCH</code> request body would specify the new value, as follows: { &#34;labels&#34;: { &#34;owner&#34;: &#34;Google&#34;, &#34;color&#34;: &#34;Blue&#34; } &#34;etag&#34;: &#34;33a64df551425fcc55e4d42a148795d9f25f89d4&#34; } If <code>etag</code> matches the one on the server, the labels of the job will be replaced with the given ones, and the server end <code>etag</code> will be recalculated. Currently the only supported update masks are <code>labels</code> and <code>etag</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_jobs-set-iam-policy" class="btn btn-neutral float-right" title="Jobs Set Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_jobs-list" class="btn btn-neutral" title="Jobs List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_jobs-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_jobs-set-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

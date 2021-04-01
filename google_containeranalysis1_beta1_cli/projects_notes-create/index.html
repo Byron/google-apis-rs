@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Notes Create - Container Analysis v2.0.0+20210326</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Container Analysis v2.0.0+20210326</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-batch-create">Notes Batch Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Notes Create</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-delete">Notes Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-get">Notes Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-get-iam-policy">Notes Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-list">Notes List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-occurrences-list">Notes Occurrences List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-patch">Notes Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-set-iam-policy">Notes Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_notes-test-iam-permissions">Notes Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-batch-create">Occurrences Batch Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-create">Occurrences Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-delete">Occurrences Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-get">Occurrences Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-get-iam-policy">Occurrences Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-get-notes">Occurrences Get Notes</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-get-vulnerability-summary">Occurrences Get Vulnerability Summary</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-list">Occurrences List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-patch">Occurrences Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-set-iam-policy">Occurrences Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_occurrences-test-iam-permissions">Occurrences Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_scan-configs-get">Scan Configs Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_scan-configs-list">Scan Configs List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_scan-configs-update">Scan Configs Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Notes Create</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Creates a new note.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>containeranalysis1-beta1 --scope &lt;scope&gt; projects notes-create ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The name of the project in the form of <code>projects/[PROJECT_ID]</code>, under which the note is to be created.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Note:
+  attestation-authority:
+    hint:
+      human-readable-name: string
+  base-image:
+    fingerprint:
+      v1-name: string
+      v2-blob: [string]
+      v2-name: string
+    resource-url: string
+  build:
+    builder-version: string
+    signature:
+      key-id: string
+      key-type: string
+      public-key: string
+      signature: string
+  create-time: string
+  deployable:
+    resource-uri: [string]
+  discovery:
+    analysis-kind: string
+  expiration-time: string
+  intoto:
+    expected-command: [string]
+    step-name: string
+    threshold: string
+  kind: string
+  long-description: string
+  name: string
+  package:
+    name: string
+  related-note-names: [string]
+  short-description: string
+  update-time: string
+  vulnerability:
+    cvss-score: number
+    cvss-v3:
+      attack-complexity: string
+      attack-vector: string
+      availability-impact: string
+      base-score: number
+      confidentiality-impact: string
+      exploitability-score: number
+      impact-score: number
+      integrity-impact: string
+      privileges-required: string
+      scope: string
+      user-interaction: string
+    severity: string
+    source-update-time: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .attestation-authority.hint    human-readable-name=et</code></p>
+<ul>
+<li>Required. The human readable name of this attestation authority, for example &#34;qa&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>...base-image.fingerprint    v1-name=magna</code></p>
+<ul>
+<li>Required. The layer ID of the final layer in the Docker image&#39;s v1 representation.</li>
+</ul>
+</li>
+<li><code>v2-blob=no</code><ul>
+<li>Required. The ordered list of v2 blobs that represent a given image.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>v2-name=ipsum</code></p>
+<ul>
+<li>Output only. The name of the image&#39;s v2 blobs computed via: [bottom] := v2_blobbottom := sha256(v2_blob[N] + &#34; &#34; + v2_name[N+1]) Only the name of the final blob is kept.</li>
+</ul>
+</li>
+<li>
+<p><code>..    resource-url=voluptua.</code></p>
+<ul>
+<li>Required. Immutable. The resource_url for the resource representing the basis of associated occurrence images.</li>
+</ul>
+</li>
+<li>
+<p><code>..build    builder-version=at</code></p>
+<ul>
+<li>Required. Immutable. Version of the builder which produced this build.</li>
+</ul>
+</li>
+<li><code>signature    key-id=sanctus</code><ul>
+<li>An ID for the key used to sign. This could be either an ID for the key stored in <code>public_key</code> (such as the ID or fingerprint for a PGP key, or the CN for a cert), or a reference to an external key (such as a reference to a key in Cloud Key Management Service).</li>
+</ul>
+</li>
+<li><code>key-type=sed</code><ul>
+<li>The type of the key, either stored in <code>public_key</code> or referenced in <code>key_id</code>.</li>
+</ul>
+</li>
+<li><code>public-key=amet.</code><ul>
+<li>Public key of the builder which can be used to verify that the related findings are valid and unchanged. If <code>key_type</code> is empty, this defaults to PEM encoded public keys. This field may be empty if <code>key_id</code> references an external key. For Cloud Build based signatures, this is a PEM encoded public key. To verify the Cloud Build signature, place the contents of this field into a file (public.pem). The signature field is base64-decoded into its binary representation in signature.bin, and the provenance bytes from <code>BuildDetails</code> are base64-decoded into a binary representation in signed.bin. OpenSSL can then verify the signature: <code>openssl sha256 -verify public.pem -signature signature.bin signed.bin</code></li>
+</ul>
+</li>
+<li>
+<p><code>signature=takimata</code></p>
+<ul>
+<li>Required. Signature of the related <code>BuildProvenance</code>. In JSON, this is base-64 encoded.</li>
+</ul>
+</li>
+<li>
+<p><code>...    create-time=amet.</code></p>
+<ul>
+<li>Output only. The time this note was created. This field can be used as a filter in list requests.</li>
+</ul>
+</li>
+<li>
+<p><code>deployable    resource-uri=duo</code></p>
+<ul>
+<li>Required. Resource URI for the artifact being deployed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..discovery    analysis-kind=ipsum</code></p>
+<ul>
+<li>Required. Immutable. The kind of analysis that is handled by this discovery.</li>
+</ul>
+</li>
+<li>
+<p><code>..    expiration-time=gubergren</code></p>
+<ul>
+<li>Time of expiration for this note. Empty if note does not expire.</li>
+</ul>
+</li>
+<li><code>intoto    expected-command=lorem</code><ul>
+<li>This field contains the expected command used to perform the step.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>step-name=gubergren</code><ul>
+<li>This field identifies the name of the step in the supply chain.</li>
+</ul>
+</li>
+<li>
+<p><code>threshold=eos</code></p>
+<ul>
+<li>This field contains a value that indicates the minimum number of keys that need to be used to sign the step&#39;s in-toto link.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=dolor</code></p>
+<ul>
+<li>Output only. The type of analysis. This field can be used as a filter in list requests.</li>
+</ul>
+</li>
+<li><code>long-description=ea</code><ul>
+<li>A detailed description of this note.</li>
+</ul>
+</li>
+<li><code>name=ipsum</code><ul>
+<li>Output only. The name of the note in the form of <code>projects/[PROVIDER_ID]/notes/[NOTE_ID]</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>package    name=invidunt</code></p>
+<ul>
+<li>Required. Immutable. The name of the package.</li>
+</ul>
+</li>
+<li>
+<p><code>..    related-note-names=amet</code></p>
+<ul>
+<li>Other notes related to this note.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>short-description=duo</code><ul>
+<li>A one sentence description of this note.</li>
+</ul>
+</li>
+<li><code>update-time=ipsum</code><ul>
+<li>Output only. The time this note was last updated. This field can be used as a filter in list requests.</li>
+</ul>
+</li>
+<li><code>vulnerability    cvss-score=0.9001265173058445</code><ul>
+<li>The CVSS score for this vulnerability.</li>
+</ul>
+</li>
+<li><code>cvss-v3    attack-complexity=ut</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>attack-vector=gubergren</code><ul>
+<li>Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.</li>
+</ul>
+</li>
+<li><code>availability-impact=rebum.</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>base-score=0.34810194289930996</code><ul>
+<li>The base score is a function of the base metric scores.</li>
+</ul>
+</li>
+<li><code>confidentiality-impact=ipsum</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>exploitability-score=0.4033695817113857</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>impact-score=0.737544430792817</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>integrity-impact=gubergren</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>privileges-required=ea</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>scope=dolor</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>user-interaction=lorem</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    severity=eos</code></p>
+<ul>
+<li>Note provider assigned impact of the vulnerability.</li>
+</ul>
+</li>
+<li><code>source-update-time=labore</code><ul>
+<li>The time this information was last changed at the source. This is an upstream timestamp from the underlying information source - e.g. Ubuntu security tracker.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p note-id=string</strong><ul>
+<li>Required. The ID to use for this note.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_notes-delete" class="btn btn-neutral float-right" title="Notes Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_notes-batch-create" class="btn btn-neutral" title="Notes Batch Create"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_notes-batch-create" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_notes-delete" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

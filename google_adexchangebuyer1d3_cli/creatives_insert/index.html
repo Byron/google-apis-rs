@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Insert - Ad Exchange Buyer v2.0.0+20210330</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Ad Exchange Buyer v2.0.0+20210330</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Accounts</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../accounts_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Billing Info</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../billing-info_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../billing-info_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Budget</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../budget_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../budget_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../budget_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Creatives</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../creatives_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Insert</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../creatives_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Direct Deals</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../direct-deals_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../direct-deals_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Performance Report</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../performance-report_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Pretargeting Config</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../pretargeting-config_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Insert</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d3-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Submit a new creative.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/adexchange.buyer</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/adexchange.buyer</em>.
+You can set the scope for this method like this: <code>adexchangebuyer1d3 --scope &lt;scope&gt; creatives insert ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Creative:
+  html-snippet: string
+  account-id: integer
+  ad-technology-providers:
+    detected-provider-ids: [string]
+    has-unidentified-provider: boolean
+  advertiser-id: [string]
+  advertiser-name: string
+  agency-id: string
+  api-upload-timestamp: string
+  attribute: [integer]
+  buyer-creative-id: string
+  click-through-url: [string]
+  filtering-reasons:
+    date: string
+  height: integer
+  impression-tracking-url: [string]
+  kind: string
+  native-ad:
+    advertiser: string
+    app-icon:
+      height: integer
+      url: string
+      width: integer
+    body: string
+    call-to-action: string
+    click-tracking-url: string
+    headline: string
+    image:
+      height: integer
+      url: string
+      width: integer
+    impression-tracking-url: [string]
+    logo:
+      height: integer
+      url: string
+      width: integer
+    price: string
+    star-rating: number
+  product-categories: [integer]
+  restricted-categories: [integer]
+  sensitive-categories: [integer]
+  status: string
+  vendor-type: [integer]
+  version: integer
+  video-url: string
+  width: integer
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    html-snippet=gubergren</code><ul>
+<li>The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.</li>
+</ul>
+</li>
+<li><code>account-id=85</code><ul>
+<li>Account id.</li>
+</ul>
+</li>
+<li><code>ad-technology-providers    detected-provider-ids=est</code><ul>
+<li>The detected ad technology provider IDs for this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/providers.csv for mapping of provider ID to provided name, a privacy policy URL, and a list of domains which can be attributed to the provider. If this creative contains provider IDs that are outside of those listed in the <code>BidRequest.adslot.consented_providers_settings.consented_providers</code> field on the  Authorized Buyers Real-Time Bidding protocol or the <code>BidRequest.user.ext.consented_providers_settings.consented_providers</code> field on the OpenRTB protocol, a bid submitted for a European Economic Area (EEA) user with this creative is not compliant with the GDPR policies as mentioned in the &#34;Third-party Ad Technology Vendors&#34; section of Authorized Buyers Program Guidelines.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>has-unidentified-provider=true</code></p>
+<ul>
+<li>Whether the creative contains an unidentified ad technology provider. If true, a bid submitted for a European Economic Area (EEA) user with this creative is not compliant with the GDPR policies as mentioned in the &#34;Third-party Ad Technology Vendors&#34; section of Authorized Buyers Program Guidelines.</li>
+</ul>
+</li>
+<li>
+<p><code>..    advertiser-id=ipsum</code></p>
+<ul>
+<li>Detected advertiser id, if any. Read-only. This field should not be set in requests.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>advertiser-name=est</code><ul>
+<li>The name of the company being advertised in the creative.</li>
+</ul>
+</li>
+<li><code>agency-id=gubergren</code><ul>
+<li>The agency id for this creative.</li>
+</ul>
+</li>
+<li><code>api-upload-timestamp=ea</code><ul>
+<li>The last upload timestamp of this creative if it was uploaded via API. Read-only. The value of this field is generated, and will be ignored for uploads. (formatted RFC 3339 timestamp).</li>
+</ul>
+</li>
+<li><code>attribute=2</code><ul>
+<li>All attributes for the ads that may be shown from this snippet.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>buyer-creative-id=lorem</code><ul>
+<li>A buyer-specific id identifying the creative in this ad.</li>
+</ul>
+</li>
+<li><code>click-through-url=eos</code><ul>
+<li>The set of destination urls for the snippet.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>filtering-reasons    date=labore</code></p>
+<ul>
+<li>The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.</li>
+</ul>
+</li>
+<li>
+<p><code>..    height=58</code></p>
+<ul>
+<li>Ad height.</li>
+</ul>
+</li>
+<li><code>impression-tracking-url=duo</code><ul>
+<li>The set of urls to be called to record an impression.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>kind=sed</code><ul>
+<li>Resource type.</li>
+</ul>
+</li>
+<li><code>native-ad    advertiser=no</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>app-icon    height=86</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>url=kasd</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>width=77</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    body=sed</code></p>
+<ul>
+<li>A long description of the ad.</li>
+</ul>
+</li>
+<li><code>call-to-action=et</code><ul>
+<li>A label for the button that the user is supposed to click.</li>
+</ul>
+</li>
+<li><code>click-tracking-url=et</code><ul>
+<li>The URL to use for click tracking.</li>
+</ul>
+</li>
+<li><code>headline=vero</code><ul>
+<li>A short title for the ad.</li>
+</ul>
+</li>
+<li><code>image    height=70</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>url=sed</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>width=81</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    impression-tracking-url=dolore</code></p>
+<ul>
+<li>The URLs are called when the impression is rendered.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>logo    height=79</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>url=voluptua.</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>width=99</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    price=consetetur</code></p>
+<ul>
+<li>The price of the promoted app including the currency info.</li>
+</ul>
+</li>
+<li>
+<p><code>star-rating=0.07223777776561668</code></p>
+<ul>
+<li>The app rating in the app store. Must be in the range [0-5].</li>
+</ul>
+</li>
+<li>
+<p><code>..    product-categories=83</code></p>
+<ul>
+<li>Detected product categories, if any. Read-only. This field should not be set in requests.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>restricted-categories=79</code><ul>
+<li>All restricted categories for the ads that may be shown from this snippet.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>sensitive-categories=6</code><ul>
+<li>Detected sensitive categories, if any. Read-only. This field should not be set in requests.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>status=stet</code><ul>
+<li>Creative serving status. Read-only. This field should not be set in requests.</li>
+</ul>
+</li>
+<li><code>vendor-type=2</code><ul>
+<li>All vendor types for the ads that may be shown from this snippet.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>version=81</code><ul>
+<li>The version for this creative. Read-only. This field should not be set in requests.</li>
+</ul>
+</li>
+<li><code>video-url=vero</code><ul>
+<li>The URL to fetch a video ad. If set, HTMLSnippet and the nativeAd should not be set.</li>
+</ul>
+</li>
+<li><code>width=25</code><ul>
+<li>Ad width.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../creatives_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../creatives_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../creatives_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../creatives_list" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

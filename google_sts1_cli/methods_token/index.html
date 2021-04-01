@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Token - Cloud Security Token v2.0.0+20210326</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Security Token v2.0.0+20210326</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Methods</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Token</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Token</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/sts1-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Exchanges a credential for a Google OAuth 2.0 access token. The token asserts an external identity within a workload identity pool, or it applies a Credential Access Boundary to a Google access token. When you call this method, do not send the <code>Authorization</code> HTTP header in the request. This method does not require the <code>Authorization</code> header, and using the header can cause the request to fail.</p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleIdentityStsV1ExchangeTokenRequest:
+  audience: string
+  grant-type: string
+  options: string
+  requested-token-type: string
+  scope: string
+  subject-token: string
+  subject-token-type: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    audience=et</code><ul>
+<li>The full resource name of the identity provider; for example: <code>//iam.googleapis.com/projects//workloadIdentityPools//providers/</code>. Required when exchanging an external credential for a Google access token.</li>
+</ul>
+</li>
+<li><code>grant-type=magna</code><ul>
+<li>Required. The grant type. Must be <code>urn:ietf:params:oauth:grant-type:token-exchange</code>, which indicates a token exchange.</li>
+</ul>
+</li>
+<li><code>options=no</code><ul>
+<li>A set of features that Security Token Service supports, in addition to the standard OAuth 2.0 token exchange, formatted as a serialized JSON object of Options.</li>
+</ul>
+</li>
+<li><code>requested-token-type=ipsum</code><ul>
+<li>Required. An identifier for the type of requested security token. Must be <code>urn:ietf:params:oauth:token-type:access_token</code>.</li>
+</ul>
+</li>
+<li><code>scope=voluptua.</code><ul>
+<li>The OAuth 2.0 scopes to include on the resulting access token, formatted as a list of space-delimited, case-sensitive strings. Required when exchanging an external credential for a Google access token.</li>
+</ul>
+</li>
+<li><code>subject-token=at</code><ul>
+<li>Required. The input token. This token is a either an external credential issued by a workload identity pool provider, or a short-lived access token issued by Google. If the token is an OIDC JWT, it must use the JWT format defined in <a href="https://tools.ietf.org/html/rfc7523">RFC 7523</a>, and the <code>subject_token_type</code> must be <code>urn:ietf:params:oauth:token-type:jwt</code>. The following headers are required: - <code>kid</code>: The identifier of the signing key securing the JWT. - <code>alg</code>: The cryptographic algorithm securing the JWT. Must be <code>RS256</code>. The following payload fields are required. For more information, see <a href="https://tools.ietf.org/html/rfc7523#section-3">RFC 7523, Section 3</a>: - <code>iss</code>: The issuer of the token. The issuer must provide a discovery document at the URL <code>/.well-known/openid-configuration</code>, where <code>` is the value of this field. The document must be formatted according to section 4.2 of the [OIDC 1.0 Discovery specification](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationResponse). -</code>iat<code>: The issue time, in seconds, since the Unix epoch. Must be in the past. -</code>exp<code>: The expiration time, in seconds, since the Unix epoch. Must be less than 48 hours after</code>iat<code>. Shorter expiration times are more secure. If possible, we recommend setting an expiration time less than 6 hours. -</code>sub<code>: The identity asserted in the JWT. -</code>aud<code>: Configured by the mapper policy. The default value is the service account&amp;#39;s unique ID. Example header: ``` { &amp;#34;alg&amp;#34;: &amp;#34;RS256&amp;#34;, &amp;#34;kid&amp;#34;: &amp;#34;us-east-11&amp;#34; } ``` Example payload: ``` { &amp;#34;iss&amp;#34;: &amp;#34;https://accounts.google.com&amp;#34;, &amp;#34;iat&amp;#34;: 1517963104, &amp;#34;exp&amp;#34;: 1517966704, &amp;#34;aud&amp;#34;: &amp;#34;113475438248934895348&amp;#34;, &amp;#34;sub&amp;#34;: &amp;#34;113475438248934895348&amp;#34;, &amp;#34;my_claims&amp;#34;: { &amp;#34;additional_claim&amp;#34;: &amp;#34;value&amp;#34; } } ``` If</code>subject_token<code>is for AWS, it must be a serialized</code>GetCallerIdentity<code>token. This token contains the same information as a request to the AWS [</code>GetCallerIdentity()<code>](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity) method, as well as the AWS [signature](https://docs.aws.amazon.com/general/latest/gr/signing_aws_api_requests.html) for the request information. Use Signature Version 4. Format the request as URL-encoded JSON, and set the</code>subject_token_type<code>parameter to</code>urn:ietf:params:aws:token-type:aws4_request<code>. The following parameters are required: -</code>url<code>: The URL of the AWS STS endpoint for</code>GetCallerIdentity()<code>, such as</code>https://sts.amazonaws.com?Action=GetCallerIdentity&amp;Version=2011-06-15<code>. Regional endpoints are also supported. -</code>method<code>: The HTTP request method:</code>POST<code>. -</code>headers<code>: The HTTP request headers, which must include: -</code>Authorization<code>: The request signature. -</code>x-amz-date<code>: The time you will send the request, formatted as an [ISO8601 Basic](https://docs.aws.amazon.com/general/latest/gr/sigv4_elements.html#sigv4_elements_date) string. This value is typically set to the current time and is used to help prevent replay attacks. -</code>host<code>: The hostname of the</code>url<code>field; for example,</code>sts.amazonaws.com<code>. -</code>x-goog-cloud-target-resource<code>: The full, canonical resource name of the workload identity pool provider, with or without an</code>https:<code>prefix. To help ensure data integrity, we recommend including this header in the</code>SignedHeaders<code>field of the signed request. For example: //iam.googleapis.com/projects//locations//workloadIdentityPools//providers/ https://iam.googleapis.com/projects//locations//workloadIdentityPools//providers/ If you are using temporary security credentials provided by AWS, you must also include the header</code>x-amz-security-token<code>, with the value set to the session token. The following example shows a</code>GetCallerIdentity<code>token: ``` { &amp;#34;headers&amp;#34;: [ {&amp;#34;key&amp;#34;: &amp;#34;x-amz-date&amp;#34;, &amp;#34;value&amp;#34;: &amp;#34;20200815T015049Z&amp;#34;}, {&amp;#34;key&amp;#34;: &amp;#34;Authorization&amp;#34;, &amp;#34;value&amp;#34;: &amp;#34;AWS4-HMAC-SHA256+Credential=$credential,+SignedHeaders=host;x-amz-date;x-goog-cloud-target-resource,+Signature=$signature&amp;#34;}, {&amp;#34;key&amp;#34;: &amp;#34;x-goog-cloud-target-resource&amp;#34;, &amp;#34;value&amp;#34;: &amp;#34;//iam.googleapis.com/projects//locations//workloadIdentityPools//providers/&amp;#34;}, {&amp;#34;key&amp;#34;: &amp;#34;host&amp;#34;, &amp;#34;value&amp;#34;: &amp;#34;sts.amazonaws.com&amp;#34;} . ], &amp;#34;method&amp;#34;: &amp;#34;POST&amp;#34;, &amp;#34;url&amp;#34;: &amp;#34;https://sts.amazonaws.com?Action=GetCallerIdentity&amp;amp;Version=2011-06-15&amp;#34; } ``` You can also use a Google-issued OAuth 2.0 access token with this field to obtain an access token with new security attributes applied, such as a Credential Access Boundary. In this case, set</code>subject_token_type<code>to</code>urn:ietf:params:oauth:token-type:access_token`. If an access token already contains security attributes, you cannot apply additional security attributes.</li>
+</ul>
+</li>
+<li><code>subject-token-type=sanctus</code><ul>
+<li>Required. An identifier that indicates the type of the security token in the <code>subject_token</code> parameter. Supported values are <code>urn:ietf:params:oauth:token-type:jwt</code>, <code>urn:ietf:params:aws:token-type:aws4_request</code>, and <code>urn:ietf:params:oauth:token-type:access_token</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

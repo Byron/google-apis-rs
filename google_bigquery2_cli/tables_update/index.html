@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Update - bigquery v2.0.0+20210327</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> bigquery v2.0.0+20210327</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Datasets</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../datasets_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Jobs</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_cancel">Cancel</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_get-query-results">Get Query Results</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../jobs_query">Query</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Models</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../models_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../models_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../models_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../models_patch">Patch</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_get-service-account">Get Service Account</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Routines</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routines_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routines_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routines_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routines_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../routines_update">Update</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Row Access Policies</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../row-access-policies_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../row-access-policies_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../row-access-policies_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../row-access-policies_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Tabledata</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tabledata_insert-all">Insert All</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tabledata_list">List</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Tables</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_delete">Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_get">Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_get-iam-policy">Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_insert">Insert</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_list">List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_patch">Patch</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_set-iam-policy">Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../tables_test-iam-permissions">Test Iam Permissions</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Update</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Update</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/bigquery</em></li>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/bigquery</em>.
+You can set the scope for this method like this: <code>bigquery2 --scope &lt;scope&gt; tables update ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;project-id&gt;</strong> <em>(string)</em><ul>
+<li>Project ID of the table to update</li>
+</ul>
+</li>
+<li><strong>&lt;dataset-id&gt;</strong> <em>(string)</em><ul>
+<li>Dataset ID of the table to update</li>
+</ul>
+</li>
+<li><strong>&lt;table-id&gt;</strong> <em>(string)</em><ul>
+<li>Table ID of the table to update</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Table:
+  clustering:
+    fields: [string]
+  creation-time: string
+  description: string
+  encryption-configuration:
+    kms-key-name: string
+  etag: string
+  expiration-time: string
+  external-data-configuration:
+    autodetect: boolean
+    bigtable-options:
+      ignore-unspecified-column-families: boolean
+      read-rowkey-as-string: boolean
+    compression: string
+    connection-id: string
+    csv-options:
+      allow-jagged-rows: boolean
+      allow-quoted-newlines: boolean
+      encoding: string
+      field-delimiter: string
+      quote: string
+      skip-leading-rows: string
+    google-sheets-options:
+      range: string
+      skip-leading-rows: string
+    hive-partitioning-options:
+      mode: string
+      require-partition-filter: boolean
+      source-uri-prefix: string
+    ignore-unknown-values: boolean
+    max-bad-records: integer
+    parquet-options:
+      enable-list-inference: boolean
+      enum-as-string: boolean
+    source-format: string
+    source-uris: [string]
+  friendly-name: string
+  id: string
+  kind: string
+  labels: { string: string }
+  last-modified-time: string
+  location: string
+  materialized-view:
+    enable-refresh: boolean
+    last-refresh-time: string
+    query: string
+    refresh-interval-ms: string
+  model:
+    model-options:
+      labels: [string]
+      loss-type: string
+      model-type: string
+  num-bytes: string
+  num-long-term-bytes: string
+  num-physical-bytes: string
+  num-rows: string
+  range-partitioning:
+    field: string
+    range:
+      end: string
+      interval: string
+      start: string
+  require-partition-filter: boolean
+  self-link: string
+  snapshot-definition:
+    base-table-reference:
+      dataset-id: string
+      project-id: string
+      table-id: string
+    snapshot-time: string
+  streaming-buffer:
+    estimated-bytes: string
+    estimated-rows: string
+    oldest-entry-time: string
+  table-reference:
+    dataset-id: string
+    project-id: string
+    table-id: string
+  time-partitioning:
+    expiration-ms: string
+    field: string
+    require-partition-filter: boolean
+    type: string
+  type: string
+  view:
+    query: string
+    use-legacy-sql: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .clustering    fields=dolor</code></p>
+<ul>
+<li>[Repeated] One or more fields on which data should be clustered. Only top-level, non-repeated, simple-type fields are supported. When you cluster a table using multiple columns, the order of columns you specify is important. The order of the specified columns determines the sort order of the data.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    creation-time=erat</code></p>
+<ul>
+<li>[Output-only] The time when this table was created, in milliseconds since the epoch.</li>
+</ul>
+</li>
+<li><code>description=dolore</code><ul>
+<li>[Optional] A user-friendly description of this table.</li>
+</ul>
+</li>
+<li>
+<p><code>encryption-configuration    kms-key-name=vero</code></p>
+<ul>
+<li>[Optional] Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.</li>
+</ul>
+</li>
+<li>
+<p><code>..    etag=ea</code></p>
+<ul>
+<li>[Output-only] A hash of the table metadata. Used to ensure there were no concurrent modifications to the resource when attempting an update. Not guaranteed to change when the table contents or the fields numRows, numBytes, numLongTermBytes or lastModifiedTime change.</li>
+</ul>
+</li>
+<li><code>expiration-time=et</code><ul>
+<li>[Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed. The defaultTableExpirationMs property of the encapsulating dataset can be used to set a default expirationTime on newly created tables.</li>
+</ul>
+</li>
+<li><code>external-data-configuration    autodetect=true</code><ul>
+<li>Try to detect schema and format options automatically. Any option specified explicitly will be honored.</li>
+</ul>
+</li>
+<li><code>bigtable-options    ignore-unspecified-column-families=true</code><ul>
+<li>[Optional] If field is true, then the column families that are not specified in columnFamilies list are not exposed in the table schema. Otherwise, they are read with BYTES type values. The default value is false.</li>
+</ul>
+</li>
+<li>
+<p><code>read-rowkey-as-string=true</code></p>
+<ul>
+<li>[Optional] If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false.</li>
+</ul>
+</li>
+<li>
+<p><code>..    compression=sed</code></p>
+<ul>
+<li>[Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.</li>
+</ul>
+</li>
+<li><code>connection-id=dolor</code><ul>
+<li>[Optional, Trusted Tester] Connection for external data source.</li>
+</ul>
+</li>
+<li><code>csv-options    allow-jagged-rows=false</code><ul>
+<li>[Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.</li>
+</ul>
+</li>
+<li><code>allow-quoted-newlines=false</code><ul>
+<li>[Optional] Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.</li>
+</ul>
+</li>
+<li><code>encoding=eos</code><ul>
+<li>[Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.</li>
+</ul>
+</li>
+<li><code>field-delimiter=nonumy</code><ul>
+<li>[Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence &#34;\t&#34; to specify a tab separator. The default value is a comma (&#39;,&#39;).</li>
+</ul>
+</li>
+<li><code>quote=ea</code><ul>
+<li>[Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote (&#39;&#34;&#39;). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.</li>
+</ul>
+</li>
+<li>
+<p><code>skip-leading-rows=aliquyam</code></p>
+<ul>
+<li>[Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped. When autodetect is on, the behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N &gt; 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.</li>
+</ul>
+</li>
+<li>
+<p><code>..google-sheets-options    range=nonumy</code></p>
+<ul>
+<li>[Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20</li>
+</ul>
+</li>
+<li>
+<p><code>skip-leading-rows=stet</code></p>
+<ul>
+<li>[Optional] The number of rows at the top of a sheet that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows that should be skipped. When autodetect is on, behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N &gt; 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.</li>
+</ul>
+</li>
+<li>
+<p><code>..hive-partitioning-options    mode=rebum.</code></p>
+<ul>
+<li>[Optional] When set, what mode of hive partitioning to use when reading data. The following modes are supported. (1) AUTO: automatically infer partition key name(s) and type(s). (2) STRINGS: automatically infer partition key name(s). All types are interpreted as strings. (3) CUSTOM: partition key schema is encoded in the source URI prefix. Not all storage formats support hive partitioning. Requesting hive partitioning on an unsupported format will lead to an error. Currently supported types include: AVRO, CSV, JSON, ORC and Parquet.</li>
+</ul>
+</li>
+<li><code>require-partition-filter=true</code><ul>
+<li>[Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified. Note that this field should only be true when creating a permanent external table or querying a temporary external table. Hive-partitioned loads with requirePartitionFilter explicitly set to true will fail.</li>
+</ul>
+</li>
+<li>
+<p><code>source-uri-prefix=dolores</code></p>
+<ul>
+<li>[Optional] When hive partition detection is requested, a common prefix for all source uris should be supplied. The prefix must end immediately before the partition key encoding begins. For example, consider files following this data layout. gs://bucket/path_to_table/dt=2019-01-01/country=BR/id=7/file.avro gs://bucket/path_to_table/dt=2018-12-31/country=CA/id=3/file.avro When hive partitioning is requested with either AUTO or STRINGS detection, the common prefix can be either of gs://bucket/path_to_table or gs://bucket/path_to_table/ (trailing slash does not matter).</li>
+</ul>
+</li>
+<li>
+<p><code>..    ignore-unknown-values=false</code></p>
+<ul>
+<li>[Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don&#39;t match any column names Google Cloud Bigtable: This setting is ignored. Google Cloud Datastore backups: This setting is ignored. Avro: This setting is ignored.</li>
+</ul>
+</li>
+<li><code>max-bad-records=93</code><ul>
+<li>[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.</li>
+</ul>
+</li>
+<li><code>parquet-options    enable-list-inference=false</code><ul>
+<li>[Optional] Indicates whether to use schema inference specifically for Parquet LIST logical type.</li>
+</ul>
+</li>
+<li>
+<p><code>enum-as-string=false</code></p>
+<ul>
+<li>[Optional] Indicates whether to infer Parquet ENUM logical type as STRING instead of BYTES by default.</li>
+</ul>
+</li>
+<li>
+<p><code>..    source-format=magna</code></p>
+<ul>
+<li>[Required] The data format. For CSV files, specify &#34;CSV&#34;. For Google sheets, specify &#34;GOOGLE_SHEETS&#34;. For newline-delimited JSON, specify &#34;NEWLINE_DELIMITED_JSON&#34;. For Avro files, specify &#34;AVRO&#34;. For Google Cloud Datastore backups, specify &#34;DATASTORE_BACKUP&#34;. [Beta] For Google Cloud Bigtable, specify &#34;BIGTABLE&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>source-uris=no</code></p>
+<ul>
+<li>[Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one &#39;<em>&#39; wildcard character and it must come after the &#39;bucket&#39; name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the &#39;</em>&#39; wildcard character is not allowed.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    friendly-name=gubergren</code></p>
+<ul>
+<li>[Optional] A descriptive name for this table.</li>
+</ul>
+</li>
+<li><code>id=erat</code><ul>
+<li>[Output-only] An opaque ID uniquely identifying the table.</li>
+</ul>
+</li>
+<li><code>kind=aliquyam</code><ul>
+<li>[Output-only] The type of the resource.</li>
+</ul>
+</li>
+<li><code>labels=key=consetetur</code><ul>
+<li>The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>last-modified-time=ea</code><ul>
+<li>[Output-only] The time when this table was last modified, in milliseconds since the epoch.</li>
+</ul>
+</li>
+<li><code>location=lorem</code><ul>
+<li>[Output-only] The geographic location where the table resides. This value is inherited from the dataset.</li>
+</ul>
+</li>
+<li><code>materialized-view    enable-refresh=false</code><ul>
+<li>[Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is &#34;true&#34;.</li>
+</ul>
+</li>
+<li><code>last-refresh-time=justo</code><ul>
+<li>[Output-only] [TrustedTester] The time when this materialized view was last modified, in milliseconds since the epoch.</li>
+</ul>
+</li>
+<li><code>query=lorem</code><ul>
+<li>[Required] A query whose result is persisted.</li>
+</ul>
+</li>
+<li>
+<p><code>refresh-interval-ms=labore</code></p>
+<ul>
+<li>[Optional] [TrustedTester] The maximum frequency at which this materialized view will be refreshed. The default value is &#34;1800000&#34; (30 minutes).</li>
+</ul>
+</li>
+<li>
+<p><code>..model.model-options    labels=gubergren</code></p>
+<ul>
+<li>No description provided.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>loss-type=vero</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>model-type=ea</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>...    num-bytes=sed</code></p>
+<ul>
+<li>[Output-only] The size of this table in bytes, excluding any data in the streaming buffer.</li>
+</ul>
+</li>
+<li><code>num-long-term-bytes=sanctus</code><ul>
+<li>[Output-only] The number of bytes in the table that are considered &#34;long-term storage&#34;.</li>
+</ul>
+</li>
+<li><code>num-physical-bytes=labore</code><ul>
+<li>[Output-only] [TrustedTester] The physical size of this table in bytes, excluding any data in the streaming buffer. This includes compression and storage used for time travel.</li>
+</ul>
+</li>
+<li><code>num-rows=amet</code><ul>
+<li>[Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.</li>
+</ul>
+</li>
+<li><code>range-partitioning    field=et</code><ul>
+<li>[TrustedTester] [Required] The table is partitioned by this field. The field must be a top-level NULLABLE/REQUIRED field. The only supported type is INTEGER/INT64.</li>
+</ul>
+</li>
+<li><code>range    end=dolore</code><ul>
+<li>[TrustedTester] [Required] The end of range partitioning, exclusive.</li>
+</ul>
+</li>
+<li><code>interval=voluptua.</code><ul>
+<li>[TrustedTester] [Required] The width of each interval.</li>
+</ul>
+</li>
+<li>
+<p><code>start=sit</code></p>
+<ul>
+<li>[TrustedTester] [Required] The start of range partitioning, inclusive.</li>
+</ul>
+</li>
+<li>
+<p><code>...    require-partition-filter=true</code></p>
+<ul>
+<li>[Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.</li>
+</ul>
+</li>
+<li><code>self-link=eirmod</code><ul>
+<li>[Output-only] A URL that can be used to access this resource again.</li>
+</ul>
+</li>
+<li><code>snapshot-definition.base-table-reference    dataset-id=vero</code><ul>
+<li>[Required] The ID of the dataset containing this table.</li>
+</ul>
+</li>
+<li><code>project-id=voluptua.</code><ul>
+<li>[Required] The ID of the project containing this table.</li>
+</ul>
+</li>
+<li>
+<p><code>table-id=sea</code></p>
+<ul>
+<li>[Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.</li>
+</ul>
+</li>
+<li>
+<p><code>..    snapshot-time=ipsum</code></p>
+<ul>
+<li>[Required] The time at which the base table was snapshot.</li>
+</ul>
+</li>
+<li>
+<p><code>..streaming-buffer    estimated-bytes=sea</code></p>
+<ul>
+<li>[Output-only] A lower-bound estimate of the number of bytes currently in the streaming buffer.</li>
+</ul>
+</li>
+<li><code>estimated-rows=et</code><ul>
+<li>[Output-only] A lower-bound estimate of the number of rows currently in the streaming buffer.</li>
+</ul>
+</li>
+<li>
+<p><code>oldest-entry-time=gubergren</code></p>
+<ul>
+<li>[Output-only] Contains the timestamp of the oldest entry in the streaming buffer, in milliseconds since the epoch, if the streaming buffer is available.</li>
+</ul>
+</li>
+<li>
+<p><code>..table-reference    dataset-id=dolore</code></p>
+<ul>
+<li>[Required] The ID of the dataset containing this table.</li>
+</ul>
+</li>
+<li><code>project-id=ea</code><ul>
+<li>[Required] The ID of the project containing this table.</li>
+</ul>
+</li>
+<li>
+<p><code>table-id=elitr</code></p>
+<ul>
+<li>[Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.</li>
+</ul>
+</li>
+<li>
+<p><code>..time-partitioning    expiration-ms=takimata</code></p>
+<ul>
+<li>[Optional] Number of milliseconds for which to keep the storage for partitions in the table. The storage in a partition will have an expiration time of its partition time plus this value.</li>
+</ul>
+</li>
+<li><code>field=duo</code><ul>
+<li>[Beta] [Optional] If not set, the table is partitioned by pseudo column, referenced via either &#39;_PARTITIONTIME&#39; as TIMESTAMP type, or &#39;_PARTITIONDATE&#39; as DATE type. If field is specified, the table is instead partitioned by this field. The field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED.</li>
+</ul>
+</li>
+<li><code>require-partition-filter=false</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>type=clita</code></p>
+<ul>
+<li>[Required] The supported types are DAY, HOUR, MONTH, and YEAR, which will generate one partition per day, hour, month, and year, respectively. When the type is not specified, the default behavior is DAY.</li>
+</ul>
+</li>
+<li>
+<p><code>..    type=sed</code></p>
+<ul>
+<li>[Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. SNAPSHOT: An immutable, read-only table that is a copy of another table. [TrustedTester] MATERIALIZED_VIEW: SQL query whose result is persisted. EXTERNAL: A table that references data stored in an external storage system, such as Google Cloud Storage. The default value is TABLE.</li>
+</ul>
+</li>
+<li><code>view    query=no</code><ul>
+<li>[Required] A query that BigQuery executes when the view is referenced.</li>
+</ul>
+</li>
+<li><code>use-legacy-sql=true</code><ul>
+<li>Specifies whether to use BigQuery&#39;s legacy SQL for this view. The default value is true. If set to false, the view will use BigQuery&#39;s standard SQL: https://cloud.google.com/bigquery/sql-reference/ Queries and views that reference this view must use the same flag value.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../tables_test-iam-permissions" class="btn btn-neutral" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../tables_test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

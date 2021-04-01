@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Run Report - AnalyticsData v2.0.0+20210329</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AnalyticsData v2.0.0+20210329</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Properties</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_batch-run-pivot-reports">Batch Run Pivot Reports</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_batch-run-reports">Batch Run Reports</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_get-metadata">Get Metadata</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_run-pivot-report">Run Pivot Report</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../properties_run-realtime-report">Run Realtime Report</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Run Report</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Run Report</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsdata1_beta-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Returns a customized report of your Google Analytics event data. Reports contain statistics derived from data collected by the Google Analytics tracking code. The data returned from the API is as a table with columns for the requested dimensions and metrics. Metrics are individual measurements of user activity on your property, such as active users or event count. Dimensions break down metrics across some common criteria, such as country or event name.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/analytics</em></li>
+<li><em>https://www.googleapis.com/auth/analytics.readonly</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/analytics</em>.
+You can set the scope for this method like this: <code>analyticsdata1-beta --scope &lt;scope&gt; properties run-report ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;property&gt;</strong> <em>(string)</em><ul>
+<li>A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/property-id">where to find your Property ID</a>. Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>RunReportRequest:
+  cohort-spec:
+    cohort-report-settings:
+      accumulate: boolean
+    cohorts-range:
+      end-offset: integer
+      granularity: string
+      start-offset: integer
+  currency-code: string
+  dimension-filter:
+    filter:
+      between-filter:
+        from-value:
+          double-value: number
+          int64-value: string
+        to-value:
+          double-value: number
+          int64-value: string
+      field-name: string
+      in-list-filter:
+        case-sensitive: boolean
+        values: [string]
+      numeric-filter:
+        operation: string
+        value:
+          double-value: number
+          int64-value: string
+      string-filter:
+        case-sensitive: boolean
+        match-type: string
+        value: string
+  keep-empty-rows: boolean
+  limit: string
+  metric-aggregations: [string]
+  metric-filter:
+    filter:
+      between-filter:
+        from-value:
+          double-value: number
+          int64-value: string
+        to-value:
+          double-value: number
+          int64-value: string
+      field-name: string
+      in-list-filter:
+        case-sensitive: boolean
+        values: [string]
+      numeric-filter:
+        operation: string
+        value:
+          double-value: number
+          int64-value: string
+      string-filter:
+        case-sensitive: boolean
+        match-type: string
+        value: string
+  offset: string
+  property: string
+  return-property-quota: boolean
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .cohort-spec.cohort-report-settings    accumulate=true</code></p>
+<ul>
+<li>If true, accumulates the result from first touch day to the end day. Not supported in <code>RunReportRequest</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..cohorts-range    end-offset=73</code></p>
+<ul>
+<li>Required. <code>endOffset</code> specifies the end date of the extended reporting date range for a cohort report. <code>endOffset</code> can be any positive integer but is commonly set to 5 to 10 so that reports contain data on the cohort for the next several granularity time periods. If <code>granularity</code> is <code>DAILY</code>, the <code>endDate</code> of the extended reporting date range is <code>endDate</code> of the cohort plus <code>endOffset</code> days. If <code>granularity</code> is <code>WEEKLY</code>, the <code>endDate</code> of the extended reporting date range is <code>endDate</code> of the cohort plus <code>endOffset * 7</code> days. If <code>granularity</code> is <code>MONTHLY</code>, the <code>endDate</code> of the extended reporting date range is <code>endDate</code> of the cohort plus <code>endOffset * 30</code> days.</li>
+</ul>
+</li>
+<li><code>granularity=et</code><ul>
+<li>Required. The granularity used to interpret the <code>startOffset</code> and <code>endOffset</code> for the extended reporting date range for a cohort report.</li>
+</ul>
+</li>
+<li>
+<p><code>start-offset=70</code></p>
+<ul>
+<li><code>startOffset</code> specifies the start date of the extended reporting date range for a cohort report. <code>startOffset</code> is commonly set to 0 so that reports contain data from the acquisition of the cohort forward. If <code>granularity</code> is <code>DAILY</code>, the <code>startDate</code> of the extended reporting date range is <code>startDate</code> of the cohort plus <code>startOffset</code> days. If <code>granularity</code> is <code>WEEKLY</code>, the <code>startDate</code> of the extended reporting date range is <code>startDate</code> of the cohort plus <code>startOffset * 7</code> days. If <code>granularity</code> is <code>MONTHLY</code>, the <code>startDate</code> of the extended reporting date range is <code>startDate</code> of the cohort plus <code>startOffset * 30</code> days.</li>
+</ul>
+</li>
+<li>
+<p><code>...    currency-code=consetetur</code></p>
+<ul>
+<li>A currency code in ISO4217 format, such as &#34;AED&#34;, &#34;USD&#34;, &#34;JPY&#34;. If the field is empty, the report uses the property&#39;s default currency.</li>
+</ul>
+</li>
+<li><code>dimension-filter.filter.between-filter.from-value    double-value=0.7759968264300798</code><ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=sed</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>..to-value    double-value=0.726541471822237</code></p>
+<ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=gubergren</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>...    field-name=et</code></p>
+<ul>
+<li>The dimension name or metric name. Must be a name defined in dimensions or metrics.</li>
+</ul>
+</li>
+<li><code>in-list-filter    case-sensitive=false</code><ul>
+<li>If true, the string value is case sensitive.</li>
+</ul>
+</li>
+<li>
+<p><code>values=dolore</code></p>
+<ul>
+<li>The list of string values. Must be non-empty.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..numeric-filter    operation=dolore</code></p>
+<ul>
+<li>The operation type for this filter.</li>
+</ul>
+</li>
+<li><code>value    double-value=0.5284480987860815</code><ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=amet.</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>...string-filter    case-sensitive=false</code></p>
+<ul>
+<li>If true, the string value is case sensitive.</li>
+</ul>
+</li>
+<li><code>match-type=lorem</code><ul>
+<li>The match type for this filter.</li>
+</ul>
+</li>
+<li>
+<p><code>value=invidunt</code></p>
+<ul>
+<li>The string value used for the matching.</li>
+</ul>
+</li>
+<li>
+<p><code>....    keep-empty-rows=true</code></p>
+<ul>
+<li>If false or unspecified, each row with all metrics equal to 0 will not be returned. If true, these rows will be returned if they are not separately removed by a filter.</li>
+</ul>
+</li>
+<li><code>limit=sit</code><ul>
+<li>The number of rows to return. If unspecified, 10,000 rows are returned. The API returns a maximum of 100,000 rows per request, no matter how many you ask for. <code>limit</code> must be positive. The API can also return fewer rows than the requested <code>limit</code>, if there aren&#39;t as many dimension values as the <code>limit</code>. For instance, there are fewer than 300 possible values for the dimension <code>country</code>, so when reporting on only <code>country</code>, you can&#39;t get more than 300 rows, even if you set <code>limit</code> to a higher value. To learn more about this pagination parameter, see <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/basics#pagination">Pagination</a>.</li>
+</ul>
+</li>
+<li><code>metric-aggregations=et</code><ul>
+<li>Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to &#34;RESERVED_(MetricAggregation)&#34;.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>metric-filter.filter.between-filter.from-value    double-value=0.4875873367661776</code><ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=ipsum</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>..to-value    double-value=0.6542024592226057</code></p>
+<ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=lorem</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>...    field-name=est</code></p>
+<ul>
+<li>The dimension name or metric name. Must be a name defined in dimensions or metrics.</li>
+</ul>
+</li>
+<li><code>in-list-filter    case-sensitive=true</code><ul>
+<li>If true, the string value is case sensitive.</li>
+</ul>
+</li>
+<li>
+<p><code>values=et</code></p>
+<ul>
+<li>The list of string values. Must be non-empty.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..numeric-filter    operation=sed</code></p>
+<ul>
+<li>The operation type for this filter.</li>
+</ul>
+</li>
+<li><code>value    double-value=0.7087562540955133</code><ul>
+<li>Double value</li>
+</ul>
+</li>
+<li>
+<p><code>int64-value=elitr</code></p>
+<ul>
+<li>Integer value</li>
+</ul>
+</li>
+<li>
+<p><code>...string-filter    case-sensitive=false</code></p>
+<ul>
+<li>If true, the string value is case sensitive.</li>
+</ul>
+</li>
+<li><code>match-type=no</code><ul>
+<li>The match type for this filter.</li>
+</ul>
+</li>
+<li>
+<p><code>value=nonumy</code></p>
+<ul>
+<li>The string value used for the matching.</li>
+</ul>
+</li>
+<li>
+<p><code>....    offset=at</code></p>
+<ul>
+<li>The row count of the start row. The first row is counted as row 0. When paging, the first request does not specify offset; or equivalently, sets offset to 0; the first request returns the first <code>limit</code> of rows. The second request sets offset to the <code>limit</code> of the first request; the second request returns the second <code>limit</code> of rows. To learn more about this pagination parameter, see <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/basics#pagination">Pagination</a>.</li>
+</ul>
+</li>
+<li><code>property=sadipscing</code><ul>
+<li>A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/property-id">where to find your Property ID</a>. Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234</li>
+</ul>
+</li>
+<li><code>return-property-quota=true</code><ul>
+<li>Toggles whether to return the current state of this Analytics Property&#39;s quota. Quota is returned in <a href="#PropertyQuota">PropertyQuota</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../properties_run-realtime-report" class="btn btn-neutral" title="Run Realtime Report"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../properties_run-realtime-report" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

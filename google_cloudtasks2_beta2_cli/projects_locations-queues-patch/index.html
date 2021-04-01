@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Locations Queues Patch - Cloud Tasks v2.0.0+20210315</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Cloud Tasks v2.0.0+20210315</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Projects</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-get">Locations Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-list">Locations List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-create">Locations Queues Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-delete">Locations Queues Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-get">Locations Queues Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-get-iam-policy">Locations Queues Get Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-list">Locations Queues List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Locations Queues Patch</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
+                            
+                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-pause">Locations Queues Pause</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-purge">Locations Queues Purge</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-resume">Locations Queues Resume</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-set-iam-policy">Locations Queues Set Iam Policy</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-acknowledge">Locations Queues Tasks Acknowledge</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-cancel-lease">Locations Queues Tasks Cancel Lease</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-create">Locations Queues Tasks Create</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-delete">Locations Queues Tasks Delete</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-get">Locations Queues Tasks Get</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-lease">Locations Queues Tasks Lease</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-list">Locations Queues Tasks List</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-renew-lease">Locations Queues Tasks Renew Lease</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-tasks-run">Locations Queues Tasks Run</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../projects_locations-queues-test-iam-permissions">Locations Queues Test Iam Permissions</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Locations Queues Patch</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta2-cli" class="icon icon-github"> Edit on GitHub</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <p>Updates a queue. This method creates the queue if it does not exist and updates the queue if it does exist. Queues created with this method allow tasks to live for a maximum of 31 days. After a task is 31 days old, the task will be deleted regardless of whether it was dispatched or not. WARNING: Using this method may have unintended side effects if you are using an App Engine <code>queue.yaml</code> or <code>queue.xml</code> file to manage your queues. Read <a href="https://cloud.google.com/tasks/docs/queue-yaml">Overview of Queue Management and queue.yaml</a> before using this method.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>cloudtasks2-beta2 --scope &lt;scope&gt; projects locations-queues-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Caller-specified and required in CreateQueue, after which it becomes output only. The queue name. The queue name must have the following format: <code>projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID</code> * <code>PROJECT_ID</code> can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), or periods (.). For more information, see <a href="https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects">Identifying projects</a> * <code>LOCATION_ID</code> is the canonical ID for the queue&#39;s location. The list of available locations can be obtained by calling ListLocations. For more information, see https://cloud.google.com/about/locations/. * <code>QUEUE_ID</code> can contain letters ([A-Za-z]), numbers ([0-9]), or hyphens (-). The maximum length is 100 characters.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Queue:
+  app-engine-http-target:
+    app-engine-routing-override:
+      host: string
+      instance: string
+      service: string
+      version: string
+  name: string
+  purge-time: string
+  rate-limits:
+    max-burst-size: integer
+    max-concurrent-tasks: integer
+    max-tasks-dispatched-per-second: number
+  retry-config:
+    max-attempts: integer
+    max-backoff: string
+    max-doublings: integer
+    max-retry-duration: string
+    min-backoff: string
+    unlimited-attempts: boolean
+  state: string
+  stats:
+    concurrent-dispatches-count: int64
+    effective-execution-rate: number
+    executed-last-minute-count: int64
+    oldest-estimated-arrival-time: string
+    tasks-count: int64
+  task-ttl: string
+  tombstone-ttl: string
+
+</code></pre>
+
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .app-engine-http-target.app-engine-routing-override    host=ut</code><ul>
+<li>Output only. The host that the task is sent to. For more information, see <a href="https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed">How Requests are Routed</a>. The host is constructed as: * <code>host = [application_domain_name]</code> <code>| [service] + &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [version] + &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [version_dot_service]+ &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [instance] + &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [instance_dot_service] + &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [instance_dot_version] + &amp;#39;.&amp;#39; + [application_domain_name]</code> <code>| [instance_dot_version_dot_service] + &amp;#39;.&amp;#39; + [application_domain_name]</code> * <code>application_domain_name</code> = The domain name of the app, for example .appspot.com, which is associated with the queue&#39;s project ID. Some tasks which were created using the App Engine SDK use a custom domain name. * <code>service =</code> service * <code>version =</code> version * <code>version_dot_service =</code> version <code>+ &amp;#39;.&amp;#39; +</code> service * <code>instance =</code> instance * <code>instance_dot_service =</code> instance <code>+ &amp;#39;.&amp;#39; +</code> service * <code>instance_dot_version =</code> instance <code>+ &amp;#39;.&amp;#39; +</code> version * <code>instance_dot_version_dot_service =</code> instance <code>+ &amp;#39;.&amp;#39; +</code> version <code>+ &amp;#39;.&amp;#39; +</code> service If service is empty, then the task will be sent to the service which is the default service when the task is attempted. If version is empty, then the task will be sent to the version which is the default version when the task is attempted. If instance is empty, then the task will be sent to an instance which is available when the task is attempted. If service, version, or instance is invalid, then the task will be sent to the default version of the default service when the task is attempted.</li>
+</ul>
+</li>
+<li><code>instance=gubergren</code><ul>
+<li>App instance. By default, the task is sent to an instance which is available when the task is attempted. Requests can only be sent to a specific instance if <a href="https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes">manual scaling is used in App Engine Standard</a>. App Engine Flex does not support instances. For more information, see <a href="https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed">App Engine Standard request routing</a> and <a href="https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed">App Engine Flex request routing</a>.</li>
+</ul>
+</li>
+<li><code>service=rebum.</code><ul>
+<li>App service. By default, the task is sent to the service which is the default service when the task is attempted. For some queues or tasks which were created using the App Engine Task Queue API, host is not parsable into service, version, and instance. For example, some tasks which were created using the App Engine SDK use a custom domain name; custom domains are not parsed by Cloud Tasks. If host is not parsable, then service, version, and instance are the empty string.</li>
+</ul>
+</li>
+<li>
+<p><code>version=est</code></p>
+<ul>
+<li>App version. By default, the task is sent to the version which is the default version when the task is attempted. For some queues or tasks which were created using the App Engine Task Queue API, host is not parsable into service, version, and instance. For example, some tasks which were created using the App Engine SDK use a custom domain name; custom domains are not parsed by Cloud Tasks. If host is not parsable, then service, version, and instance are the empty string.</li>
+</ul>
+</li>
+<li>
+<p><code>...    name=ipsum</code></p>
+<ul>
+<li>Caller-specified and required in CreateQueue, after which it becomes output only. The queue name. The queue name must have the following format: <code>projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID</code> * <code>PROJECT_ID</code> can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), or periods (.). For more information, see <a href="https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects">Identifying projects</a> * <code>LOCATION_ID</code> is the canonical ID for the queue&#39;s location. The list of available locations can be obtained by calling ListLocations. For more information, see https://cloud.google.com/about/locations/. * <code>QUEUE_ID</code> can contain letters ([A-Za-z]), numbers ([0-9]), or hyphens (-). The maximum length is 100 characters.</li>
+</ul>
+</li>
+<li><code>purge-time=ipsum</code><ul>
+<li>Output only. The last time this queue was purged. All tasks that were created before this time were purged. A queue can be purged using PurgeQueue, the <a href="https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue">App Engine Task Queue SDK, or the Cloud Console</a>. Purge time will be truncated to the nearest microsecond. Purge time will be unset if the queue has never been purged.</li>
+</ul>
+</li>
+<li><code>rate-limits    max-burst-size=94</code><ul>
+<li>The max burst size. Max burst size limits how fast tasks in queue are processed when many tasks are in the queue and the rate is high. This field allows the queue to have a high rate so processing starts shortly after a task is enqueued, but still limits resource usage when many tasks are enqueued in a short period of time. The <a href="https://wikipedia.org/wiki/Token_Bucket">token bucket</a> algorithm is used to control the rate of task dispatches. Each queue has a token bucket that holds tokens, up to the maximum specified by <code>max_burst_size</code>. Each time a task is dispatched, a token is removed from the bucket. Tasks will be dispatched until the queue&#39;s bucket runs out of tokens. The bucket will be continuously refilled with new tokens based on max_dispatches_per_second. The default value of <code>max_burst_size</code> is picked by Cloud Tasks based on the value of max_dispatches_per_second. The maximum value of <code>max_burst_size</code> is 500. For App Engine queues that were created or updated using <code>queue.yaml/xml</code>, <code>max_burst_size</code> is equal to <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#bucket_size">bucket_size</a>. If UpdateQueue is called on a queue without explicitly setting a value for <code>max_burst_size</code>, <code>max_burst_size</code> value will get updated if UpdateQueue is updating max_dispatches_per_second. </li>
+</ul>
+</li>
+<li><code>max-concurrent-tasks=39</code><ul>
+<li>The maximum number of concurrent tasks that Cloud Tasks allows to be dispatched for this queue. After this threshold has been reached, Cloud Tasks stops dispatching tasks until the number of concurrent requests decreases. If unspecified when the queue is created, Cloud Tasks will pick the default. The maximum allowed value is 5,000. This field is output only for pull queues and always -1, which indicates no limit. No other queue types can have <code>max_concurrent_tasks</code> set to -1. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#max_concurrent_requests">max_concurrent_requests in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>max-tasks-dispatched-per-second=0.6637488828437452</code></p>
+<ul>
+<li>The maximum rate at which tasks are dispatched from this queue. If unspecified when the queue is created, Cloud Tasks will pick the default. * For App Engine queues, the maximum allowed value is 500. * This field is output only for pull queues. In addition to the <code>max_tasks_dispatched_per_second</code> limit, a maximum of 10 QPS of LeaseTasks requests are allowed per pull queue. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#rate">rate in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..retry-config    max-attempts=45</code></p>
+<ul>
+<li>The maximum number of attempts for a task. Cloud Tasks will attempt the task <code>max_attempts</code> times (that is, if the first attempt fails, then there will be <code>max_attempts - 1</code> retries). Must be &gt; 0.</li>
+</ul>
+</li>
+<li><code>max-backoff=eos</code><ul>
+<li>A task will be scheduled for retry between min_backoff and max_backoff duration after it fails, if the queue&#39;s RetryConfig specifies that the task should be retried. If unspecified when the queue is created, Cloud Tasks will pick the default. This field is output only for pull queues. <code>max_backoff</code> will be truncated to the nearest second. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters">max_backoff_seconds in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li><code>max-doublings=15</code><ul>
+<li>The time between retries will double <code>max_doublings</code> times. A task&#39;s retry interval starts at min_backoff, then doubles <code>max_doublings</code> times, then increases linearly, and finally retries at intervals of max_backoff up to max_attempts times. For example, if min_backoff is 10s, max_backoff is 300s, and <code>max_doublings</code> is 3, then the a task will first be retried in 10s. The retry interval will double three times, and then increase linearly by 2^3 * 10s. Finally, the task will retry at intervals of max_backoff until the task has been attempted max_attempts times. Thus, the requests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s, 300s, .... If unspecified when the queue is created, Cloud Tasks will pick the default. This field is output only for pull queues. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters">max_doublings in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li><code>max-retry-duration=sed</code><ul>
+<li>If positive, <code>max_retry_duration</code> specifies the time limit for retrying a failed task, measured from when the task was first attempted. Once <code>max_retry_duration</code> time has passed <em>and</em> the task has been attempted max_attempts times, no further attempts will be made and the task will be deleted. If zero, then the task age is unlimited. If unspecified when the queue is created, Cloud Tasks will pick the default. This field is output only for pull queues. <code>max_retry_duration</code> will be truncated to the nearest second. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters">task_age_limit in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li><code>min-backoff=duo</code><ul>
+<li>A task will be scheduled for retry between min_backoff and max_backoff duration after it fails, if the queue&#39;s RetryConfig specifies that the task should be retried. If unspecified when the queue is created, Cloud Tasks will pick the default. This field is output only for pull queues. <code>min_backoff</code> will be truncated to the nearest second. This field has the same meaning as <a href="https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters">min_backoff_seconds in queue.yaml/xml</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>unlimited-attempts=false</code></p>
+<ul>
+<li>If true, then the number of attempts is unlimited.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=no</code></p>
+<ul>
+<li>Output only. The state of the queue. <code>state</code> can only be changed by called PauseQueue, ResumeQueue, or uploading <a href="https://cloud.google.com/appengine/docs/python/config/queueref">queue.yaml/xml</a>. UpdateQueue cannot be used to change <code>state</code>.</li>
+</ul>
+</li>
+<li><code>stats    concurrent-dispatches-count=-15</code><ul>
+<li>Output only. The number of requests that the queue has dispatched but has not received a reply for yet.</li>
+</ul>
+</li>
+<li><code>effective-execution-rate=0.6905413711203235</code><ul>
+<li>Output only. The current maximum number of tasks per second executed by the queue. The maximum value of this variable is controlled by the RateLimits of the Queue. However, this value could be less to avoid overloading the endpoints tasks in the queue are targeting.</li>
+</ul>
+</li>
+<li><code>executed-last-minute-count=-24</code><ul>
+<li>Output only. The number of tasks that the queue has dispatched and received a reply for during the last minute. This variable counts both successful and non-successful executions.</li>
+</ul>
+</li>
+<li><code>oldest-estimated-arrival-time=sed</code><ul>
+<li>Output only. An estimation of the nearest time in the future where a task in the queue is scheduled to be executed.</li>
+</ul>
+</li>
+<li>
+<p><code>tasks-count=-24</code></p>
+<ul>
+<li>Output only. An estimation of the number of tasks in the queue, that is, the tasks in the queue that haven&#39;t been executed, the tasks in the queue which the queue has dispatched but has not yet received a reply for, and the failed tasks that the queue is retrying.</li>
+</ul>
+</li>
+<li>
+<p><code>..    task-ttl=et</code></p>
+<ul>
+<li>The maximum amount of time that a task will be retained in this queue. Queues created by Cloud Tasks have a default <code>task_ttl</code> of 31 days. After a task has lived for <code>task_ttl</code>, the task will be deleted regardless of whether it was dispatched or not. The <code>task_ttl</code> for queues created via queue.yaml/xml is equal to the maximum duration because there is a <a href="https://cloud.google.com/appengine/quotas#Task_Queue">storage quota</a> for these queues. To view the maximum valid duration, see the documentation for Duration.</li>
+</ul>
+</li>
+<li><code>tombstone-ttl=vero</code><ul>
+<li>The task tombstone time to live (TTL). After a task is deleted or completed, the task&#39;s tombstone is retained for the length of time specified by <code>tombstone_ttl</code>. The tombstone is used by task de-duplication; another task with the same name can&#39;t be created until the tombstone has expired. For more information about task de-duplication, see the documentation for CreateTaskRequest. Queues created by Cloud Tasks have a default <code>tombstone_ttl</code> of 1 hour.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p update-mask=string</strong><ul>
+<li>A mask used to specify which fields of the queue are being updated. If empty, then all fields will be updated.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../projects_locations-queues-pause" class="btn btn-neutral float-right" title="Locations Queues Pause"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../projects_locations-queues-list" class="btn btn-neutral" title="Locations Queues List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+        
+      <span><a href="../projects_locations-queues-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../projects_locations-queues-pause" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>
