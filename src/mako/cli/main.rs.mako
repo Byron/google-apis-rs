@@ -37,7 +37,7 @@ async fn main() {
     let matches = app.get_matches();
 
     let debug = matches.is_present("${DEBUG_FLAG}");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();

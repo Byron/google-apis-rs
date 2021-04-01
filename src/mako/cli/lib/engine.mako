@@ -289,7 +289,7 @@ if dry_run {
     match match protocol {
         % if mc.media_params:
         % for p in mc.media_params:
-        CallType::Upload(UploadProtocol::${p.protocol.capitalize()}) => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        CallType::Upload(UploadProtocol::${p.protocol.capitalize()}) => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()).await,
         % endfor
         CallType::Standard => unreachable!()
         % else:
