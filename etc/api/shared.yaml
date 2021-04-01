@@ -1,5 +1,5 @@
 api:
-  credentials: "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}"
+  credentials: '{"installed":{"auth_uri":"https://accounts.google.com/o/oauth2/auth","client_secret":"hCsslbCUyfehWMmbkG8vTYxG","token_uri":"https://accounts.google.com/o/oauth2/token","client_email":"","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","oob"],"client_x509_cert_url":"","client_id":"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs"}}'
   blacklist:
     # exclude APIs which currently don't build correctly. State the reason for the exclusion as well
     # to allow looking at it at a later point.
@@ -11,6 +11,8 @@ api:
     # It seems functions are containing illegal characters, like `@context`
     - kgsearch
     - mapsengine
+    # Has a struct field called 'async', which is now reserved
+    - homegraph
     - spanner
     - firebaserules
     - servicemanagement
@@ -92,8 +94,6 @@ urls:
   authenticator_delegate: https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html
 copyright:
   license_abbrev: "MIT"
-  years: '2015-2020'
+  years: "2015-2020"
   authors:
-    - 'Sebastian Thiel'
-    
-
+    - "Sebastian Thiel"
