@@ -16,7 +16,7 @@
     tc = dict()
     for api_type in make.types:
         data = yaml.load_all(open(os.path.join(directories.api_base, 'type-%s.yaml' % api_type)))
-        tc[api_type] = merge_required_fields(type(directories)(data.next()))
+        tc[api_type] = merge_required_fields(type(directories)(next(data)))
     # end for each type to load cache for
 %>\
 <!DOCTYPE html>

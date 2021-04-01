@@ -4,7 +4,6 @@
 
 <%
 	import os
-	import urllib
 	import json
 
 	apis = {}
@@ -22,8 +21,10 @@
 	central_api_index = lambda crate_name: doc_root + '/' + util.to_extern_crate_name(crate_name) + '/index.html'
 
 	if os.environ.get('FETCH_APIS') is not None:
+		import urllib3
+		http = urllib3.PoolManager()
 		discovery_url = 'https://www.googleapis.com/discovery/v1/'
-		apis = json.loads(urllib.request.urlopen(discovery_url + "apis").read())
+		apis = json.loads(http.request('GET', discovery_url + "apis").data)
 
 		print('Loaded {} apis from Google'.format(len(apis['items'])))
 
@@ -193,7 +194,7 @@ help${agsuffix}:
 	name = util.normalize_library_name(info['name'])
 	target = util.api_json_path(directories.api_base, name, info['version'])
 	target_dir = os.path.dirname(target)
-	## assure the target never actually exists to force him to wget whenver we ask !
+	## assure the target never actually exists to force it to wget whenver we ask !
 	fake_target = target + '-force'
 	## Some service urls have $ in them. This may cause the console to treat them as env vars.
 	## To handle this properly, we need to escape the $.
@@ -202,7 +203,7 @@ help${agsuffix}:
 %>\
 ${fake_target}: $(PYTHON_BIN)
 	@mkdir -p ${target_dir}
-	@-curl --silent --show-error --fail --retry 3 -o '${target}' '${url}'
+	-curl --silent --show-error --fail --retry 3 -o '${target}' '${url}'
 	$(PYTHON) $(SORT_JSON_FILE) --skip-missing-file '${target}' || rm ${target}
 % endfor
 
