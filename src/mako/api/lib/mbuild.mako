@@ -619,10 +619,7 @@ else {
         <%
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
-        let mut key = ${auth_call}.api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
+        let key = dlg.api_key();
         match key {
             Some(value) => params.push(("key", value)),
             None => {
