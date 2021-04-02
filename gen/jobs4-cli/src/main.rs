@@ -427,7 +427,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size", "require-open-jobs"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "require-open-jobs"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -613,7 +613,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["scope", "query", "type", "company", "page-size", "language-codes"].iter().map(|v|*v));
+                                                                           v.extend(["company", "language-codes", "page-size", "query", "scope", "type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1353,7 +1353,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "filter", "job-view", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "job-view", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1807,7 +1807,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

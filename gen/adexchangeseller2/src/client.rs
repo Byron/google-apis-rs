@@ -14,6 +14,7 @@ use hyper;
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
+use hyper::body::Buf;
 
 use mime::{Attr, Mime, SubLevel, TopLevel, Value};
 use oauth2;
@@ -805,4 +806,11 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
         }
         _ => {}
     }
+}
+
+// Borrowing the body object as mutable and converts it to a string
+pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
+    let res_body_buf = hyper::body::aggregate(res_body).await.unwrap();
+    let res_body_string = String::from_utf8_lossy(res_body_buf.chunk());
+    res_body_string.to_string()
 }

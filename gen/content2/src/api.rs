@@ -9362,25 +9362,15 @@ impl<'a, C> AccountAuthinfoCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -9388,13 +9378,15 @@ impl<'a, C> AccountAuthinfoCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -9622,25 +9614,15 @@ impl<'a, C> AccountClaimwebsiteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -9648,13 +9630,15 @@ impl<'a, C> AccountClaimwebsiteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -9905,25 +9889,15 @@ impl<'a, C> AccountCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -9931,13 +9905,15 @@ impl<'a, C> AccountCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -10185,25 +10161,15 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -10211,11 +10177,11 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
-                    let result_value = reconstructed_result;
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -10466,25 +10432,15 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -10492,13 +10448,15 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -10765,25 +10723,15 @@ impl<'a, C> AccountInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -10791,13 +10739,15 @@ impl<'a, C> AccountInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -11067,25 +11017,15 @@ impl<'a, C> AccountLinkCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -11093,13 +11033,15 @@ impl<'a, C> AccountLinkCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -11359,25 +11301,15 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -11385,13 +11317,15 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -11664,25 +11598,15 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -11690,13 +11614,15 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -11951,25 +11877,15 @@ impl<'a, C> AccountstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -11977,13 +11893,15 @@ impl<'a, C> AccountstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -12222,25 +12140,15 @@ impl<'a, C> AccountstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -12248,13 +12156,15 @@ impl<'a, C> AccountstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -12520,25 +12430,15 @@ impl<'a, C> AccountstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -12546,13 +12446,15 @@ impl<'a, C> AccountstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -12808,25 +12710,15 @@ impl<'a, C> AccounttaxCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -12834,13 +12726,15 @@ impl<'a, C> AccounttaxCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -13079,25 +12973,15 @@ impl<'a, C> AccounttaxGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -13105,13 +12989,15 @@ impl<'a, C> AccounttaxGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -13362,25 +13248,15 @@ impl<'a, C> AccounttaxListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -13388,13 +13264,15 @@ impl<'a, C> AccounttaxListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -13667,25 +13545,15 @@ impl<'a, C> AccounttaxUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -13693,13 +13561,15 @@ impl<'a, C> AccounttaxUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -13959,25 +13829,15 @@ impl<'a, C> DatafeedCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -13985,13 +13845,15 @@ impl<'a, C> DatafeedCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -14234,25 +14096,15 @@ impl<'a, C> DatafeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -14260,11 +14112,11 @@ impl<'a, C> DatafeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
-                    let result_value = reconstructed_result;
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -14513,25 +14365,15 @@ impl<'a, C> DatafeedFetchnowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -14539,13 +14381,15 @@ impl<'a, C> DatafeedFetchnowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -14795,25 +14639,15 @@ impl<'a, C> DatafeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -14821,13 +14655,15 @@ impl<'a, C> DatafeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -15094,25 +14930,15 @@ impl<'a, C> DatafeedInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -15120,13 +14946,15 @@ impl<'a, C> DatafeedInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -15383,25 +15211,15 @@ impl<'a, C> DatafeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -15409,13 +15227,15 @@ impl<'a, C> DatafeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -15688,25 +15508,15 @@ impl<'a, C> DatafeedUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -15714,13 +15524,15 @@ impl<'a, C> DatafeedUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -15975,25 +15787,15 @@ impl<'a, C> DatafeedstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clie
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -16001,13 +15803,15 @@ impl<'a, C> DatafeedstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -16249,25 +16053,15 @@ impl<'a, C> DatafeedstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -16275,13 +16069,15 @@ impl<'a, C> DatafeedstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -16546,25 +16342,15 @@ impl<'a, C> DatafeedstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -16572,13 +16358,15 @@ impl<'a, C> DatafeedstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -16826,25 +16614,15 @@ impl<'a, C> InventoryCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -16852,13 +16630,15 @@ impl<'a, C> InventoryCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -17125,25 +16905,15 @@ impl<'a, C> InventorySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -17151,13 +16921,15 @@ impl<'a, C> InventorySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -17427,25 +17199,15 @@ impl<'a, C> LiasettingCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -17453,13 +17215,15 @@ impl<'a, C> LiasettingCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -17698,25 +17462,15 @@ impl<'a, C> LiasettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -17724,13 +17478,15 @@ impl<'a, C> LiasettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -17973,25 +17729,15 @@ impl<'a, C> LiasettingGetaccessiblegmbaccountCall<'a, C> where C: BorrowMut<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -17999,13 +17745,15 @@ impl<'a, C> LiasettingGetaccessiblegmbaccountCall<'a, C> where C: BorrowMut<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -18256,25 +18004,15 @@ impl<'a, C> LiasettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -18282,13 +18020,15 @@ impl<'a, C> LiasettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -18510,25 +18250,15 @@ impl<'a, C> LiasettingListposdataproviderCall<'a, C> where C: BorrowMut<hyper::C
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -18536,13 +18266,15 @@ impl<'a, C> LiasettingListposdataproviderCall<'a, C> where C: BorrowMut<hyper::C
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -18767,25 +18499,15 @@ impl<'a, C> LiasettingRequestgmbaccesCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -18793,13 +18515,15 @@ impl<'a, C> LiasettingRequestgmbaccesCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -19054,25 +18778,15 @@ impl<'a, C> LiasettingRequestinventoryverificationCall<'a, C> where C: BorrowMut
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -19080,13 +18794,15 @@ impl<'a, C> LiasettingRequestinventoryverificationCall<'a, C> where C: BorrowMut
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -19347,25 +19063,15 @@ impl<'a, C> LiasettingSetinventoryverificationcontactCall<'a, C> where C: Borrow
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -19373,13 +19079,15 @@ impl<'a, C> LiasettingSetinventoryverificationcontactCall<'a, C> where C: Borrow
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -19674,25 +19382,15 @@ impl<'a, C> LiasettingSetposdataproviderCall<'a, C> where C: BorrowMut<hyper::Cl
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -19700,13 +19398,15 @@ impl<'a, C> LiasettingSetposdataproviderCall<'a, C> where C: BorrowMut<hyper::Cl
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -19999,25 +19699,15 @@ impl<'a, C> LiasettingUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -20025,13 +19715,15 @@ impl<'a, C> LiasettingUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -20311,25 +20003,15 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -20337,13 +20019,15 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -20616,25 +20300,15 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -20642,13 +20316,15 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -20918,25 +20594,15 @@ impl<'a, C> OrderreportListdisbursementCall<'a, C> where C: BorrowMut<hyper::Cli
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -20944,13 +20610,15 @@ impl<'a, C> OrderreportListdisbursementCall<'a, C> where C: BorrowMut<hyper::Cli
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -21231,25 +20899,15 @@ impl<'a, C> OrderreportListtransactionCall<'a, C> where C: BorrowMut<hyper::Clie
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -21257,13 +20915,15 @@ impl<'a, C> OrderreportListtransactionCall<'a, C> where C: BorrowMut<hyper::Clie
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -21534,25 +21194,15 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -21560,13 +21210,15 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -21832,25 +21484,15 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -21858,13 +21500,15 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -22153,25 +21797,15 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -22179,13 +21813,15 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -22437,25 +22073,15 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -22463,13 +22089,15 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -22733,25 +22361,15 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -22759,13 +22377,15 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -23038,25 +22658,15 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -23064,13 +22674,15 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -23343,25 +22955,15 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -23369,13 +22971,15 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -23646,25 +23250,15 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -23672,13 +23266,15 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -23941,25 +23537,15 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -23967,13 +23553,15 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -24221,25 +23809,15 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -24247,13 +23825,15 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -24485,25 +24065,15 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -24511,13 +24081,15 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -24760,25 +24332,15 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -24786,13 +24348,15 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -25040,25 +24604,15 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -25066,13 +24620,15 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -25343,25 +24899,15 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -25369,13 +24915,15 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -25662,25 +25210,15 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -25688,13 +25226,15 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -25998,25 +25538,15 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -26024,13 +25554,15 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -26303,25 +25835,15 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -26329,13 +25851,15 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -26608,25 +26132,15 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -26634,13 +26148,15 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -26913,25 +26429,15 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -26939,13 +26445,15 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -27218,25 +26726,15 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -27244,13 +26742,15 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -27523,25 +27023,15 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -27549,13 +27039,15 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -27828,25 +27320,15 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -27854,13 +27336,15 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -28133,25 +27617,15 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -28159,13 +27633,15 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -28438,25 +27914,15 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -28464,13 +27930,15 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -28723,25 +28191,15 @@ impl<'a, C> PoCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -28749,13 +28207,15 @@ impl<'a, C> PoCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -29000,25 +28460,15 @@ impl<'a, C> PoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -29026,11 +28476,11 @@ impl<'a, C> PoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
-                    let result_value = reconstructed_result;
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -29286,25 +28736,15 @@ impl<'a, C> PoGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -29312,13 +28752,15 @@ impl<'a, C> PoGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -29597,25 +29039,15 @@ impl<'a, C> PoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -29623,13 +29055,15 @@ impl<'a, C> PoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -29914,25 +29348,15 @@ impl<'a, C> PoInventoryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -29940,13 +29364,15 @@ impl<'a, C> PoInventoryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -30205,25 +29631,15 @@ impl<'a, C> PoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -30231,13 +29647,15 @@ impl<'a, C> PoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -30506,25 +29924,15 @@ impl<'a, C> PoSaleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -30532,13 +29940,15 @@ impl<'a, C> PoSaleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -30798,25 +30208,15 @@ impl<'a, C> ProductCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -30824,13 +30224,15 @@ impl<'a, C> ProductCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -31073,25 +30475,15 @@ impl<'a, C> ProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -31099,11 +30491,11 @@ impl<'a, C> ProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
-                    let result_value = reconstructed_result;
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -31347,25 +30739,15 @@ impl<'a, C> ProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -31373,13 +30755,15 @@ impl<'a, C> ProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -31646,25 +31030,15 @@ impl<'a, C> ProductInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -31672,13 +31046,15 @@ impl<'a, C> ProductInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -31940,25 +31316,15 @@ impl<'a, C> ProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -31966,13 +31332,15 @@ impl<'a, C> ProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -32227,25 +31595,15 @@ impl<'a, C> ProductstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clien
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -32253,13 +31611,15 @@ impl<'a, C> ProductstatuseCustombatchCall<'a, C> where C: BorrowMut<hyper::Clien
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -32510,25 +31870,15 @@ impl<'a, C> ProductstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -32536,13 +31886,15 @@ impl<'a, C> ProductstatuseGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -32825,25 +32177,15 @@ impl<'a, C> ProductstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -32851,13 +32193,15 @@ impl<'a, C> ProductstatuseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -33127,25 +32471,15 @@ impl<'a, C> ShippingsettingCustombatchCall<'a, C> where C: BorrowMut<hyper::Clie
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -33153,13 +32487,15 @@ impl<'a, C> ShippingsettingCustombatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -33398,25 +32734,15 @@ impl<'a, C> ShippingsettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -33424,13 +32750,15 @@ impl<'a, C> ShippingsettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -33671,25 +32999,15 @@ impl<'a, C> ShippingsettingGetsupportedcarrierCall<'a, C> where C: BorrowMut<hyp
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -33697,13 +33015,15 @@ impl<'a, C> ShippingsettingGetsupportedcarrierCall<'a, C> where C: BorrowMut<hyp
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -33934,25 +33254,15 @@ impl<'a, C> ShippingsettingGetsupportedholidayCall<'a, C> where C: BorrowMut<hyp
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -33960,13 +33270,15 @@ impl<'a, C> ShippingsettingGetsupportedholidayCall<'a, C> where C: BorrowMut<hyp
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -34197,25 +33509,15 @@ impl<'a, C> ShippingsettingGetsupportedpickupserviceCall<'a, C> where C: BorrowM
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -34223,13 +33525,15 @@ impl<'a, C> ShippingsettingGetsupportedpickupserviceCall<'a, C> where C: BorrowM
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -34470,25 +33774,15 @@ impl<'a, C> ShippingsettingListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -34496,13 +33790,15 @@ impl<'a, C> ShippingsettingListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));
@@ -34775,25 +34071,15 @@ impl<'a, C> ShippingsettingUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body_string: String = String::from_utf8(
-                        hyper::body::to_bytes(res_body)
-                            .await
-                            .unwrap()
-                            .into_iter()
-                            .collect(),
-                    )
-                    .unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
 
-                    if !reconstructed_result.status().is_success() {
                         let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
                         let server_error = json::from_str::<client::ServerError>(&res_body_string)
                             .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                        if let client::Retry::After(d) = dlg.http_failure(&res,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
@@ -34801,13 +34087,15 @@ impl<'a, C> ShippingsettingUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         }
                         dlg.finished(false);
                         return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Err(_) => Err(client::Error::Failure(res)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
                     let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
                         match json::from_str(&res_body_string) {
-                            Ok(decoded) => (reconstructed_result, decoded),
+                            Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&res_body_string, &err);
                                 return Err(client::Error::JsonDecodeError(res_body_string, err));

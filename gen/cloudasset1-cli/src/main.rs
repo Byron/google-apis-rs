@@ -438,7 +438,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["analysis-query-identity-selector-identity", "execution-timeout", "analysis-query-options-output-group-edges", "analysis-query-resource-selector-full-resource-name", "analysis-query-access-selector-permissions", "analysis-query-options-analyze-service-account-impersonation", "analysis-query-options-output-resource-edges", "analysis-query-options-expand-groups", "analysis-query-options-expand-resources", "analysis-query-options-expand-roles", "analysis-query-access-selector-roles"].iter().map(|v|*v));
+                                                                           v.extend(["analysis-query-access-selector-permissions", "analysis-query-access-selector-roles", "analysis-query-identity-selector-identity", "analysis-query-options-analyze-service-account-impersonation", "analysis-query-options-expand-groups", "analysis-query-options-expand-resources", "analysis-query-options-expand-roles", "analysis-query-options-output-group-edges", "analysis-query-options-output-resource-edges", "analysis-query-resource-selector-full-resource-name", "execution-timeout"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -603,7 +603,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["content-type", "asset-names", "read-time-window-start-time", "read-time-window-end-time"].iter().map(|v|*v));
+                                                                           v.extend(["asset-names", "content-type", "read-time-window-end-time", "read-time-window-start-time"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -759,7 +759,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size", "query"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -827,7 +827,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["asset-types", "page-token", "page-size", "query", "order-by"].iter().map(|v|*v));
+                                                                           v.extend(["asset-types", "order-by", "page-size", "page-token", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

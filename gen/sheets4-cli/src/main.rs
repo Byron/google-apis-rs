@@ -466,7 +466,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["ranges", "include-grid-data"].iter().map(|v|*v));
+                                                                           v.extend(["include-grid-data", "ranges"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -739,7 +739,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["value-input-option", "include-values-in-response", "response-date-time-render-option", "response-value-render-option", "insert-data-option"].iter().map(|v|*v));
+                                                                           v.extend(["include-values-in-response", "insert-data-option", "response-date-time-render-option", "response-value-render-option", "value-input-option"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -973,7 +973,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["major-dimension", "value-render-option", "date-time-render-option", "ranges"].iter().map(|v|*v));
+                                                                           v.extend(["date-time-render-option", "major-dimension", "ranges", "value-render-option"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1382,7 +1382,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["major-dimension", "value-render-option", "date-time-render-option"].iter().map(|v|*v));
+                                                                           v.extend(["date-time-render-option", "major-dimension", "value-render-option"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1481,7 +1481,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["response-date-time-render-option", "value-input-option", "response-value-render-option", "include-values-in-response"].iter().map(|v|*v));
+                                                                           v.extend(["include-values-in-response", "response-date-time-render-option", "response-value-render-option", "value-input-option"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

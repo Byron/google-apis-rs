@@ -70,7 +70,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["success-on-timeout", "wait-token", "agent-id"].iter().map(|v|*v));
+                                                                           v.extend(["agent-id", "success-on-timeout", "wait-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -454,7 +454,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["strip-results", "include-inactive", "client-version", "include-all-users", "wait-token", "action-value"].iter().map(|v|*v));
+                                                                           v.extend(["action-value", "client-version", "include-all-users", "include-inactive", "strip-results", "wait-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -565,7 +565,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["client-version", "canary-option"].iter().map(|v|*v));
+                                                                           v.extend(["canary-option", "client-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -627,7 +627,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["client-version", "project", "include-inactive"].iter().map(|v|*v));
+                                                                           v.extend(["client-version", "include-inactive", "project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

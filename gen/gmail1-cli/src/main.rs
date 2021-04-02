@@ -275,7 +275,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-spam-trash", "page-token", "max-results", "q"].iter().map(|v|*v));
+                                                                           v.extend(["include-spam-trash", "max-results", "page-token", "q"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -599,7 +599,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-history-id", "max-results", "history-types", "label-id", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["history-types", "label-id", "max-results", "page-token", "start-history-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1454,7 +1454,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["process-for-calendar", "never-mark-spam", "internal-date-source", "deleted"].iter().map(|v|*v));
+                                                                           v.extend(["deleted", "internal-date-source", "never-mark-spam", "process-for-calendar"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1562,7 +1562,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["internal-date-source", "deleted"].iter().map(|v|*v));
+                                                                           v.extend(["deleted", "internal-date-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1633,7 +1633,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["label-ids", "include-spam-trash", "q", "max-results", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["include-spam-trash", "label-ids", "max-results", "page-token", "q"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4316,7 +4316,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["label-ids", "include-spam-trash", "q", "max-results", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["include-spam-trash", "label-ids", "max-results", "page-token", "q"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

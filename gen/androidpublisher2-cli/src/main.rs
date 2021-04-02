@@ -3510,7 +3510,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-index", "token", "max-results", "end-time", "start-time"].iter().map(|v|*v));
+                                                                           v.extend(["end-time", "max-results", "start-index", "start-time", "token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

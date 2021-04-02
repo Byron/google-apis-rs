@@ -963,7 +963,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["customer-name-prefix", "customer-id", "max-results", "page-token", "customer-auth-token"].iter().map(|v|*v));
+                                                                           v.extend(["customer-auth-token", "customer-id", "customer-name-prefix", "max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

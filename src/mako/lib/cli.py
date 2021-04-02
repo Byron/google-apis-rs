@@ -99,7 +99,7 @@ def new_method_context(resource, method, c):
                          required_props, optional_props, part_prop)
 
 def comma_sep_fields(fields):
-    return ', '.join('"%s"' % mangle_subcommand(f) for f in fields)
+    return ', '.join('"%s"' % mangle_subcommand(f) for f in sorted(fields))
 
 # Returns a string representing a string-vector of mangled names
 # fields is an iterator

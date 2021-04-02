@@ -761,7 +761,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "show-hidden", "updated-min", "completed-max", "page-token", "show-completed", "show-deleted", "due-min", "completed-min", "due-max"].iter().map(|v|*v));
+                                                                           v.extend(["completed-max", "completed-min", "due-max", "due-min", "max-results", "page-token", "show-completed", "show-deleted", "show-hidden", "updated-min"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

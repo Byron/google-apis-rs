@@ -228,7 +228,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["assignee", "customer-name", "custom-field", "customer-phone-number", "note"].iter().map(|v|*v));
+                                                                           v.extend(["assignee", "custom-field", "customer-name", "customer-phone-number", "note"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -293,7 +293,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["omit-job-changes", "min-modified-timestamp-ms", "max-results", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "min-modified-timestamp-ms", "omit-job-changes", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -422,7 +422,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["lng", "assignee", "title", "customer-name", "custom-field", "customer-phone-number", "lat", "address", "progress", "note"].iter().map(|v|*v));
+                                                                           v.extend(["address", "assignee", "custom-field", "customer-name", "customer-phone-number", "lat", "lng", "note", "progress", "title"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -551,7 +551,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["lng", "assignee", "title", "customer-name", "custom-field", "customer-phone-number", "lat", "address", "progress", "note"].iter().map(|v|*v));
+                                                                           v.extend(["address", "assignee", "custom-field", "customer-name", "customer-phone-number", "lat", "lng", "note", "progress", "title"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -764,7 +764,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["end-time", "all-day", "start-time", "duration"].iter().map(|v|*v));
+                                                                           v.extend(["all-day", "duration", "end-time", "start-time"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -866,7 +866,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["end-time", "all-day", "start-time", "duration"].iter().map(|v|*v));
+                                                                           v.extend(["all-day", "duration", "end-time", "start-time"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -928,7 +928,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["admin", "worker", "dispatcher"].iter().map(|v|*v));
+                                                                           v.extend(["admin", "dispatcher", "worker"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

@@ -193,7 +193,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -368,7 +368,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -494,7 +494,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -559,7 +559,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -685,7 +685,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -811,7 +811,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1002,7 +1002,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1128,7 +1128,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1498,7 +1498,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1673,7 +1673,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1799,7 +1799,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1861,7 +1861,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "filter"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1926,7 +1926,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2052,7 +2052,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2178,7 +2178,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2369,7 +2369,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["propagation-policy", "dry-run", "api-version", "kind"].iter().map(|v|*v));
+                                                                           v.extend(["api-version", "dry-run", "kind", "propagation-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2551,7 +2551,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["continue", "resource-version", "field-selector", "include-uninitialized", "limit", "watch", "label-selector"].iter().map(|v|*v));
+                                                                           v.extend(["continue", "field-selector", "include-uninitialized", "label-selector", "limit", "resource-version", "watch"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

@@ -448,7 +448,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "include-inactive", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["include-inactive", "max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -840,7 +840,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "dimension", "sort", "start-index", "filter", "metric", "locale"].iter().map(|v|*v));
+                                                                           v.extend(["dimension", "filter", "locale", "max-results", "metric", "sort", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1566,7 +1566,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "dimension", "sort", "start-index", "filter", "metric", "locale"].iter().map(|v|*v));
+                                                                           v.extend(["dimension", "filter", "locale", "max-results", "metric", "sort", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

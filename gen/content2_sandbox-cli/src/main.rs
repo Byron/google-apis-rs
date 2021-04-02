@@ -668,7 +668,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-results", "order-by", "page-token", "created-end-date", "created-start-date"].iter().map(|v|*v));
+                                                                           v.extend(["created-end-date", "created-start-date", "max-results", "order-by", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1674,7 +1674,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "max-results", "statuses", "placed-date-end", "page-token", "placed-date-start", "acknowledged"].iter().map(|v|*v));
+                                                                           v.extend(["acknowledged", "max-results", "order-by", "page-token", "placed-date-end", "placed-date-start", "statuses"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

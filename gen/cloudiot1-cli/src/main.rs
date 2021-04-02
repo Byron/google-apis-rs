@@ -585,7 +585,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["gateway-list-options-associations-device-id", "field-mask", "device-ids", "page-size", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-gateway-id", "device-num-ids"].iter().map(|v|*v));
+                                                                           v.extend(["device-ids", "device-num-ids", "field-mask", "gateway-list-options-associations-device-id", "gateway-list-options-associations-gateway-id", "gateway-list-options-gateway-type", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1139,7 +1139,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["gateway-list-options-associations-device-id", "field-mask", "device-ids", "page-size", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-gateway-id", "device-num-ids"].iter().map(|v|*v));
+                                                                           v.extend(["device-ids", "device-num-ids", "field-mask", "gateway-list-options-associations-device-id", "gateway-list-options-associations-gateway-id", "gateway-list-options-gateway-type", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1454,7 +1454,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

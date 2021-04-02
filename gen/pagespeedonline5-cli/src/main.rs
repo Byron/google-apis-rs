@@ -79,7 +79,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["utm-source", "captcha-token", "strategy", "locale", "utm-campaign", "category"].iter().map(|v|*v));
+                                                                           v.extend(["captcha-token", "category", "locale", "strategy", "utm-campaign", "utm-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

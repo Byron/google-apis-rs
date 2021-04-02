@@ -82,7 +82,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["offset", "review-publisher-site-filter", "page-size", "page-token", "query", "max-age-days", "language-code"].iter().map(|v|*v));
+                                                                           v.extend(["language-code", "max-age-days", "offset", "page-size", "page-token", "query", "review-publisher-site-filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

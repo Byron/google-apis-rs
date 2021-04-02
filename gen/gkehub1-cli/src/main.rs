@@ -233,7 +233,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["request-id", "membership-id"].iter().map(|v|*v));
+                                                                           v.extend(["membership-id", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -360,7 +360,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["version", "proxy", "namespace", "is-upgrade", "registry", "image-pull-secret-content"].iter().map(|v|*v));
+                                                                           v.extend(["image-pull-secret-content", "is-upgrade", "namespace", "proxy", "registry", "version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -644,7 +644,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["request-id", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

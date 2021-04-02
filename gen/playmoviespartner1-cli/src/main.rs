@@ -140,7 +140,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["alt-id", "title", "page-size", "alt-ids", "pph-names", "page-token", "territories", "video-ids", "studio-names"].iter().map(|v|*v));
+                                                                           v.extend(["alt-id", "alt-ids", "page-size", "page-token", "pph-names", "studio-names", "territories", "title", "video-ids"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -269,7 +269,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "name", "pph-names", "custom-id", "video-ids", "page-token", "status", "studio-names"].iter().map(|v|*v));
+                                                                           v.extend(["custom-id", "name", "page-size", "page-token", "pph-names", "status", "studio-names", "video-ids"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -404,7 +404,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["season-ids", "page-size", "mids", "name", "pph-names", "page-token", "video-id", "countries", "video-ids", "studio-names"].iter().map(|v|*v));
+                                                                           v.extend(["countries", "mids", "name", "page-size", "page-token", "pph-names", "season-ids", "studio-names", "video-id", "video-ids"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

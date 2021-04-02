@@ -112,7 +112,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["enable-detailed-highway-types", "enable-private-roads", "client-info-user-id", "client-info-operating-system", "region-code", "enable-political-features", "enable-modeled-volumes", "enable-feature-names", "client-info-api-client", "client-info-device-model", "language-code", "client-tile-version-id", "enable-unclipped-buildings", "client-info-platform", "client-info-application-id", "always-include-building-footprints", "client-info-application-version"].iter().map(|v|*v));
+                                                                           v.extend(["always-include-building-footprints", "client-info-api-client", "client-info-application-id", "client-info-application-version", "client-info-device-model", "client-info-operating-system", "client-info-platform", "client-info-user-id", "client-tile-version-id", "enable-detailed-highway-types", "enable-feature-names", "enable-modeled-volumes", "enable-political-features", "enable-private-roads", "enable-unclipped-buildings", "language-code", "region-code"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -195,7 +195,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["client-info-user-id", "client-info-operating-system", "altitude-precision-centimeters", "client-info-api-client", "client-info-device-model", "client-info-application-version", "client-info-platform", "client-info-application-id", "terrain-formats", "min-elevation-resolution-cells", "max-elevation-resolution-cells"].iter().map(|v|*v));
+                                                                           v.extend(["altitude-precision-centimeters", "client-info-api-client", "client-info-application-id", "client-info-application-version", "client-info-device-model", "client-info-operating-system", "client-info-platform", "client-info-user-id", "max-elevation-resolution-cells", "min-elevation-resolution-cells", "terrain-formats"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

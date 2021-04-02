@@ -67,7 +67,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["threat-types", "hash-prefix"].iter().map(|v|*v));
+                                                                           v.extend(["hash-prefix", "threat-types"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -311,7 +311,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "filter", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -548,7 +548,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["constraints-supported-compressions", "threat-type", "constraints-max-diff-entries", "version-token", "constraints-max-database-entries"].iter().map(|v|*v));
+                                                                           v.extend(["constraints-max-database-entries", "constraints-max-diff-entries", "constraints-supported-compressions", "threat-type", "version-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

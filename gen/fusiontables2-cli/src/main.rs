@@ -1334,7 +1334,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["is-strict", "delimiter", "end-line", "encoding", "start-line"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "encoding", "end-line", "is-strict", "start-line"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1774,7 +1774,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["is-strict", "delimiter", "end-line", "encoding", "start-line"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "encoding", "end-line", "is-strict", "start-line"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2035,7 +2035,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results", "start-index"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

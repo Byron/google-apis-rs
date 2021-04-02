@@ -82,7 +82,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["grouping-strategy", "user-id", "source", "page-size", "drive-file-id", "page-token", "drive-ancestor-id"].iter().map(|v|*v));
+                                                                           v.extend(["drive-ancestor-id", "drive-file-id", "grouping-strategy", "page-size", "page-token", "source", "user-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

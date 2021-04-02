@@ -244,7 +244,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["status", "role", "view", "fetch-user-info"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-user-info", "role", "status", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -470,7 +470,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-date", "page-token", "max-results", "end-date", "view", "status", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["end-date", "fetch-bodies", "max-results", "page-token", "start-date", "status", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -541,7 +541,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-date", "page-token", "max-results", "end-date", "status", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["end-date", "fetch-bodies", "max-results", "page-token", "start-date", "status"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -972,7 +972,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results", "view", "status", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-bodies", "max-results", "page-token", "status", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1078,7 +1078,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revert", "publish"].iter().map(|v|*v));
+                                                                           v.extend(["publish", "revert"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1288,7 +1288,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revert", "publish"].iter().map(|v|*v));
+                                                                           v.extend(["publish", "revert"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1424,7 +1424,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-date", "page-token", "labels", "max-results", "order-by", "end-date", "view", "status", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["end-date", "fetch-bodies", "labels", "max-results", "order-by", "page-token", "start-date", "status", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1533,7 +1533,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-comments", "fetch-images", "view", "fetch-body"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-body", "fetch-images", "max-comments", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1711,7 +1711,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["fetch-images", "is-draft", "fetch-body"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-body", "fetch-images", "is-draft"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1794,7 +1794,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-date", "page-token", "labels", "fetch-images", "max-results", "order-by", "end-date", "view", "status", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["end-date", "fetch-bodies", "fetch-images", "labels", "max-results", "order-by", "page-token", "start-date", "status", "view"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1919,7 +1919,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-comments", "fetch-images", "publish", "revert", "fetch-body"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-body", "fetch-images", "max-comments", "publish", "revert"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2086,7 +2086,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-bodies", "order-by"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2211,7 +2211,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-comments", "fetch-images", "publish", "revert", "fetch-body"].iter().map(|v|*v));
+                                                                           v.extend(["fetch-body", "fetch-images", "max-comments", "publish", "revert"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

@@ -2534,7 +2534,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["request-id", "cluster-uuid"].iter().map(|v|*v));
+                                                                           v.extend(["cluster-uuid", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2903,7 +2903,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "filter", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3091,7 +3091,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["graceful-decommission-timeout", "update-mask", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["graceful-decommission-timeout", "request-id", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3775,7 +3775,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["job-state-matcher", "cluster-name", "page-size", "filter", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["cluster-name", "filter", "job-state-matcher", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4723,7 +4723,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "filter", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

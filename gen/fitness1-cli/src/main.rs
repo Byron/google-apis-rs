@@ -166,7 +166,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "limit"].iter().map(|v|*v));
+                                                                           v.extend(["limit", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -269,7 +269,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "limit"].iter().map(|v|*v));
+                                                                           v.extend(["limit", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -824,7 +824,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-deleted", "page-token", "start-time", "end-time", "activity-type"].iter().map(|v|*v));
+                                                                           v.extend(["activity-type", "end-time", "include-deleted", "page-token", "start-time"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

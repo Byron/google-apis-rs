@@ -85,7 +85,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["rule", "utm-source", "strategy", "locale", "utm-campaign", "screenshot", "filter-third-party-resources", "snapshots"].iter().map(|v|*v));
+                                                                           v.extend(["filter-third-party-resources", "locale", "rule", "screenshot", "snapshots", "strategy", "utm-campaign", "utm-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

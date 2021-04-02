@@ -767,7 +767,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["project-id", "page-size", "page-token", "q"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "project-id", "q"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

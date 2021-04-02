@@ -275,7 +275,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1633,7 +1633,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results", "filter"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2695,7 +2695,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results", "instance"].iter().map(|v|*v));
+                                                                           v.extend(["instance", "max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2899,7 +2899,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["verify-connection-only", "sync-mode"].iter().map(|v|*v));
+                                                                           v.extend(["sync-mode", "verify-connection-only"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3337,7 +3337,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["name", "host"].iter().map(|v|*v));
+                                                                           v.extend(["host", "name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3584,7 +3584,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["name", "host"].iter().map(|v|*v));
+                                                                           v.extend(["host", "name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

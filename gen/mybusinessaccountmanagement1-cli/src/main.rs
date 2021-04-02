@@ -712,7 +712,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["parent-account", "page-token", "page-size", "filter"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token", "parent-account"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -822,7 +822,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["validate-only", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["update-mask", "validate-only"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

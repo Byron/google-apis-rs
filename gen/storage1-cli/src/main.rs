@@ -67,7 +67,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -118,7 +118,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -221,7 +221,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -280,7 +280,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -383,7 +383,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -486,7 +486,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -551,7 +551,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "if-metageneration-match", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -611,7 +611,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "projection", "provisional-user-project", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -673,7 +673,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "options-requested-policy-version"].iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -806,7 +806,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "projection", "predefined-acl", "provisional-user-project", "predefined-default-object-acl"].iter().map(|v|*v));
+                                                                           v.extend(["predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -877,7 +877,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "page-token", "prefix", "projection", "max-results", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token", "prefix", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -936,7 +936,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1075,7 +1075,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "projection", "predefined-acl", "provisional-user-project", "if-metageneration-not-match", "predefined-default-object-acl"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1170,7 +1170,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1229,7 +1229,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1368,7 +1368,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "projection", "predefined-acl", "provisional-user-project", "if-metageneration-not-match", "predefined-default-object-acl"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "predefined-default-object-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1513,7 +1513,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1564,7 +1564,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1669,7 +1669,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1734,7 +1734,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "if-metageneration-match", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1839,7 +1839,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1944,7 +1944,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2003,7 +2003,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2054,7 +2054,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2154,7 +2154,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2213,7 +2213,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2275,7 +2275,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2329,7 +2329,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2437,7 +2437,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2499,7 +2499,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2607,7 +2607,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2715,7 +2715,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2852,7 +2852,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "kms-key-name", "if-generation-match", "if-metageneration-match", "destination-predefined-acl", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["destination-predefined-acl", "if-generation-match", "if-metageneration-match", "kms-key-name", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3012,7 +3012,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "if-source-metageneration-match", "if-generation-match", "projection", "destination-predefined-acl", "if-generation-not-match", "if-source-metageneration-not-match", "provisional-user-project", "if-metageneration-not-match", "source-generation", "if-source-generation-match", "if-source-generation-not-match", "destination-kms-key-name"].iter().map(|v|*v));
+                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "projection", "provisional-user-project", "source-generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3086,7 +3086,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "if-generation-match", "generation", "if-generation-not-match", "provisional-user-project", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3159,7 +3159,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "if-generation-match", "generation", "projection", "if-generation-not-match", "provisional-user-project", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3227,7 +3227,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3378,7 +3378,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "kms-key-name", "if-metageneration-match", "if-generation-match", "projection", "predefined-acl", "provisional-user-project", "if-generation-not-match", "if-metageneration-not-match", "name", "content-encoding"].iter().map(|v|*v));
+                                                                           v.extend(["content-encoding", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "kms-key-name", "name", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3467,7 +3467,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["versions", "user-project", "page-token", "prefix", "delimiter", "projection", "max-results", "provisional-user-project", "end-offset", "start-offset", "include-trailing-delimiter"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "provisional-user-project", "start-offset", "user-project", "versions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3612,7 +3612,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "if-generation-match", "generation", "projection", "predefined-acl", "provisional-user-project", "if-generation-not-match", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3778,7 +3778,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "rewrite-token", "if-source-metageneration-match", "if-metageneration-match", "projection", "if-generation-match", "destination-predefined-acl", "if-generation-not-match", "provisional-user-project", "if-source-metageneration-not-match", "if-metageneration-not-match", "source-generation", "if-source-generation-match", "max-bytes-rewritten-per-call", "if-source-generation-not-match", "destination-kms-key-name"].iter().map(|v|*v));
+                                                                           v.extend(["destination-kms-key-name", "destination-predefined-acl", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "if-source-generation-match", "if-source-generation-not-match", "if-source-metageneration-match", "if-source-metageneration-not-match", "max-bytes-rewritten-per-call", "projection", "provisional-user-project", "rewrite-token", "source-generation", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3876,7 +3876,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3938,7 +3938,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project", "generation"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4083,7 +4083,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "if-metageneration-match", "if-generation-match", "generation", "projection", "predefined-acl", "provisional-user-project", "if-generation-not-match", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "if-generation-match", "if-generation-not-match", "if-metageneration-match", "if-metageneration-not-match", "predefined-acl", "projection", "provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4211,7 +4211,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["versions", "user-project", "page-token", "prefix", "delimiter", "projection", "max-results", "provisional-user-project", "end-offset", "start-offset", "include-trailing-delimiter"].iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "end-offset", "include-trailing-delimiter", "max-results", "page-token", "prefix", "projection", "provisional-user-project", "start-offset", "user-project", "versions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4439,7 +4439,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "page-token", "show-deleted-keys", "service-account-email", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token", "service-account-email", "show-deleted-keys", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4596,7 +4596,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["provisional-user-project", "user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

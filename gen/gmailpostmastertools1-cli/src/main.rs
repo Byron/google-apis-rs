@@ -248,7 +248,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-date-year", "page-size", "end-date-year", "page-token", "end-date-month", "end-date-day", "start-date-day", "start-date-month"].iter().map(|v|*v));
+                                                                           v.extend(["end-date-day", "end-date-month", "end-date-year", "page-size", "page-token", "start-date-day", "start-date-month", "start-date-year"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }

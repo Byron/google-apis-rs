@@ -872,7 +872,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dimension", "locale", "filter", "currency", "max-results", "start-index", "metric", "sort", "use-timezone-reporting"].iter().map(|v|*v));
+                                                                           v.extend(["currency", "dimension", "filter", "locale", "max-results", "metric", "sort", "start-index", "use-timezone-reporting"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -940,7 +940,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "max-results", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1969,7 +1969,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dimension", "locale", "filter", "currency", "account-id", "max-results", "start-index", "metric", "sort", "use-timezone-reporting"].iter().map(|v|*v));
+                                                                           v.extend(["account-id", "currency", "dimension", "filter", "locale", "max-results", "metric", "sort", "start-index", "use-timezone-reporting"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2037,7 +2037,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "max-results", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
