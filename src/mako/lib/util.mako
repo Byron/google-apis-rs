@@ -16,7 +16,7 @@ ${v[1:]}\
 </%def>
 
 <%def name="github_source_root_url()" buffered="True">\
-${cargo.repo_base_url}/tree/master/${directories.output}/${util.target_directory_name(name, version, make.target_suffix)}\
+${cargo.repo_base_url}/tree/main/${directories.output}/${util.target_directory_name(name, version, make.target_suffix)}\
 </%def>
 
 <%def name="library_name()" buffered="True">\
