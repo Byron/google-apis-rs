@@ -23,8 +23,8 @@
 	if os.environ.get('FETCH_APIS') is not None:
 		import urllib3
 		http = urllib3.PoolManager()
-		discovery_url = 'https://www.googleapis.com/discovery/v1/'
-		apis = json.loads(http.request('GET', discovery_url + "apis").data)
+		discovery_url = 'https://www.googleapis.com/discovery/v1/apis'
+		apis = json.loads(http.request('GET', discovery_url).data)
 
 		print('Loaded {} apis from Google'.format(len(apis['items'])))
 
