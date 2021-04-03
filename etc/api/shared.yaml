@@ -14,7 +14,6 @@ api:
     - civicinfo
     # It seems functions are containing illegal characters, like `@context`
     - kgsearch
-    - mapsengine
     # Has a struct field called 'async', which is now reserved
     - homegraph
     - spanner
@@ -28,8 +27,6 @@ api:
     - serviceusage
     # defines its own `Option` type
     - servicenetworking
-    - freebase
-    - audit
     - cloudsearch
     - toolresults
     - script
