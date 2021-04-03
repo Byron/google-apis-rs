@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Generate yaml output suitable for use in shared.yaml
-# 
+#
 
 import sys
 import os
@@ -15,7 +15,8 @@ if __name__ != '__main__':
     raise AssertionError("Not for import")
 
 if len(sys.argv) != 4:
-    sys.stderr.write("USAGE: <program> <api_dir> <api-list.yaml> <dest.yaml>, i.e. <program> etc/api etc/api/api-list.yaml out.yaml\n")
+    sys.stderr.write(
+        "USAGE: <program> <api_dir> <api-list.yaml> <dest.yaml>, i.e. <program> etc/api etc/api/api-list.yaml out.yaml\n")
     sys.exit(1)
 
 api_base = sys.argv[1]
@@ -28,15 +29,16 @@ if isfile(yaml_path):
 else:
     api_data = dict()
 
-    
+
 for api_name in sorted(os.listdir(api_base)):
     api_path = join(api_base, api_name)
     if not isdir(api_path):
         continue
-    all_versions = sorted((v for v in os.listdir(api_path) if isdir(join(api_path, v))), reverse=True)
+    all_versions = sorted((v for v in os.listdir(api_path) if isdir(
+        join(api_path, v)) and isfile(join(api_path, v, "%s-api.json" % api_name))), reverse=True)
     if not all_versions:
+        del api_data[api_name]
         continue
-
     last_version = None
     for v in all_versions:
         if 'beta' not in v and 'alpha' not in v:
@@ -49,7 +51,11 @@ for api_name in sorted(os.listdir(api_base)):
     versions = api_data.get(api_name, list())
     if last_version not in versions:
         versions.append(last_version)
-    api_data[api_name] = list(sorted(versions))
+    version = list(sorted(set(versions) & set(all_versions)))
+    if versions:
+        api_data[api_name] = versions
+    else:
+        del api_data[api_name]
 # end for each item in api-base
 
 fp = open(sys.argv[3], 'wt')
@@ -58,4 +64,3 @@ fp.write("# Created by '%s'\n" % ' '.join(sys.argv))
 fp.write("# DO NOT EDIT !!!\n")
 yaml.dump(dict(api=dict(list=api_data)), fp, default_flow_style=False)
 fp.close()
-

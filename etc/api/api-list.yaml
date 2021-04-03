@@ -69,8 +69,6 @@ api:
     - v1beta1
     assuredworkloads:
     - v1
-    audit:
-    - v1
     autoscaler:
     - v1beta2
     bigquery:
@@ -183,6 +181,7 @@ api:
     - v1beta1
     dataflow:
     - v1b4
+    - v1b3
     datafusion:
     - v1
     - v1beta1
@@ -269,8 +268,6 @@ api:
     - v1beta1
     fitness:
     - v1
-    freebase:
-    - v1sandbox
     fusiontables:
     - v2
     games:
@@ -336,8 +333,6 @@ api:
     manager:
     - v1beta2
     manufacturers:
-    - v1
-    mapsengine:
     - v1
     memcache:
     - v1
