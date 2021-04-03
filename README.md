@@ -6,10 +6,10 @@ To find a library of your interest, you might want to proceed looking at the [AP
 
 # Project Features
 
-* provide an idiomatic rust implementation for google APIs
-* first-class documentation with cross-links and complete code-examples
-* support all features, including downloads and resumable uploads
-* safety and resilience are built-in, allowing you to create highly available tools on top of it. For example, you can trigger retries for all operations that may temporarily fail, e.g. due to network outage.
+- provide an idiomatic rust implementation for google APIs
+- first-class documentation with cross-links and complete code-examples
+- support all features, including downloads and resumable uploads
+- safety and resilience are built-in, allowing you to create highly available tools on top of it. For example, you can trigger retries for all operations that may temporarily fail, e.g. due to network outage.
 
 # Build Instructions
 
@@ -17,15 +17,15 @@ To find a library of your interest, you might want to proceed looking at the [AP
 
 To generate the APIs yourself, you will need to meet the following prerequisites:
 
-* **make**
- * Make is used to automate and efficiently call all involved programs
-* **python**
- * As [*mako*][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
-* **an internet connection and wget**
- * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
-* **Rust Stable**
- * This project compiles on *stable* Rust *1.6 or greater* only. You might consider using [Rustup][rustup] to control
-   the toolchain on a per-project basis.
+- **make**
+- Make is used to automate and efficiently call all involved programs
+- **python**
+- As [_mako_][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
+- **an internet connection and wget**
+- Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
+- **Rust Stable**
+- This project compiles on _stable_ Rust _1.6 or greater_ only. You might consider using [Rustup][rustup] to control
+  the toolchain on a per-project basis.
 
 ## Using Make
 
@@ -69,17 +69,17 @@ For example, to update all json files and possibly retrieve new API schemas, do 
 
 ```bash
 # -j8 will allow 8 parallel schema downloads
-rm -f .api.deps .cli.deps && make update-json -j8
+rm -f .api.deps .cli.deps && FETCH_APIS=1 make update-json -j8
 ```
 
 # Setup API and CLI version numbers
 
 The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves
-to the supported program types, being *cli* and *api* at the time of writing. You can change the
-version for all expected artifacts by editing the respective key inside of the yaml (*cargo.build_version*
+to the supported program types, being _cli_ and _api_ at the time of writing. You can change the
+version for all expected artifacts by editing the respective key inside of the yaml (_cargo.build_version_
 at the time of writing).
 
-The following script would regenerate all higher-level programs (*CLI*), add the result to git and push it.
+The following script would regenerate all higher-level programs (_CLI_), add the result to git and push it.
 
 ```bash
 $ make gen-all-cli
@@ -134,8 +134,8 @@ The license of everything not explicitly under a different license are licensed 
 
 Licensed under either of
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
 
@@ -164,9 +164,9 @@ Click the image below to see the playlist with all project related content:
 
 Each episode sums up one major step in project development:
 
-* [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
-* [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
-* [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
+- [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
+- [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
+- [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
 
 [oauth]: https://crates.io/crates/yup-oauth2
 [google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
