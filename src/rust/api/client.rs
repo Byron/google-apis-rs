@@ -1,7 +1,6 @@
 use std::error;
 use std::fmt::{self, Display};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
-use std::iter;
 use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
