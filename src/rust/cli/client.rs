@@ -3,7 +3,6 @@ use mime::Mime;
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret};
 use serde_json as json;
 use serde_json::value::Value;
-use strsim;
 
 use std::env;
 use std::error::Error as StdError;
@@ -141,7 +140,7 @@ impl From<&'static str> for FieldCursor {
     }
 }
 
-fn assure_entry<'a, 'b>(m: &'a mut json::Map<String, Value>, k: &'b String) -> &'a mut Value {
+fn assure_entry<'a>(m: &'a mut json::Map<String, Value>, k: &str) -> &'a mut Value {
     if m.contains_key(k) {
         return m.get_mut(k).expect("value to exist");
     }
@@ -151,7 +150,7 @@ fn assure_entry<'a, 'b>(m: &'a mut json::Map<String, Value>, k: &'b String) -> &
 
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
-        if value.len() == 0 {
+        if value.is_empty() {
             return Err(CLIError::Field(FieldError::Empty));
         }
 
@@ -164,7 +163,7 @@ impl FieldCursor {
         let mut fields = self.0.clone();
 
         let push_field = |fs: &mut Vec<String>, f: &mut String| {
-            if f.len() > 0 {
+            if !f.is_empty() {
                 fs.push(f.clone());
                 f.truncate(0);
             }
@@ -187,10 +186,8 @@ impl FieldCursor {
                 }
             } else {
                 num_conscutive_field_seps = 0;
-                if cid == 1 {
-                    if first_is_field_sep {
-                        fields.truncate(0);
-                    }
+                if cid == 1 && first_is_field_sep {
+                    fields.truncate(0);
                 }
                 field.push(c);
             }
@@ -214,7 +211,7 @@ impl FieldCursor {
     }
 
     pub fn did_you_mean(value: &str, possible_values: &[&str]) -> Option<String> {
-        if value.len() == 0 {
+        if value.is_empty() {
             return None;
         }
 
@@ -224,7 +221,7 @@ impl FieldCursor {
         let mut output = String::new();
 
         let push_field = |fs: &mut String, f: &mut String| {
-            if f.len() > 0 {
+            if !f.is_empty() {
                 fs.push_str(match did_you_mean(&f, possible_values) {
                     Some(candidate) => candidate,
                     None => &f,
@@ -248,7 +245,7 @@ impl FieldCursor {
 
         push_field(&mut output, &mut field);
 
-        if &output == value {
+        if output == value {
             None
         } else {
             Some(output)
@@ -263,7 +260,7 @@ impl FieldCursor {
         err: &mut InvalidOptionsError,
         orig_cursor: &FieldCursor,
     ) {
-        assert!(self.0.len() > 0);
+        assert!(!self.0.is_empty());
 
         for field in &self.0[..self.0.len() - 1] {
             let tmp = object;
@@ -353,7 +350,7 @@ pub fn parse_kv_arg<'a>(
     match kv.find('=') {
         None => {
             add_err();
-            return (kv, None);
+            (kv, None)
         }
         Some(pos) => {
             let key = &kv[..pos];
@@ -598,7 +595,7 @@ impl fmt::Display for CLIError {
                     Some(v) => format!(" Did you mean '{}' ?", v),
                     None => String::new(),
                 };
-                write!(f, "Parameter '{}' is unknown.{}\n", param_name, suffix)
+                writeln!(f, "Parameter '{}' is unknown.{}", param_name, suffix)
             }
             CLIError::InvalidKeyValueSyntax(ref kv, is_hashmap) => {
                 let hashmap_info = if is_hashmap { "hashmap " } else { "" };
@@ -637,7 +634,7 @@ impl InvalidOptionsError {
     pub fn single(err: CLIError, exit_code: i32) -> InvalidOptionsError {
         InvalidOptionsError {
             issues: vec![err],
-            exit_code: exit_code,
+            exit_code,
         }
     }
 
@@ -651,12 +648,12 @@ impl InvalidOptionsError {
 
 pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     let trdir = dir.trim();
-    if trdir.len() == 0 {
+    if trdir.is_empty() {
         return Err(CLIError::Configuration(ConfigurationError::DirectoryUnset));
     }
 
     let expanded_config_dir = if trdir.as_bytes()[0] == b'~' {
-        match env::var("HOME").ok().or(env::var("UserProfile").ok()) {
+        match env::var("HOME").ok().or_else(|| env::var("UserProfile").ok()) {
             None => {
                 return Err(CLIError::Configuration(
                     ConfigurationError::HomeExpansionFailed(trdir.to_string()),
