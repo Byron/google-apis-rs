@@ -2,6 +2,7 @@ use std;
 use std::error;
 use std::fmt::{self, Display};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+use std::iter;
 use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
@@ -808,7 +809,7 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
 
 // Borrowing the body object as mutable and converts it to a string
 pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
-    let res_body_buf = hyper::body::aggregate(res_body).await.unwrap();
-    let res_body_string = String::from_utf8_lossy(res_body_buf.chunk());
+    let res_body_buf = hyper::body::to_bytes(res_body).await.unwrap();
+    let res_body_string = String::from_utf8_lossy(&res_body_buf);
     res_body_string.to_string()
 }
