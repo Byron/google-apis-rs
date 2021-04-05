@@ -653,7 +653,10 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     }
 
     let expanded_config_dir = if trdir.as_bytes()[0] == b'~' {
-        match env::var("HOME").ok().or_else(|| env::var("UserProfile").ok()) {
+        match env::var("HOME")
+            .ok()
+            .or_else(|| env::var("UserProfile").ok())
+        {
             None => {
                 return Err(CLIError::Configuration(
                     ConfigurationError::HomeExpansionFailed(trdir.to_string()),

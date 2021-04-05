@@ -8,10 +8,10 @@ use std::time::Duration;
 
 use itertools::Itertools;
 
+use hyper::body::Buf;
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
-use hyper::body::Buf;
 
 use mime::{Attr, Mime, SubLevel, TopLevel, Value};
 
