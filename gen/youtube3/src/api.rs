@@ -152,7 +152,7 @@ impl<'a, C> YouTube<C>
         YouTube {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            _user_agent: "google-api-rust-client/2.0.2".to_string(),
             _base_url: "https://youtube.googleapis.com/".to_string(),
             _root_url: "https://youtube.googleapis.com/".to_string(),
         }
@@ -247,7 +247,7 @@ impl<'a, C> YouTube<C>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

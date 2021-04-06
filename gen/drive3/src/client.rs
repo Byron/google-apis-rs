@@ -1,6 +1,5 @@
 // COPY OF 'src/rust/api/client.rs'
 // DO NOT EDIT
-use std;
 use std::error;
 use std::fmt::{self, Display};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
@@ -10,18 +9,16 @@ use std::time::Duration;
 
 use itertools::Itertools;
 
-use hyper;
+use hyper::body::Buf;
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
-use hyper::body::Buf;
 
 use mime::{Attr, Mime, SubLevel, TopLevel, Value};
-use oauth2;
 
 use serde_json as json;
 
-const LINE_ENDING: &'static str = "\r\n";
+const LINE_ENDING: &str = "\r\n";
 
 pub enum Retry {
     /// Signal you don't want to retry
@@ -307,9 +304,9 @@ impl Display for Error {
                         err.domain,
                         err.message,
                         err.reason,
-                        match &err.location {
-                            &Some(ref loc) => format!("@{}", loc),
-                            &None => String::new(),
+                        match err.location {
+                            Some(ref loc) => format!("@{}", loc),
+                            None => String::new(),
                         }
                     )?;
                 }
@@ -357,7 +354,7 @@ pub struct MethodInfo {
     pub http_method: Method,
 }
 
-const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
+const BOUNDARY: &str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 
 /// Provides a `Read` interface that converts multiple parts into the protocol
 /// identified by [RFC2387](https://tools.ietf.org/html/rfc2387).
@@ -418,14 +415,14 @@ impl<'a> MultiPartReader<'a> {
 
     /// Returns true if we are totally used
     fn is_depleted(&self) -> bool {
-        self.raw_parts.len() == 0
+        self.raw_parts.is_empty()
             && self.current_part.is_none()
             && self.last_part_boundary.is_none()
     }
 
     /// Returns true if we are handling our last part
     fn is_last_part(&self) -> bool {
-        self.raw_parts.len() == 0 && self.current_part.is_some()
+        self.raw_parts.is_empty() && self.current_part.is_some()
     }
 }
 
@@ -520,12 +517,12 @@ pub struct XUploadContentType(pub Mime);
 
 impl ::std::ops::Deref for XUploadContentType {
     type Target = Mime;
-    fn deref<'a>(&'a self) -> &'a Mime {
+    fn deref(&self) -> &Mime {
         &self.0
     }
 }
 impl ::std::ops::DerefMut for XUploadContentType {
-    fn deref_mut<'a>(&'a mut self) -> &'a mut Mime {
+    fn deref_mut(&mut self) -> &mut Mime {
         &mut self.0
     }
 }
@@ -595,11 +592,11 @@ pub struct RangeResponseHeader(pub Chunk);
 
 impl RangeResponseHeader {
     fn from_bytes(raw: &[u8]) -> Self {
-        if raw.len() > 0 {
+        if !raw.is_empty() {
             if let Ok(s) = std::str::from_utf8(raw) {
-                const PREFIX: &'static str = "bytes ";
-                if s.starts_with(PREFIX) {
-                    if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
+                const PREFIX: &str = "bytes ";
+                if let Some(stripped) = s.strip_prefix(PREFIX) {
+                    if let Ok(c) = <Chunk as FromStr>::from_str(&stripped) {
                         return RangeResponseHeader(c);
                     }
                 }
@@ -810,7 +807,7 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
 
 // Borrowing the body object as mutable and converts it to a string
 pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
-    let res_body_buf = hyper::body::aggregate(res_body).await.unwrap();
-    let res_body_string = String::from_utf8_lossy(res_body_buf.chunk());
+    let res_body_buf = hyper::body::to_bytes(res_body).await.unwrap();
+    let res_body_string = String::from_utf8_lossy(&res_body_buf);
     res_body_string.to_string()
 }

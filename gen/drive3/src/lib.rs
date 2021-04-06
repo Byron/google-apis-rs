@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *2.0.1+20210322*, where *20210322* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.1*.
+//! This documentation was generated from *drive* crate version *2.0.2+20210322*, where *20210322* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.2*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/drive3).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/drive3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](DriveHub) ... 
