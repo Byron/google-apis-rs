@@ -841,11 +841,12 @@ else {
                                 dlg.store_upload_url(Some(url_str));
                             }
 
+                            drop(authenticator);
                             client::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &mut *${auth_call},
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
