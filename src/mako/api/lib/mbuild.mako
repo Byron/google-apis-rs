@@ -451,7 +451,7 @@ match result {
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
     delegate_finish = 'dlg.finished'
-    auth_call = 'self.hub.auth.borrow_mut()'
+    auth_call = 'self.hub.auth'
 
     default_scope = method_default_scope(m)
 
@@ -700,8 +700,7 @@ else {
 
         loop {
             % if default_scope:
-            let authenticator = ${auth_call};
-            let token = match authenticator.token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
+            let token = match ${auth_call}.token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -841,12 +840,11 @@ else {
                                 dlg.store_upload_url(Some(url_str));
                             }
 
-                            drop(authenticator);
                             client::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *${auth_call},
+                                auth: &${auth_call},
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
