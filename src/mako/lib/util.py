@@ -112,7 +112,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-HUB_TYPE_PARAMETERS = ('C',)
+HUB_TYPE_PARAMETERS = ()
 
 def items(p):
     if isinstance(p, dict):
@@ -899,10 +899,6 @@ def _to_type_params_s(p):
 def hub_type_params_s():
     return _to_type_params_s(HUB_TYPE_PARAMETERS)
 
-# return a list of where statements to server as bounds for the hub.
-def hub_type_bounds():
-    return ['C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>>']
-
 # Returns True if this API has particular authentication scopes to choose from
 def supports_scopes(auth):
     return bool(auth) and bool(auth.oauth2)
@@ -921,10 +917,6 @@ def method_default_scope(m):
         # end for each scope
     # end try to find read-only default scope
     return default_scope
-
-# return list of type bounds required by method builder
-def mb_type_bounds():
-    return hub_type_bounds()
 
 _rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
 

@@ -26,7 +26,7 @@ ${lib.docs(c)}
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%
     from util import (new_context, rust_comment, rust_doc_comment, rust_module_doc_comment,
-                      rb_type, hub_type, mangle_ident, hub_type_params_s, hub_type_bounds,
+                      rb_type, hub_type, mangle_ident, hub_type_params_s,
                       rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS, METHODS_RESOURCE,
                       UNUSED_TYPE_MARKER, schema_markers)
 

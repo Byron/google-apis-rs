@@ -6,7 +6,7 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params,
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
+                      hub_type_params_s, method_media_params, enclose_in, method_response,
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
@@ -132,7 +132,7 @@ pub struct ${ThisType}
 
 impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
-impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
+impl${mb_tparams} ${ThisType} {
 % if api.get('no_upload_prefix') is not None and ThisType.startswith(api.no_upload_prefix):
 ${self._action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = True)}\
 % endif
@@ -744,7 +744,7 @@ else {
                     _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                 };
             % endif
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(${method_name_to_variant(m.httpMethod)}).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())\
@@ -792,7 +792,7 @@ else {
                 % endif
 ;
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
 </%block>\
                 % if resumable_media_param:
@@ -833,7 +833,6 @@ else {
                     % if resumable_media_param:
                     if protocol == "${resumable_media_param.protocol}" {
                         ${READER_SEEK | indent_all_but_first_by(6)}
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -841,7 +840,7 @@ else {
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &${auth_call},

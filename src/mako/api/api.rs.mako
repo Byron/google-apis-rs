@@ -5,7 +5,7 @@
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%
     from util import (new_context, rust_comment, rust_doc_comment, rust_module_doc_comment,
-                      rb_type, hub_type, mangle_ident, hub_type_params_s, hub_type_bounds,
+                      rb_type, hub_type, mangle_ident, hub_type_params_s, 
                       rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS, METHODS_RESOURCE,
                       UNUSED_TYPE_MARKER, schema_markers)
 
@@ -17,7 +17,6 @@
 %>\
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -49,7 +48,7 @@ ${lib.scope_enum()}
 ${lib.hub_usage_example(c)}\
 </%block>
 pub struct ${hub_type}${ht_params} {
-    client: RefCell<C>,
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
     auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
@@ -58,12 +57,11 @@ pub struct ${hub_type}${ht_params} {
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_params} {}
 
-impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
-    where  ${', '.join(hub_type_bounds())} {
+impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ${hub_type}${ht_params} {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ${hub_type}${ht_params} {
         ${hub_type} {
-            client: RefCell::new(client),
+            client,
             auth: authenticator,
             _user_agent: "${default_user_agent}".to_string(),
             _base_url: "${baseUrl}".to_string(),
